@@ -7,11 +7,7 @@
  * a link to a specific game and state.
  */
 
-//$root = realpath(dirname($_SERVER['DOCUMENT_ROOT']));
-//$docroot = $root . '/appliednerditry';
 $docroot = getcwd() . '/..';
-$root = $docroot . '/..';
-
 $rooturl = '..';
 
 $headerurl = $docroot.'/header.php';

@@ -3,10 +3,7 @@
  * to gameboard.js
 */
 
-//$root = realpath(dirname($_SERVER['DOCUMENT_ROOT']));
-//$docroot = $root . '/appliednerditry';
 $docroot = getcwd() . '/..';
-$root = $docroot . '/..';
 
 $dir = $docroot . '/chaos/saves/';
 

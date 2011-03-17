@@ -4,10 +4,7 @@
  * Created on: 7 Dec 2010
  */
 
-//$root = realpath(dirname($_SERVER['DOCUMENT_ROOT']));
-//$docroot = $root . '/appliednerditry';
 $docroot = getcwd() . '/..';
-$root = $docroot . '/..';
 
 $dir = $docroot . '/chaos/capture/';
 

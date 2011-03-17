@@ -5,13 +5,10 @@
  * gameboard.js and saves it as a file on the server.
  */
 
-//$root = realpath(dirname($_SERVER['DOCUMENT_ROOT']));
-//$docroot = $root . '/appliednerditry';
 $docroot = getcwd() . '/..';
-$root = $docroot . '/..';
 
 //Set the session path
-session_save_path($root . '/var/php_sessions');
+session_save_path(realpath(dirname($_SERVER['DOCUMENT_ROOT']) . '/../var/php_sessions'));
 //Attempt to resume a session
 session_start();
 $user = $_SESSION['username'];
