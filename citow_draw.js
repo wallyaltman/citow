@@ -1,0 +1,1023 @@
+/* http://appliednerditry.com/chaos/citow_draw.js
+ * This file contains board-drawing functions
+ * for Chaos in the Old World.
+ * Created 13 Dec 2010
+ */
+
+/* Draw an Old World card or a
+ * Chaos card or card slot.
+ */
+function drawCard(x, y, ctx){
+    var card = this;
+    var x1 = x + 7;
+    var y1 = y;
+    ctx.textBaseline = "bottom";
+    //Draw a backdrop so that nothing shows
+    //through the gaps when a card is moved
+    if (card.type == "chaos"){
+        ctx.fillStyle = card.bgcolor2;
+    }
+    else if (card.type == "oldworld"){
+        ctx.fillStyle = "#000000";
+    }
+    ctx.fillRect(x1, y1, 170, 16);
+    ctx.beginPath();
+    ctx.moveTo(x1 + .5, y1 + .65);
+    ctx.bezierCurveTo(x1 - 7, y1 + .65, x1 - 7, y1 + 16.35, x1 + .5, y1 + 16.35);
+    ctx.fill();
+    //Draw the straight-line borders
+    ctx.strokeStyle = "#B0B0B0";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1 + .5);
+    ctx.lineTo(x1 + 170, y1 + .5);
+    ctx.moveTo(x1, y1 + 16.5);
+    ctx.lineTo(x1 + 170, y1 + 16.5);
+    //Draw two left-end cells for
+    //Chaos cards
+    if (card.type == "chaos"){
+        ctx.moveTo(x1 + 6.5, y1);
+        ctx.lineTo(x1 + 6.5, y1 + 16);
+        ctx.moveTo(x1 + 18.5, y1);
+        ctx.lineTo(x1 + 18.5, y1 + 16);
+    }
+    //Draw one left-end cell for
+    //Old World cards
+    else if (card.type == "oldworld"){
+        ctx.moveTo(x1 + 9.5, y1);
+        ctx.lineTo(x1 + 9.5, y1 + 16);
+    }
+    ctx.moveTo(x1 + 169.5, y1);
+    ctx.lineTo(x1 + 169.5, y1 + 16);
+    ctx.stroke();
+    //Draw the curved endcap
+    ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    ctx.moveTo(x1 + .5, y1 + .65);
+    ctx.bezierCurveTo(x1 - 7, y1 + .65, x1 - 7, y1 + 16.35, x1 + .5, y1 + 16.35);
+    ctx.stroke();
+    //Draw the fill for a Chaos card
+    if (card.type == "chaos"){
+        //Check for card data
+        var highlight = !card.placeholder ? card.owner.highlight : null;
+        var shadow = !card.placeholder ? card.owner.shadow : null;
+        //Draw the fill
+        ctx.fillStyle = shadow || card.bgcolor;
+        ctx.fillRect(x1 + 8, y1 + 2, 9, 13);
+        ctx.fillRect(x1 + 20, y1 + 2, 149, 13);
+        ctx.fillRect(x1, y1 + 2, 5, 13);
+    }
+    //Draw the fill for an Old World card
+    else if (card.type == "oldworld"){
+        var color1 = "#B0B0B0";
+        var color2 = "#595959";
+        ctx.fillStyle = "#111111";
+        ctx.fillRect(x1, y1 + 2, 8, 13);
+        ctx.fillRect(x1 + 11, y1 + 2, 158, 13);
+    }
+    ctx.beginPath();
+    ctx.moveTo(x1, y1 + 2);
+    ctx.bezierCurveTo(x1 - 4, y1 + 4, x1 - 4, y1 + 13, x1, y1 + 15);
+    ctx.closePath();
+    ctx.fill();
+    //Write the card info
+    if (!card.placeholder){
+        //Set the card's bounding box
+        card.x0 = x;
+        card.x1 = x + 178;
+        card.y0 = y;
+        card.y1 = y + 17;
+        ctx.font = "12px Tahoma, Helvetica, sans-serif";
+        //Write the Chaos card details
+        if (card.type == "chaos"){
+            ctx.fillStyle = highlight;
+            ctx.fillText(card.cost, x1 - 2, y1 + 15);
+            ctx.fillText(card.name, x1 + 20, y1 + 15);
+            if (card.magic){
+                card.magicIcon.draw(x1 + 8, y1 + 4, ctx);
+            }
+        }
+        //Write the Old World card details
+        else if (card.type == "oldworld"){
+            ctx.fillStyle = (card.active) ? color1 : color2;
+            ctx.fillText(card.name, x1 + 11, y1 + 15);
+            if (card.event){
+                if (card.active){
+                    card.symbol.ctx = ctx;
+                    card.symbol.draw(x1 - 2, y1 + 3, ctx);
+                }
+                else {
+                    card.symbol2.draw(x1 - 2, y1 + 3, ctx);
+                }
+            }
+        }
+    }
+}
+
+/* Draw a cultist, warrior, or daemon figure, and return
+ * the x-coordinate for drawing the next figure.
+ */
+function drawFigure(x0, y0, ctx){
+    var highlight = this.owner.highlight;
+    var shadow = this.owner.shadow;
+    var x1, y1, x2, x3, y3, r1, r2, r3, x4, y4;
+    //Scale the figure
+    if (this.model == "cultist"){
+        r1 = 3.5;
+    }
+    else if (this.model == "warrior"){
+        r1 = 5.5;
+    }
+    else if (this.model == "daemon"){
+        r1 = 7.5;
+    }
+    x1 = x0 + r1 - 0.5;
+    y1 = y0 - (3 * r1);
+    x2 = x0 + (2 * r1);
+    r3 = r1 / 2;
+    x3 = x1 - (r1 - r3) / 2;
+    y3 = y1 - (r1 - r3) / 2;
+    var linGrad, radGrad;
+    //Draw the Soporific Musk effect, if needed
+    if (this.musk){
+        var darkPurple = "#351044";
+        var lightPurple = "#AD20E5";
+        ctx.save();
+        ctx.translate(x1, y1);
+        ctx.scale(1, 1.4);
+        radGrad = ctx.createRadialGradient(0, 2, r1 - 1, 0, -1 * r1 + 1, 2 * (r1 + 1));
+        radGrad.addColorStop(0.01, darkPurple);
+        radGrad.addColorStop(0.15, darkPurple);
+        radGrad.addColorStop(0.42, lightPurple);
+        radGrad.addColorStop(0.65, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = radGrad;
+        ctx.fillRect(-2 * (r1 + 2), -2 * (r1 + 2) + 1, 4 * r1 + 7, 4 * r1 + 7);
+        ctx.restore();
+    }
+    //Draw the body
+    linGrad = ctx.createLinearGradient(x0, y0 - r3, x2, y0);
+    linGrad.addColorStop(0, highlight);
+    linGrad.addColorStop(1, shadow);
+    ctx.fillStyle = linGrad;
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y3);
+    ctx.lineTo(x2, y0);
+    ctx.closePath();
+    ctx.fill();
+    //Draw the head
+    radGrad = ctx.createRadialGradient(x3, y3, r3, x1, y1, r1);
+    radGrad.addColorStop(0.01, highlight);
+    radGrad.addColorStop(0.05, highlight);
+    radGrad.addColorStop(0.95, shadow);
+    radGrad.addColorStop(0.97, "rgba(0, 0, 0, 0)");
+    ctx.fillStyle = radGrad;
+    ctx.fillRect(x0 - 1, y1 - r1 - 2, 2 * (r1 + 1), 2 * (r1 + 2));
+    //Draw the horns, if the figure
+    //is a daemon
+    if (this.model == "daemon"){
+        linGrad = ctx.createLinearGradient(x1, y1 - r1 - 2, x1 + 1, y1 + r1 + 2);
+        linGrad.addColorStop(0, highlight);
+        linGrad.addColorStop(1, shadow);
+        ctx.fillStyle = linGrad;
+        ctx.beginPath();
+        ctx.moveTo(x1 - r1, y1);
+        ctx.bezierCurveTo(x1 - r1 - 3, y1 - 3, x1 - r1 - 2, y1 - 6, x1 - r1 + 2, y1 - r1 - 2);
+        ctx.bezierCurveTo(x1 - r1, y1 - 5, x1 - r1 + 0.5, y1 - 3, x1 - 4.8, y1 - 4.8);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x1 + r1, y1);
+        ctx.bezierCurveTo(x1 + r1 + 3, y1 - 3, x1 + r1 + 2, y1 - 6, x1 + r1 - 2, y1 - r1 - 2);
+        ctx.bezierCurveTo(x1 + r1, y1 - 5, x1 + r1 - 0.5, y1 - 3, x1 + 4.8, y1 - 4.8);
+        ctx.closePath();
+        ctx.fill();
+    }
+    //Draw effects, if needed
+    //Warp Shield
+    if (this.shield){
+        ctx.lineWidth = 1;
+        x4 = Math.floor(x1) - .5;
+        y4 = Math.floor(y0 - (2 * r1)) - .5;
+        linGrad = ctx.createLinearGradient(x4, y4, x4 + 5, y4 + 2);
+        linGrad.addColorStop(0.1, "#0F1C38");
+        linGrad.addColorStop(0.5, "#0065FF");
+        linGrad.addColorStop(0.9, "#0F1C38");
+        ctx.fillStyle = linGrad;
+        ctx.strokeStyle = "#A0A0A0";
+        ctx.beginPath();
+        ctx.moveTo(x4, y4);
+        ctx.lineTo(x4, y4 + 4);
+        ctx.lineTo(x4 + 2.5, y4 + 6);
+        ctx.lineTo(x4 + 5, y4 + 4);
+        ctx.lineTo(x4 + 5, y4);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+    //Nurgle's Leper upgrade
+    if (this.marker){
+        ctx.lineWidth = 1.5;
+        x4 = Math.floor(x1) - 1.5;
+        y4 = Math.floor(y0 - r1 + .5);
+        ctx.strokeStyle = "#202020";
+        ctx.fillStyle = highlight;
+        ctx.beginPath();
+        ctx.arc(x4, y4, 2, 0, 2 * Math.PI, true);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = shadow;
+        ctx.beginPath();
+        ctx.arc(x4, y4, 0.5, 0, 2 * Math.PI, true);
+    }
+    //Store the figure's bounding box
+    this.x0 = x0;
+    this.y0 = Math.floor(y0 - (4 * r1));
+    this.x1 = Math.floor(x2 + 1);
+    this.y1 = y0 + 1;
+    //Return the horizontal position to start
+    //drawing the next figure
+    return x2 + 2;
+}
+
+/* Draw a token at the specified coordinates.
+ */
+function drawToken(x, y, ctx){
+    //Set the image association if
+    //it is not yet set
+    if (!this.icon){
+        this.icon = document.createElement('img');
+        this.icon.src = "../chaos/icons/" + this.name + ".png";
+    }
+    var token = this;
+    //If the image is loaded already, draw
+    //the token
+    if (this.icon.complete){
+        ctx.drawImage(this.icon, x, y);
+        //Store the token's bounding box
+        this.x0 = x;
+        this.y0 = y;
+        this.x1 = x + this.icon.width;
+        this.y1 = y + this.icon.height;
+    }
+    //Otherwise, set an interval that will
+    //draw the token once it is loaded
+    else {
+        var loadTimer = setInterval(function(){
+            if (token.icon.complete){
+                clearInterval(loadTimer);
+                ctx.drawImage(token.icon, x, y);
+                //Store the token's bounding box
+                token.x0 = x;
+                token.y0 = y;
+                token.x1 = x + token.icon.width;
+                token.y1 = y + token.icon.height;
+            }
+        }, 100);
+    }
+}
+
+ /* Draw a subset of the reserve pool
+ * of OldWorld tokens.
+ */
+function drawOldWorldTokens(){
+    var tokens = this.tokens;
+    var ctx = this.ctx;
+    var x, i;
+    var y = this.y0;
+    var width = this.x1 - this.x0;
+    var height = this.y1 - this.y0;
+    ctx.clearRect(this.x0, this.y0, width, height);
+    for (i = 0; i < tokens.length; i++){
+        x = this.x0 + 25 * (i % 7);
+        if (i == 7 || i == 14){
+            y += 25;
+        }
+        tokens[i].draw(x, y, ctx);
+    }
+}
+
+/* Draw the slide-out Old World card
+ * activation selector.
+ */
+function drawOldWorldActive(){
+    var slider = this;
+    var i, toggle;
+    //Clear the previous controls
+    while (slider.childNodes.length > 0){
+        slider.removeChild(slider.lastChild);
+    }
+    //Draw controls for each card
+    for (i = 0; i < this.cards.length; i++){
+        toggle = createToggleSwitch(this.cards[i], this.oldWorld, true);
+        slider.appendChild(toggle);
+    }
+    this.oldWorld.draw(true);
+}
+
+/* Draw a region, with the upper-left corner at the
+ * specified coordinates.
+ */
+function drawRegion(){
+    var ctx = this.ctx;
+    var players = this.players;
+    ctx.textBaseline = "bottom";
+    ctx.strokeStyle = "rgba(172, 49, 16, 1)";
+    ctx.lineWidth = 1;
+    ctx.lineJoin = 'miter';
+    var width = 220;
+    var height = 110;
+    var x = 10 + (this.border.col * (width + 10));
+    var y = 10 + (this.border.row * (height + 10));
+    //Clear the area
+    ctx.fillStyle = "#332211";
+    ctx.fillRect(x, y, width, height);
+    //Draw the outer border
+    ctx.strokeRect(x + .5, y + .5, width, height);
+    //Draw connections to adjacent regions
+    ctx.fillStyle = "rgba(172, 49, 16, 1)";
+    var pos, i;
+    for (i = 0; i < this.links.length; i++){
+        pos = this.links[i];
+        if (pos == "E"){
+            ctx.fillRect(x + width + 1, y + Math.floor(height / 2) - 4, 10, 10);
+        }
+        else if (pos == "NE"){
+            ctx.fillRect(x + width, y + 19, 10, 10);
+        }
+        else if (pos == "SE"){
+            ctx.fillRect(x + width + 1, y + height - 31, 10, 10);
+        }
+        else if (pos == "S"){
+            ctx.fillRect(x + Math.floor(width / 2) - 4, y + height + 1, 10, 10);
+        }
+    }
+    //Check for ruination and set background
+    //colors accordingly
+    var bgcolor, textcolor, bgcolor2, bgPop, textPop;
+    if (this.ruined){
+        bgcolor = "#111111";
+        textcolor = "#606060";
+        bgcolor2 = "#000000";
+        bgPop = "#111111";
+        textPop = "#606060";
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(x + 1, y + 1, width - 1, height - 1);
+    }
+    else {
+        bgcolor = "#553311";
+        textcolor = "#CC7711";
+        bgcolor2 = "#332211";
+        bgPop = "#124445";
+        textPop = "#20CBCB";
+    }
+    //Draw the header box borders
+    ctx.beginPath();
+    ctx.moveTo(x + 1, y + 19.5);
+    ctx.lineTo(x + width, y + 19.5);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x + 19.5, y + 1);
+    ctx.lineTo(x + 19.5, y + 19);
+    ctx.closePath();
+    ctx.stroke();
+    //Fill the header box background
+    ctx.fillStyle = bgcolor;
+    ctx.fillRect(x + 2, y + 2, 16, 16);
+    ctx.fillRect(x + 21, y + 2, width - 22, 16);
+    //Draw the "populated" indicator
+    if (this.populated){
+        ctx.fillStyle = bgcolor2;
+        ctx.fillRect(x + 192, y + 2, 27, 13);
+        ctx.beginPath();
+        ctx.moveTo(x + width - 26.5, y + 1);
+        ctx.lineTo(x + width - 26.5, y + 13.5);
+        ctx.lineTo(x + width + .5, y + 13.5);
+        ctx.stroke();
+        ctx.fillStyle = bgPop;
+        ctx.fillRect(x + width - 25, y + 2, 24, 10);
+        ctx.fillStyle = textPop;
+        ctx.font = "bold 10px Tahoma, Helvetica, sans-serif";
+        ctx.fillText("POP", x + width - 24, y + 13);
+    }
+    //Write the resistance value and region name
+    ctx.fillStyle = textcolor;
+    ctx.font = "17px Tahoma, Helvetica, sans-serif";
+    ctx.fillText(this.resistance, x + 5, y + 20);
+    ctx.font = "15px Tahoma, Helvetica, sans-serif";
+    ctx.fillText(this.name, x + 23, y + 19);
+    //Draw the card slots, and insert the chaos
+    //cards (if any), inserting empty placeholder
+    //cards where needed
+    var cards = this.cards;
+    var blankCard;
+    while (cards.length < 2){
+        blankCard = {
+            placeholder : true,
+            draw : drawCard,
+            type : "chaos"
+        };
+        cards.push(blankCard);
+    }
+    for (i = 0; i < 2; i++){
+        cards[i].bgcolor = bgcolor;
+        cards[i].bgcolor2 = bgcolor2;
+        cards[i].draw(x + 41, y + 22 + (18 * i), ctx);
+    }
+    //Dispose of the placeholder cards
+    while (cards.length > 0 && cards[cards.length - 1].placeholder == true){
+        cards.pop();
+    }
+    //Draw the corruption display
+    ctx.strokeStyle = "#B0B0B0";
+    ctx.lineWidth = 1;
+    //Draw the straight-line borders
+    ctx.beginPath();
+    ctx.moveTo(x + 90, y + 58.5);
+    ctx.lineTo(x + 218, y + 58.5);
+    ctx.moveTo(x + 90, y + 74.5);
+    ctx.lineTo(x + 218, y + 74.5);
+    ctx.moveTo(x + 217.5, y + 58);
+    ctx.lineTo(x + 217.5, y + 75);
+    if (!this.ruined){
+        ctx.moveTo(x + 201.5, y + 58);
+        ctx.lineTo(x + 201.5, y + 75);
+        ctx.moveTo(x + 185.5, y + 58);
+        ctx.lineTo(x + 185.5, y + 75);
+        ctx.moveTo(x + 169.5, y + 58);
+        ctx.lineTo(x + 169.5, y + 75);
+        ctx.moveTo(x + 153.5, y + 58);
+        ctx.lineTo(x + 153.5, y + 75);
+    }
+    ctx.stroke();
+    //Draw the curved endcap
+    ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    ctx.moveTo(x + 90.5, y + 58.65);
+    ctx.bezierCurveTo(x + 84, y + 58.65, x + 84, y + 74.35, x + 90.5, y + 74.35);
+    ctx.stroke();
+    //Fill and write the corruption legend
+    ctx.fillStyle = bgcolor;
+    if (this.ruined){
+        ctx.fillRect(x + 92, y + 60, 125, 13);
+    }
+    else {
+        ctx.fillRect(x + 92, y + 60, 60, 13);
+    }
+    ctx.beginPath();
+    ctx.moveTo(x + 92, y + 60);
+    ctx.bezierCurveTo(x + 86, y + 62, x + 86, y + 71, x + 92, y + 73);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = textcolor;
+    ctx.font = "12px Tahoma, Helvetica, sans-serif";
+    var legend;
+    if (this.ruined){
+        switch (Number(this.ruined)){
+        case 1:
+            legend = "Ruined:1st";
+            break;
+        case 2:
+            legend = "Ruined:2nd";
+            break;
+        case 3:
+            legend = "Ruined:3rd";
+            break;
+        default:
+            legend = "Ruined:" + this.ruined + "th";
+        }
+    }
+    else {
+        legend = "Corruption";
+    }
+    ctx.fillText(legend, x + 90, y + 73);
+    //Fill the corruption counters, set the
+    //click areas, and insert the values
+    var playerName, corruption, highlight, shadow, j;
+    for (i = 0; i < players.length; i++){
+        highlight = players[i].highlight;
+        shadow = players[i].shadow;
+        x1 = x + 155 + (i * 16);
+        y1 = y + 60;
+        for (j = 0; j < this.corruption.length; j++){
+            if (this.corruption[j].owner.name == players[i].name){
+                corruption = this.corruption[j].value;
+                corruption.x0 = x1;
+                corruption.y0 = y1;
+                corruption.x1 = x1 + 14;
+                corruption.y1 = y1 + 14;
+                break;
+            }
+        }
+        if (!this.ruined){
+            ctx.fillStyle = shadow;
+            ctx.fillRect(x1, y1, 13, 13);
+        }
+        ctx.fillStyle = highlight;
+        if (corruption < 10){
+            ctx.fillText(corruption, x1 + 3, y1 + 13);
+        }
+        else {
+            ctx.fillText(corruption, x1 - 1, y1 + 13);
+        }
+    }
+    //Insert the old world tokens, if any
+    var x1, y1;
+    var xArray = [2, 22, 2, 22, 2, 22, 42, 62, 82, 102, 122];
+    var yArray = [21, 21, 41, 41, 61, 61, 61, 61, 61, 61, 61];
+    for (i = 0; i < this.tokens.length; i++){
+        if (i > 10){
+            break;
+        }
+        x1 = x + xArray[i];
+        y1 = y + yArray[i];
+        this.tokens[i].draw(x1, y1, ctx);
+    }
+    //Count the figures of each type to
+    //determine spacing between groups
+    var space = width - 8;
+    for (i = 0; i < this.figures.length; i++){
+        if (this.figures[i].model == "cultist"){
+            space -= 9;
+        }
+        else if (this.figures[i].model == "warrior"){
+            space -= 12;
+        }
+        else {
+            space -= 16;
+        }
+    }
+    space = Math.floor(space / 3);
+    //Draw the figures in the region
+    x1 = x + 5;
+    var figure;
+    for (i = 0; i < players.length; i++){
+        playerName = players[i].name;
+        for (j = 0; j < this.figures.length; j++){
+            figure = this.figures[j];
+            if (playerName == figure.owner.name){
+                x1 = figure.draw(x1, y + height - 1, ctx);
+            }
+        }
+        x1 += space;
+    }
+    //Store the region's bounding box
+    this.x0 = x;
+    this.y0 = y;
+    this.x1 = x + width + 1;
+    this.y1 = y + height + 1;
+}
+
+/* Draw the Old World card track.
+ */
+function drawOldWorld(noslider){
+    var ctx = this.ctx;
+    var x = 24;
+    var y = 29;
+    var x2 = x + 161;
+    var i;
+    var color1 = "#B0B0B0";
+    var color2 = "#595959";
+    var bgcolor1 = "#111111";
+    var bgcolor2 = "#000000";
+    //Draw the outside border and fill
+    //for the title box
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = color1;
+    ctx.fillStyle = bgcolor2;
+    ctx.beginPath();
+    ctx.moveTo(x2 - .5, y - 12.5);
+    ctx.lineTo(x2 - .5, y + .5);
+    ctx.lineTo(x + .5, y + .5);
+    ctx.lineTo(x + .5, y - 12.5);
+    ctx.bezierCurveTo(x + .5, y - 16.5, x + 2.5, y - 18.5, x + 6.5, y - 18.5);
+    ctx.lineTo(x2 - 6.5, y - 18.5);
+    ctx.bezierCurveTo(x2 - 2.5, y - 18.5, x2 - .5, y - 16.5, x2 - .5, y - 12.5);
+    ctx.fill();
+    ctx.stroke();
+    //Redraw the corner curves at a
+    //greater thickness
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(x + .6, y - 12.5);
+    ctx.bezierCurveTo(x + .6, y - 16.5, x + 2.5, y - 18.4, x + 6.5, y - 18.4);
+    ctx.moveTo(x2 - 6.5, y - 18.4);
+    ctx.bezierCurveTo(x2 - 2.5, y - 18.4, x2 - .6, y - 16.5, x2 - .6, y - 12.5);
+    ctx.stroke();
+    //Draw the inset fill for
+    //the title box
+    ctx.fillStyle = bgcolor1;
+    ctx.beginPath();
+    ctx.moveTo(x2 - 2, y - 13);
+    ctx.lineTo(x2 - 2, y + 3);
+    ctx.lineTo(x + 2, y + 3);
+    ctx.lineTo(x + 2, y - 13);
+    ctx.bezierCurveTo(x + 2, y - 15.7, x + 3.3, y - 17, x + 6, y - 17);
+    ctx.lineTo(x2 - 6, y - 17);
+    ctx.bezierCurveTo(x2 - 3.3, y - 17, x2 - 2, y - 15.7, x2 - 2, y - 13);
+    ctx.fill();
+    //Write the title, centered
+    ctx.fillStyle = color1;
+    ctx.font = "15px Tahoma, Helvetica, sans-serif";
+    var len = ctx.measureText("Old World Deck").width;
+    var space = (x2 - x - len) / 2;
+    ctx.fillText("Old World Deck", x + space, y - 1);
+    //Draw the cards
+    var cards = this.cards;
+    var currentCard;
+    for (i = 0; i < 7; i++){
+        if (!this.cards[i]){
+            currentCard = {
+                placeholder : true,
+                draw : drawCard,
+                type : "oldworld"
+            };
+            cards.push(currentCard);
+        }
+        else {
+            currentCard = cards[i];
+        }
+        currentCard.color1 = color1;
+        currentCard.color2 = color2;
+        currentCard.bgcolor1 = bgcolor1;
+        currentCard.bgcolor2 = bgcolor2;
+        currentCard.draw(x - 16, y + (16 * i), ctx);
+    }
+    //Dispose of the placeholder cards
+    while (cards.length > 0 && cards[cards.length - 1].placeholder == true){
+        cards.pop();
+    }
+    //Draw the slide-out selector, unless the
+    //slider itself called the function
+    if (!noslider){
+        this.slider.draw();
+    }
+    //Set the Old World track's bounding box
+    this.x0 = x - 16;
+    this.y0 = y - 19;
+    this.x1 = x2;
+    this.y1 = y + 112;
+}
+
+/* Draw the scoreboard.
+ */
+function drawScoreBoard(){
+    var players = this.players;
+    var ctx = this.ctx;
+    var x = 18;
+    var y = 172;
+    var width = 461 - x;  //not counting left caps
+    var height = 22 * players.length + 1;  //not counting headers
+    //Clear the drawing area;
+    ctx.fillStyle = "#332211";
+    ctx.fillRect(x - 10, y - 20, width + 19, height + 20);
+    var bgcolor = "#553311";
+    var textcolor = "#CC7711";
+    var bordercolor = "#BB7711";
+    var i, j, len, space;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = bordercolor;
+    //Draw the row borders
+    ctx.beginPath();
+    for (i = 0; i <= players.length; i++){
+        ctx.moveTo(x, y + (22 * i) + .5);
+        ctx.lineTo(461, y + (22 * i) + .5);
+    }
+    ctx.moveTo(460.5, y);
+    ctx.lineTo(460.5, y + (22 * players.length) + 1);
+    ctx.stroke();
+    //Draw the endcaps
+    ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    for (i = 0; i < players.length; i++){
+        ctx.moveTo(x, y + (22 * i) + .65);
+        ctx.bezierCurveTo(x - 10, y + (22 * i) + .65, x - 10, y + (22 * (i + 1)) + .35, x, y + (22 * (i + 1)) + .35);
+    }
+    ctx.stroke();
+    var currentPlayer, currentObj, pp, vp, dial, dialCap, dialValue, threat;
+    var peasants, upgrades, dacs;
+    var offset, radGrad;
+    var x1, y1, x2, y2;
+    //This array determines the cell widths:
+    //Name, Peasants, Upgrades, PP, VP, Dial
+    var startX = [71, 65, 69, 22, 23, 211 - x];
+    //Draw and fill the rows and cell dividers
+    ctx.lineWidth = 1;
+    ctx.font = "17px Tahoma, Helvetica, sans-serif";
+    var obj, count;
+    for (i = 0; i < players.length; i++){
+        y1 = y + (22 * i);
+        currentPlayer = players[i];
+        highlight = currentPlayer.highlight;
+        shadow = currentPlayer.shadow;
+        //Player name
+        x1 = x;
+        x2 = x + startX[0];
+        ctx.fillStyle = shadow;
+        ctx.fillRect(x1 + 1, y1 + 2, (x2 - x1 - 4), 19);
+        ctx.beginPath();
+        ctx.moveTo(x1 + 1, y1 + 2);
+        ctx.bezierCurveTo(x1 - 7.4, y1 + 3, x1 - 7.4, y1 + 20, x1 + 1, y1 + 21);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = highlight;
+        ctx.fillText(currentPlayer.name, x1 - 2, y1 + 21);
+        //Peasant tokens
+        peasants = currentPlayer.peasants;
+        x1 = x2;
+        x2 = x2 + startX[1];
+        ctx.beginPath();
+        ctx.moveTo(x1 - 1.5, y1);
+        ctx.lineTo(x1 - 1.5, y1 + 22);
+        ctx.stroke();
+        ctx.fillStyle = shadow;
+        ctx.fillRect(x1, y1 + 2, (x2 - x1 - 3), 19);
+        if (peasants.length < 7){
+            for (j = 0; j < peasants.length; j++){
+                peasants[j].draw(x1 + (8 * j), y1 + 2, ctx);
+            }
+        }
+        else {
+            peasants[0].draw(x1, y1 + 2, ctx);
+            ctx.fillStyle = highlight;
+            ctx.fillText("\u00D7 " + peasants.length, x1 + 22, y1 + 21);
+        }
+        //Upgrades
+        x1 = x2;
+        x2 = x2 + startX[2];
+        ctx.beginPath();
+        ctx.moveTo(x1 - 1.5, y1);
+        ctx.lineTo(x1 - 1.5, y1 + 22);
+        ctx.stroke();
+        ctx.fillStyle = shadow;
+        ctx.fillRect(x1, y1 + 2, (x2 - x1 - 3), 19);
+        upgrades = currentPlayer.upgrades;
+        offset = 0;
+        ctx.fillStyle = highlight;
+        count = 0;
+        for (j = 0; j < upgrades.length; j++){
+            //Draw the appropriate upgrade icon, if
+            //the upgrade is active
+            if (upgrades[j].active){
+                ctx.fillRect(x1 + offset + 1, y1 + 3, 21, 17);
+                upgrades[j].draw(x1 + offset + 1, y1 + 3, ctx);
+                offset += 22;
+                count++;
+            }
+            //Stop drawing upgrades after three
+            if (count >= 3){
+                break;
+            }
+        }
+        //PP
+        x1 = x2;
+        x2 = x2 + startX[3];
+        ctx.beginPath();
+        ctx.moveTo(x1 - 1.5, y1);
+        ctx.lineTo(x1 - 1.5, y1 + 22);
+        ctx.stroke();
+        ctx.fillStyle = shadow;
+        ctx.fillRect(x1, y1 + 2, (x2 - x1 - 3), 19);
+        ctx.fillStyle = highlight;
+        pp = currentPlayer.pp;
+        len = ctx.measureText(pp).width;
+        space = Math.max((x2 - x1 - len) / 2, 2) - 2;
+        ctx.fillText(pp, x1 + space, y1 + 21);
+        //VP
+        x1 = x2;
+        x2 = x2 + startX[4];
+        ctx.beginPath();
+        ctx.moveTo(x1 - 1.5, y1);
+        ctx.lineTo(x1 - 1.5, y1 + 22);
+        ctx.stroke();
+        ctx.fillStyle = shadow;
+        ctx.fillRect(x1, y1 + 2, (x2 - x1 - 3), 19);
+        ctx.fillStyle = highlight;
+        vp = currentPlayer.vp;
+        len = ctx.measureText(vp).width;
+        space = Math.max((x2 - x1 - len) / 2, 2) - 2;
+        ctx.fillText(vp, x1 + space, y1 + 21);
+        //Threat Dial - threat value
+        x1 = x2;
+        x2 = x2 + 22;
+        ctx.beginPath();
+        ctx.moveTo(x1 - 1.5, y1);
+        ctx.lineTo(x1 - 1.5, y1 + 22);
+        ctx.stroke();
+        ctx.fillStyle = shadow;
+        ctx.fillRect(x1, y1 + 2, 19, 19);
+        dialCap = currentPlayer.dialCap;
+        dialValue = Number(currentPlayer.dialValue);
+        threat = (dialValue < dialCap) ? currentPlayer.threat[dialValue] : "\u221E";
+        ctx.fillStyle = highlight;
+        len = ctx.measureText(threat).width;
+        space = Math.max((22 - len) / 2, 2) - 2;
+        ctx.fillText(threat, x1 + space, y1 + 21);
+        //Threat Dial - dial advancement
+        x1 = x2;
+        ctx.beginPath();
+        ctx.moveTo(x1 - 1.5, y1);
+        ctx.lineTo(x1 - 1.5, y1 + 22);
+        ctx.stroke();
+        for (j = 0; j < 10; j++){
+            //Check to see if the dial cap is hit yet
+            if (j < dialCap){
+                ctx.fillStyle = shadow;
+                ctx.fillRect(x2, y1 + 2, 9, 19);
+                //Draw a dial indicator if needed
+                if (j < dialValue){
+                    ctx.save();
+                    ctx.translate(x2, y1);
+                    ctx.scale(0.91, 1.4);
+                    radGrad = ctx.createRadialGradient(4, 6, 2, 5, 8, 6);
+                    radGrad.addColorStop(0.05, highlight);
+                    radGrad.addColorStop(0.95, shadow);
+                    radGrad.addColorStop(0.97, "rgba(0, 0, 0, 0)");
+                    ctx.fillStyle = radGrad;
+                    ctx.fillRect(0, 1, 10, 13);
+                    ctx.restore();
+                }
+                //Draw the right cell border
+                x2 += 12;
+                ctx.beginPath();
+                ctx.moveTo(x2 - 1.5, y1);
+                ctx.lineTo(x2 - 1.5, y1 + 22);
+                ctx.stroke();
+            }
+            else if (j == 9){
+                //Fill the remaining area
+                len = 12 * (10 - dialCap) - 1;
+                ctx.fillStyle = "#000000";
+                ctx.fillRect(x2 - 1, y1 + 1, len, 21);
+                ctx.fillStyle = "#111111";
+                ctx.fillRect(x2, y1 + 2, len - 2, 19);
+                //Draw the right border
+                ctx.beginPath();
+                ctx.moveTo(x2 + len - .5, y1);
+                ctx.lineTo(x2 + len - .5, y1 + 22);
+                ctx.stroke();
+            }
+        }
+        x1 += 120;
+        //Dial Advancement Counters
+        ctx.fillStyle = shadow;
+        ctx.fillRect(x1, y1 + 2, 459 - x1, 19);
+        dacs = currentPlayer.dacs;
+        if (dacs < 6){
+            for (j = 0; j < dacs; j++){
+                obj = {
+                    name : "dac",
+                    draw : drawToken
+                };
+                obj.draw(x1 + (7 * j), y1 + 2, ctx);
+            }
+        }
+        else {
+            obj = {
+                name : "dac",
+                draw : drawToken
+            };
+            obj.draw(x1, y1 + 2, ctx);
+            ctx.fillStyle = highlight;
+            ctx.fillText("\u00D7 " + dacs, x1 + 21, y1 + 21);
+        }
+        //Create a drop zone for peasant tokens
+        var score = this;
+        var scoreDraw = function(){
+            score.draw();
+        };
+        currentPlayer.playerRow = {
+            tokens : currentPlayer.peasants,
+            type : "playerrow",
+            draw : scoreDraw,
+            drop : dropObject,
+            x0 : x,
+            y0 : y1,
+            x1 : 461,
+            y1 : y1 + 22
+        };
+    }
+    //Draw the header row
+    ctx.font = "15px Tahoma, Helvetica, sans-serif";
+    y1 = y;
+    y2 = y - 13.5;
+    x2 = x + startX[0] - 1.5;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x2, y1);
+    ctx.lineTo(x2, y2 - .35);
+    ctx.stroke();
+    var headers = ["Peasants", "Upgrades", "PP", "VP", "Threat Dials and Tokens"];
+    for (i = 0; i < 5; i++){
+        //Set the current boundaries
+        x1 = x2;
+        x2 = (i == 4) ? 460.5 : x2 + startX[i + 1];
+        //Draw the border
+        ctx.lineWidth = 1.3;
+        ctx.beginPath();
+        ctx.moveTo(x1 + .15, y2);
+        ctx.bezierCurveTo(x1 + .15, y2 - 4, x1 + 2, y2 - 5.85, x1 + 6, y2 - 5.85);
+        ctx.moveTo(x2 - 6, y2 - 5.85);
+        ctx.bezierCurveTo(x2 - 2, y2 - 5.85, x2 - .15, y2 - 4, x2 - .15, y2);
+        ctx.stroke();
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x1 + 5.65, y2 - 6);
+        ctx.lineTo(x2 - 5.65, y2 - 6);
+        ctx.moveTo(x2, y2 - .35);
+        ctx.lineTo(x2, y1);
+        ctx.stroke();
+        //Draw the fill
+        ctx.fillStyle = bgcolor;
+        ctx.beginPath();
+        ctx.moveTo(x1 + 1.5, y1 - 1);
+        ctx.lineTo(x1 + 1.5, y2);
+        ctx.bezierCurveTo(x1 + 1.5, y2 - 2.4, x1 + 3.6, y2 - 4.5, x1 + 6, y2 - 4.5);
+        ctx.lineTo(x2 - 6, y2 - 4.5);
+        ctx.bezierCurveTo(x2 - 3.6, y2 - 4.5, x2 - 1.5, y2 - 2.4, x2 - 1.5, y2);
+        ctx.lineTo(x2 - 1.5, y1 - 1);
+        ctx.closePath();
+        ctx.fill();
+        //Write the text
+        len = ctx.measureText(headers[i]).width;
+        space = Math.max((x2 - x1 - len) / 2, 1) - 1;
+        ctx.fillStyle = textcolor;
+        ctx.fillText(headers[i], x1 + space, y - 1);
+    }
+}
+
+/* Draw a player's reserve area
+ */
+function drawReserves(){
+    var numPlayers = this.map.players.length;
+    var width = Math.min((460 / numPlayers) - 10, 76);
+    var x0 = 10 + (width + 10) * this.idNum;
+    var y0 = 550;
+    var height = 50;
+    var bordercolor = "#BB7711";
+    var shadow = this.shadow;
+    var ctx = this.ctx;
+    var i, j, figure, x1, y1, x2, y2;
+    //Clear the area
+    ctx.clearRect(x0, y0, width, height);
+    //Draw the fill
+    ctx.fillStyle = shadow;
+    ctx.fillRect(x0 + 2, y0 + 2, width - 3, height - 3);
+    ctx.save();
+    ctx.fillStyle = "rgba(17, 17, 17, 0.6)";
+    ctx.fillRect(x0 + 1, y0 + 1, width - 1, height - 1);
+    ctx.restore();
+    //Draw the border
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = bordercolor;
+    ctx.beginPath();
+    ctx.moveTo(x0, y0 + .5);
+    ctx.lineTo(x0 + width + 1, y0 + .5);
+    ctx.moveTo(x0, y0 + height + .5);
+    ctx.lineTo(x0 + width + 1, y0 + height + .5);
+    ctx.moveTo(x0 + .5, y0);
+    ctx.lineTo(x0 + .5, y0 + height + 1);
+    ctx.moveTo(x0 + width + .5, y0);
+    ctx.lineTo(x0 + width + .5, y0 + height + 1);
+    ctx.stroke();
+    //Classify the figures
+    var cultists = this.cultists;
+    var warriors = this.warriors;
+    var daemons = this.daemons;
+    //Draw cultists in the top row
+    x1 = x0 + 4;
+    y1 = y0 + 16;
+    for (i = 0; i < cultists.length; i++){
+        x1 = cultists[i].draw(x1, y1, ctx);
+    }
+    //Draw daemon(s) in the bottom row
+    x2 = x0 + 5;
+    y2 = y0 + height - 2;
+    for (i = 0; i < daemons.length; i++){
+        x2 = daemons[i].draw(x2, y2, ctx);
+    }
+    //Draw warriors from right to left in the bottom
+    //row, then the top row (if necessary)
+    var x3;
+    for (i = 0; i < warriors.length; i++){
+        x3 = x0 + width - 13 * (i + 1);
+        if (x3 - 1 < x2){
+            break;
+        }
+        warriors[i].draw(x3, y2, ctx);
+    }
+    if (i < warriors.length){
+        var diff = warriors.length - i;
+        y1 = y0 + 23; //Height of a warrior + 1 (or so)
+        for (j = 0; j < diff; j++){
+            x3 = x0 + width - 13 * (j + 1);
+            warriors[i].draw(x3, y1, ctx);
+        }
+    }
+    //Set the reserve area's bounding box
+    this.x0 = x0;
+    this.y0 = y0;
+    this.x1 = x0 + width + 1;
+    this.y1 = y0 + height + 1;
+}

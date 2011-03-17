@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<boardstate creator="testplayer">
+  <oldworld>
+    <card>The Crusade is Come</card>
+  </oldworld>
+  <scoreboard>
+    <player name="Khorne">
+      <tokens/>
+      <upgrades/>
+      <pp>4</pp>
+      <vp>0</vp>
+      <dial cap="9">
+        <value>0</value>
+        <dac>0</dac>
+      </dial>
+    </player>
+    <player name="Nurgle">
+      <tokens>
+        <peasant/>
+        <peasant/>
+        <peasant/>
+      </tokens>
+      <upgrades>
+        <warrior/>
+      </upgrades>
+      <pp>3</pp>
+      <vp>0</vp>
+      <dial cap="10">
+        <value>0</value>
+        <dac>1</dac>
+      </dial>
+    </player>
+    <player name="Tzeentch">
+      <tokens/>
+      <upgrades>
+        <cultist/>
+        <pp1/>
+      </upgrades>
+      <pp>5</pp>
+      <vp>0</vp>
+      <dial cap="8">
+        <value>0</value>
+        <dac>5</dac>
+      </dial>
+    </player>
+    <player name="Slaanesh">
+      <tokens>
+        <peasant/>
+        <peasant/>
+      </tokens>
+      <upgrades>
+        <daemon/>
+        <pp1/>
+        <pp2/>
+      </upgrades>
+      <pp>3</pp>
+      <vp>15</vp>
+      <dial cap="7">
+        <value>0</value>
+        <dac>2</dac>
+      </dial>
+    </player>
+  </scoreboard>
+  <map>
+    <region name="Norsca">
+      <tokens>
+        <warpstone/>
+        <peasant/>
+      </tokens>
+      <chaos/>
+      <figures>
+        <cultist owner="Slaanesh"/>
+      </figures>
+    </region>
+    <region name="Troll Country">
+      <tokens>
+        <noble/>
+      </tokens>
+      <chaos>
+        <card cost="1" owner="Slaanesh" magic="true">Dark Influence</card>
+      </chaos>
+      <figures/>
+    </region>
+    <region name="Kislev">
+      <tokens>
+        <peasant/>
+      </tokens>
+      <chaos/>
+      <figures>
+        <cultist owner="Khorne"/>
+        <cultist owner="Khorne"/>
+      </figures>
+    </region>
+    <region name="The Empire">
+      <tokens>
+        <peasant/>
+        <hero/>
+      </tokens>
+      <chaos/>
+      <figures>
+        <cultist owner="Khorne"/>
+        <daemon owner="Slaanesh"/>
+      </figures>
+    </region>
+    <region name="Bretonnia">
+      <tokens>
+        <warpstone/>
+        <noble/>
+      </tokens>
+      <chaos>
+        <card cost="1" owner="Tzeentch" magic="true">Temporal Stasis</card>
+      </chaos>
+      <corruption owner="Nurgle">4</corruption>
+      <figures>
+        <cultist owner="Nurgle"/>
+        <daemon owner="Nurgle"/>
+      </figures>
+    </region>
+    <region name="Estalia">
+      <tokens>
+        <noble/>
+        <hero/>
+      </tokens>
+      <chaos/>
+      <figures>
+        <cultist owner="Nurgle"/>
+        <cultist owner="Nurgle"/>
+        <daemon owner="Khorne"/>
+        <warrior owner="Nurgle"/>
+      </figures>
+    </region>
+    <region name="Tilea">
+      <tokens>
+        <peasant/>
+        <noble/>
+      </tokens>
+      <chaos/>
+      <figures/>
+    </region>
+    <region name="The Border Princes">
+      <tokens>
+        <peasant/>
+      </tokens>
+      <chaos>
+        <card cost="0" owner="Tzeentch">Drain Power</card>
+        <card cost="1" owner="Tzeentch">Teleport</card>
+      </chaos>
+      <corruption owner="Slaanesh">5</corruption>
+      <figures/>
+    </region>
+    <region name="The Badlands">
+      <tokens>
+        <warpstone/>
+        <peasant/>
+      </tokens>
+      <chaos/>
+      <figures/>
+    </region>
+  </map>
+</boardstate>

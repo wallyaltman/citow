@@ -1,0 +1,82 @@
+[04-Jan-2011 10:59:15] PHP Fatal error:  Call to undefined function fileexist() in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 44
+[04-Jan-2011 11:01:46] PHP Fatal error:  Call to undefined function fileexist() in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 44
+[04-Jan-2011 11:02:04] PHP Fatal error:  Call to undefined function fileexist() in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 44
+[04-Jan-2011 11:02:17] PHP Fatal error:  Call to undefined function fileexist() in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 44
+[04-Jan-2011 11:03:28] PHP Warning:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]: ./savesgame0028state02:2: parser error : AttValue: &quot; or ' expected in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 75
+[04-Jan-2011 11:03:28] PHP Warning:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]: &lt;boardstate creator=\&quot;FunkyWaltDogg\&quot;&gt;&lt;oldworld&gt;&lt;card active=\&quot;true\&quot;&gt;Warpstone  in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 75
+[04-Jan-2011 11:03:28] PHP Warning:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]:                     ^ in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 75
+[04-Jan-2011 11:03:28] PHP Warning:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]: ./savesgame0028state02:2: parser error : attributes construct error in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 75
+[04-Jan-2011 11:03:28] PHP Warning:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]: &lt;boardstate creator=\&quot;FunkyWaltDogg\&quot;&gt;&lt;oldworld&gt;&lt;card active=\&quot;true\&quot;&gt;Warpstone  in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 75
+[04-Jan-2011 11:03:28] PHP Warning:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]:                     ^ in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 75
+[04-Jan-2011 11:03:28] PHP Warning:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]: ./savesgame0028state02:2: parser error : Couldn't find end of Start Tag boardstate line 2 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 75
+[04-Jan-2011 11:03:28] PHP Warning:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]: &lt;boardstate creator=\&quot;FunkyWaltDogg\&quot;&gt;&lt;oldworld&gt;&lt;card active=\&quot;true\&quot;&gt;Warpstone  in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 75
+[04-Jan-2011 11:03:28] PHP Warning:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]:                     ^ in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 75
+[04-Jan-2011 11:03:28] PHP Warning:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]: ./savesgame0028state02:2: parser error : Extra content at the end of the document in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 75
+[04-Jan-2011 11:03:28] PHP Warning:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]: &lt;boardstate creator=\&quot;FunkyWaltDogg\&quot;&gt;&lt;oldworld&gt;&lt;card active=\&quot;true\&quot;&gt;Warpstone  in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 75
+[04-Jan-2011 11:03:28] PHP Warning:  simplexml_load_file() [<a href='function.simplexml-load-file'>function.simplexml-load-file</a>]:                     ^ in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 75
+[04-Jan-2011 12:38:29] PHP Parse error:  syntax error, unexpected '{' in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/header.php on line 17
+[04-Jan-2011 12:42:46] PHP Warning:  include(./stealthlogin.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/header.php on line 18
+[04-Jan-2011 12:42:46] PHP Warning:  include() [<a href='function.include'>function.include</a>]: Failed opening './stealthlogin.php' for inclusion (include_path='.:/usr/local/lib/php-5.2.12/lib/php') in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/header.php on line 18
+[04-Jan-2011 12:47:32] PHP Parse error:  syntax error, unexpected ';' in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/header.php on line 18
+[04-Jan-2011 12:49:12] PHP Warning:  include(/home/users/web/b722/stealthlogin.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/header.php on line 18
+[04-Jan-2011 12:49:12] PHP Warning:  include() [<a href='function.include'>function.include</a>]: Failed opening '/home/users/web/b722/stealthlogin.php' for inclusion (include_path='.:/usr/local/lib/php-5.2.12/lib/php') in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/header.php on line 18
+[04-Jan-2011 12:51:41] PHP Warning:  include(/hermes/bosweb/web072/b722/stealthlogin.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/header.php on line 18
+[04-Jan-2011 12:51:41] PHP Warning:  include() [<a href='function.include'>function.include</a>]: Failed opening '/hermes/bosweb/web072/b722/stealthlogin.php' for inclusion (include_path='.:/usr/local/lib/php-5.2.12/lib/php') in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/header.php on line 18
+[04-Jan-2011 12:51:48] PHP Warning:  include(/hermes/bosweb/web072/b722/stealthlogin.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/header.php on line 18
+[04-Jan-2011 12:51:48] PHP Warning:  include() [<a href='function.include'>function.include</a>]: Failed opening '/hermes/bosweb/web072/b722/stealthlogin.php' for inclusion (include_path='.:/usr/local/lib/php-5.2.12/lib/php') in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/header.php on line 18
+[06-Jan-2011 00:12:46] PHP Warning:  XMLReader::readString() [<a href='xmlreader.readstring'>xmlreader.readstring</a>]: Unimplemented block at xmlreader.c:1754 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 60
+[06-Jan-2011 15:40:15] PHP Warning:  XMLReader::readString() [<a href='xmlreader.readstring'>xmlreader.readstring</a>]: Unimplemented block at xmlreader.c:1754 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 60
+[06-Jan-2011 15:40:28] PHP Warning:  XMLReader::readString() [<a href='xmlreader.readstring'>xmlreader.readstring</a>]: Unimplemented block at xmlreader.c:1754 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 60
+[06-Jan-2011 15:41:43] PHP Warning:  XMLReader::readString() [<a href='xmlreader.readstring'>xmlreader.readstring</a>]: Unimplemented block at xmlreader.c:1754 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 60
+[06-Jan-2011 15:43:51] PHP Warning:  XMLReader::readString() [<a href='xmlreader.readstring'>xmlreader.readstring</a>]: Unimplemented block at xmlreader.c:1754 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 60
+[06-Jan-2011 15:45:51] PHP Warning:  XMLReader::readString() [<a href='xmlreader.readstring'>xmlreader.readstring</a>]: Unimplemented block at xmlreader.c:1754 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 60
+[06-Jan-2011 15:46:34] PHP Warning:  XMLReader::readString() [<a href='xmlreader.readstring'>xmlreader.readstring</a>]: Unimplemented block at xmlreader.c:1754 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 60
+[06-Jan-2011 15:46:43] PHP Warning:  XMLReader::readString() [<a href='xmlreader.readstring'>xmlreader.readstring</a>]: Unimplemented block at xmlreader.c:1754 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 60
+[06-Jan-2011 15:46:51] PHP Warning:  XMLReader::readString() [<a href='xmlreader.readstring'>xmlreader.readstring</a>]: Unimplemented block at xmlreader.c:1754 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 60
+[06-Jan-2011 15:47:46] PHP Warning:  XMLReader::readString() [<a href='xmlreader.readstring'>xmlreader.readstring</a>]: Unimplemented block at xmlreader.c:1754 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 60
+[06-Jan-2011 15:48:10] PHP Warning:  XMLReader::readString() [<a href='xmlreader.readstring'>xmlreader.readstring</a>]: Unimplemented block at xmlreader.c:1754 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 60
+[18-Feb-2011 10:37:51] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: Entity: line 1: parser error : Start tag expected, '&lt;' not found in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 7
+[18-Feb-2011 10:37:51] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: 2197 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 7
+[18-Feb-2011 10:37:51] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: ^ in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 7
+[18-Feb-2011 10:37:51] PHP Fatal error:  Uncaught exception 'Exception' with message 'String could not be parsed as XML' in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php:7
+Stack trace:
+#0 /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php(7): SimpleXMLElement->__construct('2197')
+#1 /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php(41): xmlpp(2197, true)
+#2 {main}
+  thrown in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 7
+[18-Feb-2011 10:38:59] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: Entity: line 1: parser error : Start tag expected, '&lt;' not found in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 7
+[18-Feb-2011 10:38:59] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: 2197 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 7
+[18-Feb-2011 10:38:59] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: ^ in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 7
+[18-Feb-2011 10:38:59] PHP Fatal error:  Uncaught exception 'Exception' with message 'String could not be parsed as XML' in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php:7
+Stack trace:
+#0 /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php(7): SimpleXMLElement->__construct('2197')
+#1 /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php(41): xmlpp(2197, false)
+#2 {main}
+  thrown in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 7
+[18-Feb-2011 10:39:01] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: Entity: line 1: parser error : Start tag expected, '&lt;' not found in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 7
+[18-Feb-2011 10:39:01] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: 2197 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 7
+[18-Feb-2011 10:39:01] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: ^ in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 7
+[18-Feb-2011 10:39:01] PHP Fatal error:  Uncaught exception 'Exception' with message 'String could not be parsed as XML' in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php:7
+Stack trace:
+#0 /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php(7): SimpleXMLElement->__construct('2197')
+#1 /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php(41): xmlpp(2197, false)
+#2 {main}
+  thrown in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 7
+[18-Feb-2011 10:41:21] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: Entity: line 1: parser error : Start tag expected, '&lt;' not found in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 14
+[18-Feb-2011 10:41:21] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: 2197 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 14
+[18-Feb-2011 10:41:21] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: ^ in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 14
+[18-Feb-2011 10:41:21] PHP Fatal error:  Uncaught exception 'Exception' with message 'String could not be parsed as XML' in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php:14
+Stack trace:
+#0 /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php(14): SimpleXMLElement->__construct('2197')
+#1 /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php(48): xmlpp(2197, true)
+#2 {main}
+  thrown in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 14
+[18-Feb-2011 10:54:18] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: Entity: line 1: parser error : Start tag expected, '&lt;' not found in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 14
+[18-Feb-2011 10:54:18] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: 2197 in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 14
+[18-Feb-2011 10:54:18] PHP Warning:  SimpleXMLElement::__construct() [<a href='simplexmlelement.--construct'>simplexmlelement.--construct</a>]: ^ in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 14
+[18-Feb-2011 10:54:18] PHP Fatal error:  Uncaught exception 'Exception' with message 'String could not be parsed as XML' in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php:14
+Stack trace:
+#0 /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php(14): SimpleXMLElement->__construct('2197')
+#1 /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php(48): xmlpp(2197, true)
+#2 {main}
+  thrown in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/prettytest.php on line 14

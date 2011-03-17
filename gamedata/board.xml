@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<gameboard>
+  <tokens>
+    <event>6</event>
+    <hero>4</hero>
+    <noble>6</noble>
+    <peasant>20</peasant>
+    <skaven>6</skaven>
+    <warpstone>14</warpstone>
+  </tokens>
+  <powers>
+    <player id="0" highlight="#DD1111" shadow="#3A0A0A">
+      <name>Khorne</name>
+      <dial cap="9">3,6,12,14,17,23,28,31,32</dial>
+      <figures>
+        <cultists>4</cultists>
+        <warriors>6</warriors>
+        <daemons>1</daemons>
+      </figures>
+      <pp>7</pp>
+      <upgrades>
+        <cultist />
+        <warrior />
+        <daemon />
+        <pp1 pp="1" />
+        <cards />
+      </upgrades>    
+    </player>
+    <player id="1" highlight="#339911" shadow="#112C08">
+      <name>Nurgle</name>
+      <dial cap="10">1,5,10,13,18,22,26,30,33,34</dial>
+      <figures>
+        <cultists>6</cultists>
+        <warriors>5</warriors>
+        <daemons>1</daemons>
+      </figures>
+      <pp>6</pp>
+      <upgrades>
+        <cultist />
+        <warrior />
+        <daemon />
+        <pp1 pp="1" />
+        <provender />
+      </upgrades>
+    </player>
+    <player id="2" highlight="#2255DD" shadow="#0D1A3D">
+      <name>Tzeentch</name>
+      <dial cap="8">2,7,9,15,20,21,25,29</dial>
+      <figures>
+        <cultists>8</cultists>
+        <warriors>3</warriors>
+        <daemons>1</daemons>
+      </figures>
+      <pp>6</pp>
+      <upgrades>
+        <cultist />
+        <warrior />
+        <daemon />
+        <pp1 pp="1" />
+        <cards />        
+      </upgrades>
+    </player>
+    <player id="3" highlight="#9922CC" shadow="#2D0D3B">
+      <name>Slaanesh</name>    
+      <dial cap="7">4,8,11,16,19,24,27</dial>
+      <figures>
+        <cultists>6</cultists>
+        <warriors>3</warriors>
+        <daemons>1</daemons>
+      </figures>
+      <pp>6</pp>
+      <upgrades>
+        <cultist />
+        <warrior />
+        <daemon />
+        <pp1 pp="1" />
+        <pp2 pp="2" />
+      </upgrades>
+    </player>
+  </powers>
+  <map>
+    <region id="0">
+      <name>Norsca</name>
+      <border row="0" col="1">
+        <link>E</link>
+      </border>
+      <resistance>1</resistance>
+    </region>
+    <region id="1">
+      <name>Troll Country</name>
+      <border row="0" col="2">
+        <link>W</link>
+        <link>S</link>
+      </border>
+      <resistance>1</resistance>
+    </region>
+    <region id="2" populated="true">
+      <name>Kislev</name>
+      <border row="1" col="2">
+        <link>N</link>
+        <link>S</link>
+      </border>
+      <resistance>3</resistance>
+    </region>
+    <region id="3" populated="true">
+      <name>The Empire</name>
+      <border row="2" col="2">
+        <link>N</link>
+        <link>S</link>
+        <link>SW</link>
+      </border>
+      <resistance>5</resistance>
+    </region>
+    <region id="4" populated="true">
+      <name>Bretonnia</name>
+      <border row="2.5" col="1">
+        <link>NE</link>
+        <link>SE</link>
+        <link>S</link>
+        <link>SW</link>
+      </border>
+      <resistance>3</resistance>
+    </region>
+    <region id="5" populated="true">
+      <name>Estalia</name>
+      <border row="3" col="0">
+        <link>NE</link>
+        <link>SE</link>
+      </border>
+      <resistance>4</resistance>
+    </region>
+    <region id="6">
+      <name>Tilea</name>
+      <border row="3.5" col="1">
+        <link>NE</link>
+        <link>NW</link>
+        <link>N</link>
+      </border>
+      <resistance>2</resistance>
+    </region>
+    <region id="7">
+      <name>The Border Princes</name>
+      <border row="3" col="2">
+        <link>N</link>
+        <link>S</link>
+        <link>SW</link>
+        <link>NW</link>
+      </border>
+      <resistance>1</resistance>
+    </region>
+    <region id="8">
+      <name>The Badlands</name>
+      <border row="4" col="2">
+        <link>N</link>
+      </border>
+      <resistance>1</resistance>
+    </region>
+  </map>
+</gameboard>

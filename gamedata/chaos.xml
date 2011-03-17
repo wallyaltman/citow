@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<chaoscards>
+  <card owner="Khorne" cost="0">Blood Frenzy</card>
+  <card owner="Khorne" cost="1">Battle Cry</card>
+  <card owner="Khorne" cost="1">Field of Carnage</card>
+  <card owner="Khorne" cost="1">Ritual Slaying</card>
+  <card owner="Khorne" cost="1">The Skull Throne</card>
+  <card owner="Khorne" cost="2">Reborn In Blood</card>
+  <card owner="Khorne" cost="2">The Blood God's Call</card>
+  <card owner="Nurgle" cost="0" magic="true">Plague Aura</card>
+  <card owner="Nurgle" cost="0">Plague Touch</card>
+  <card owner="Nurgle" cost="1">All Things Decay</card>
+  <card owner="Nurgle" cost="1">Influenza</card>
+  <card owner="Nurgle" cost="1">Rain of Pus</card>
+  <card owner="Nurgle" cost="2">A Great Foul Consumption</card>
+  <card owner="Nurgle" cost="2">The Final Rotting</card>
+  <card owner="Nurgle" cost="3" magic="true">The Stench of Death</card>
+  <card owner="Tzeentch" cost="0" magic="true">Changer of Ways</card>
+  <card owner="Tzeentch" cost="0">Drain Power</card>
+  <card owner="Tzeentch" cost="0">Warp Shield</card>
+  <card owner="Tzeentch" cost="1">Teleport</card>
+  <card owner="Tzeentch" cost="1" magic="true">Temporal Stasis</card>
+  <card owner="Tzeentch" cost="1">The Meddling of Skaven</card>
+  <card owner="Tzeentch" cost="1" magic="true">The Persistence of Change</card>
+  <card owner="Tzeentch" cost="2" magic="true">Dazzle</card>
+  <card owner="Tzeentch" cost="-">--------------Horror--------------</card>
+  <card owner="Slaanesh" cost="0" magic="true">Abyssal Pact</card>
+  <card owner="Slaanesh" cost="0">Perverse Infiltration</card>
+  <card owner="Slaanesh" cost="1" magic="true">Dark Influence</card>
+  <card owner="Slaanesh" cost="1">Insidious Lies</card>
+  <card owner="Slaanesh" cost="2">Field of Ecstasy</card>
+  <card owner="Slaanesh" cost="2" magic="true">Soporific Musk</card>
+  <card owner="Slaanesh" cost="3">Degenerate Royalty</card>
+</chaoscards>

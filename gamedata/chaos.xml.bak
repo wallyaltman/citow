@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<chaoscards>
+  <card>
+    <name>Blood Frenzy</name>
+    <owner>Khorne</owner>
+    <cost>0</cost>
+  </card>
+  <card>
+    <name>Battle Cry</name>
+    <owner>Khorne</owner>
+    <cost>1</cost>
+  </card>
+  <card>
+    <name>Field of Carnage</name>
+    <owner>Khorne</owner>
+    <cost>1</cost>
+  </card>
+  <card>
+    <name>Ritual Slaying</name>
+    <owner>Khorne</owner>
+    <cost>1</cost>
+  </card>
+  <card>
+    <name>The Skull Throne</name>
+    <owner>Khorne</owner>
+    <cost>1</cost>
+  </card>
+  <card>
+    <name>Reborn In Blood</name>
+    <owner>Khorne</owner>
+    <cost>2</cost>
+  </card>
+  <card>
+    <name>The Blood God's Call</name>
+    <owner>Khorne</owner>
+    <cost>2</cost>
+  </card>
+  <card magic="true">
+    <name>Plague Aura</name>
+    <owner>Nurgle</owner>
+    <cost>0</cost>
+  </card>
+  <card>
+    <name>Plague Touch</name>
+    <owner>Nurgle</owner>
+    <cost>0</cost>
+  </card>
+  <card>
+    <name>All Things Decay</name>
+    <owner>Nurgle</owner>
+    <cost>1</cost>
+  </card>
+  <card>
+    <name>Influenza</name>
+    <owner>Nurgle</owner>
+    <cost>1</cost>
+  </card>
+  <card>
+    <name>Rain of Pus</name>
+    <owner>Nurgle</owner>
+    <cost>1</cost>
+  </card>
+  <card>
+    <name>A Great Foul Consumption</name>
+    <owner>Nurgle</owner>
+    <cost>2</cost>
+  </card>
+  <card>
+    <name>The Final Rotting</name>
+    <owner>Nurgle</owner>
+    <cost>2</cost>
+  </card>
+  <card magic="true">
+    <name>The Stench of Death</name>
+    <owner>Nurgle</owner>
+    <cost>3</cost>
+  </card>
+  <card magic="true">
+    <name>Changer of Ways</name>
+    <owner>Tzeentch</owner>
+    <cost>0</cost>
+  </card>
+  <card>
+    <name>Drain Power</name>
+    <owner>Tzeentch</owner>
+    <cost>0</cost>
+  </card>
+  <card>
+    <name>Warp Shield</name>
+    <owner>Tzeentch</owner>
+    <cost>0</cost>
+  </card>
+  <card>
+    <name>Teleport</name>
+    <owner>Tzeentch</owner>
+    <cost>1</cost>
+  </card>
+  <card magic="true">
+    <name>Temporal Stasis</name>
+    <owner>Tzeentch</owner>
+    <cost>1</cost>
+  </card>
+  <card>
+    <name>The Meddling of Skaven</name>
+    <owner>Tzeentch</owner>
+    <cost>1</cost>
+  </card>
+  <card magic="true">
+    <name>The Persistence of Change</name>
+    <owner>Tzeentch</owner>
+    <cost>1</cost>
+  </card>
+  <card magic="true">
+    <name>Dazzle</name>
+    <owner>Tzeentch</owner>
+    <cost>2</cost>
+  </card>
+  <card magic="true">
+    <name>Abyssal Pact</name>
+    <owner>Slaanesh</owner>
+    <cost>0</cost>
+  </card>
+  <card>
+    <name>Perverse Infiltration</name>
+    <owner>Slaanesh</owner>
+    <cost>0</cost>
+  </card>
+  <card magic="true">
+    <name>Dark Influence</name>
+    <owner>Slaanesh</owner>
+    <cost>1</cost>
+  </card>
+  <card>
+    <name>Insidious Lies</name>
+    <owner>Slaanesh</owner>
+    <cost>1</cost>
+  </card>
+  <card>
+    <name>Field of Ecstasy</name>
+    <owner>Slaanesh</owner>
+    <cost>2</cost>
+  </card>
+  <card magic="true">
+    <name>Soporific Musk</name>
+    <owner>Slaanesh</owner>
+    <cost>2</cost>
+  </card>
+  <card>
+    <name>Degenerate Royalty</name>
+    <owner>Slaanesh</owner>
+    <cost>3</cost>
+  </card>
+</chaoscards>

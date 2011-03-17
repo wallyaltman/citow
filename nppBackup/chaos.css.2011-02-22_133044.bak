@@ -1,0 +1,487 @@
+html {
+  background-color:#737980;
+  color:#000000;
+  font-size:.75em;
+  font-family:Tahoma,'Trebuchet MS',Helvetica,'sans-serif';
+  line-height:1.2;
+}
+
+h2 {
+  background-color:#774415;
+  border:2px outset #452811;
+  color:#CC7711;
+  cursor:url(../graphics/cursors/pointer_ds.cur) 12 6, default;
+  display:block;
+  font-size:1.375em;
+  height:21px;
+  width:176px;
+}
+
+h2.down {
+  background-color:#322311;
+  border:2px inset #452811;
+}
+
+canvas#board {
+  background-color:#202020;
+  border:4px ridge #EF2308;
+  cursor:url(../graphics/cursors/crosshair.cur) 15 15, default;
+  font-smooth:never;
+  position:relative;
+  z-index:4;
+}
+canvas.card {
+  margin-top:-1px;
+}
+canvas.drag {
+  background:transparent;
+  border:0px;
+  cursor:url(../graphics/cursors/grab_ds.cur) 6 9, default;
+  margin:0px;
+}
+canvas.gone {
+  display:none;
+}
+canvas.workshop {
+  background-color:#303030;
+  float:left;
+  margin-bottom:4px;
+}
+canvas p {
+  margin:8px;
+}
+
+div.buttons {
+  width:744px;
+}
+div.corrupt {
+  background-color:#111111;
+  border:4px ridge #56CC08;
+  margin-top:0px;
+  padding:3px 2px 2px 3px;
+  -o-transition:margin-top .1s linear;
+  -moz-transition:margin-top .1s linear;
+  -webkit-transition:margin-top .1s linear;
+  transition:margin-top .1s linear;
+}
+div.corruptinner {
+  height:23px;
+}
+div.shiftbox {
+  position:absolute;
+  left:20px;
+  top:270px;
+  background-color:#111111;
+  border:4px ridge #56CC08;
+  padding:3px;
+  width:61px;
+}
+div.shiftbox img {
+  vertical-align:bottom;
+}
+div.dragframe {
+  background:transparent;
+  cursor:url(../graphics/cursors/grab_ds.cur) 6 9, default;
+  padding:50px;
+  position:absolute;
+  z-index:2;
+}
+div.holding {
+  display:none;
+  position:absolute;
+  left:25px;
+  top:25px;
+  z-index:-1;
+}
+div.floatbox {
+  float:left;
+  margin-top:8px;
+  margin-left:8px;
+  position:relative;
+  z-index:1;
+}
+div.framebox {
+  background-color:#111111;
+  border:4px ridge #EF2308;
+  position:relative;
+  overflow:hidden;
+  z-index:3;
+}
+div.framebox table {
+  border:0px;
+  float:left;
+  width:700px;
+}
+div.lefthandle {
+  margin:14px;
+  padding:14px;
+  position:absolute;
+  left:0px;
+  -o-transition:left .05s linear, -o-box-shadow .4s linear;
+  -moz-transition:left .05s linear, -moz-box-shadow .4s linear;
+  -webkit-transition:left .05s linear, -webkit-box-shadow .4s linear;
+  transition:left .1s linear, box-shadow .4s linear;  
+  z-index:2;
+}
+div.lefthandle:hover {
+  left:-16px;
+}
+div.lefthandle#activehandle {
+  top:0px;
+}
+div#activate {
+  background-color:#111111;
+  border:4px ridge #CF2308;
+  height:112px;
+  padding:3px 4px 2px 2px;
+}
+div#corrupthandle {
+  top:173px;
+  border-color:#56CC08;
+}
+div#scorehandle {
+  top:310px;
+  border-color:#0840CE;
+}
+div#workhandle {
+  top:451px;
+  border-color:#8A08CC;
+}
+div.stuck {
+  left:-16px;
+}
+div#corruptswitch {
+  background-color:#31C600;
+}
+div#scoreswitch {
+  background-color:#195AFF;
+}
+div#workswitch {
+  background-color:#AE19FF;
+}
+div.textbox {
+  background-color:#000000;
+  border-color:inherit;
+  margin:0;
+}
+div.textbox img{
+  background-color:inherit;
+  vertical-align:bottom;
+}
+div.stuck div.textbox img{
+  background-color:#FFFFFF;
+}
+div.messagebox {
+  position:absolute;
+  left:35px;
+  top:0px;
+  margin:4px;
+  width:700px;
+  height:610px;
+  z-index:6;
+}
+div.error {
+  background-color:#E8C2C2;
+  position:absolute;
+  top:50%;
+  right:0px;
+  left:0px;
+  margin:0px auto;
+  padding:4px;
+  width:400px;
+}
+div.okay {
+  background-color:#D4EAC2;
+  position:absolute;
+  top:50%;
+  right:0px;
+  left:0px;
+  margin:0px auto;
+  padding:4px;
+  width:400px;
+}
+div.error p {
+  background-image:url('../graphics/warning.png');
+  border:4px #9F0000 inset;
+  color:#9F0000;
+  margin:0;
+}
+div.okay p {
+  background-image:url('../graphics/check.png');
+  border:4px #2A5E05 inset;
+  color:#2A5E05;
+  margin:0;
+}
+div.messagebox div p {
+  background-position:8px;
+  background-repeat:no-repeat;
+  padding:8px 8px 8px 45px;
+  font-weight:bold;
+}
+span.messagefoot {
+  font-weight:normal;
+  font-style:italic;
+  font-size:.75em;
+}
+div.midbox {
+  background-color:#322311;
+  border:4px ridge #CF2308;
+  display:inline-block;
+}
+div.slidetop {
+  position:absolute;
+  top:75px;
+  z-index:1;
+}
+div.slidedown {
+  background-color:#553311;
+  line-height:16px;
+  position:relative;
+  padding-top:4px;
+  margin-top:-600px;
+  width:180px;
+  -o-transition:margin-top .2s linear;
+  -moz-transition:margin-top .2s linear;
+  -webkit-transition:margin-top .2s linear;
+  transition:margin-top .2s linear;
+}
+div.open {
+  background-color:#322311;
+  margin-top:3px;
+  -o-transition:margin-top .2s linear, background-color .2s linear;
+  -moz-transition:margin-top .2s linear, background-color .2s linear;
+  -webkit-transition:margin-top .2s linear, background-color .2s linear;
+  transition:margin-top .2s linear, background-color .2s linear;
+}
+div.spacer {
+  float:left;
+  height:10px;
+  width:35px;
+  z-index:1;
+}
+div.tall {
+  height:600px;
+}
+div.upper {
+  z-index:2;
+}
+div.switchbox {
+  display:inline-block;
+  float:left;
+}
+div.switch, div.effect {
+  clear:left;
+  float:left;
+}
+div.effect {
+  height:24px;
+  width:27px;
+}
+
+div.switchtext, div.effecttext {
+  color:#E0E0E0;
+  font-size:12px;
+  font-weight:bold;
+  float:left;
+  height:15px;
+  vertical-align:middle;
+}
+div.effecttext {
+  padding-top:6px;
+}
+div.switchtext {
+  padding-top:3px;
+}
+div.togglebox img {
+  vertical-align:middle;
+}
+div.switch div.togglebox {
+  margin:1px 3px 3px 1px;
+}
+div.effect div.togglebox{
+  margin:6px 7px;
+}
+div.updown {
+  display:inline-block;
+  line-height:11px;
+  margin:0;
+  padding-left:1px;
+  height:22px;
+  width:16px;
+  vertical-align:bottom;
+}
+div.underbox {
+  position:absolute;
+  left:35px;
+  margin:4px;
+  z-index:3;
+}
+div.z5 {
+  z-index:5;
+}
+div.scoresubbox {
+  position:absolute;
+  border:4px ridge #0840CE;
+}
+div#corruptbox {
+  top:0px;
+}
+div#corruptbox.shift div.corrupt{
+  margin-top:55px;
+}
+div#scorebox {
+  height:388px;
+  width:462px;
+}
+div#upgradecontrolbox {
+  bottom:0px;
+  right:0px;
+}
+div#scorecontrolbox {
+  top:5px;
+  right:30px;
+}
+div#workbox {
+  top:273px;
+  background-color:#111111;
+  border:4px ridge #8A08CC;
+  margin-left:14px;
+  padding:-4px;
+  height:75px;
+  width:180px;
+}
+
+hr {
+  margin:0 -2px;
+  padding:0;
+  color:#CF2308;
+  background-color:transparent;
+  border:2px solid #CF2308;
+  height:1px;
+}
+
+img {
+  border:0;
+  margin:0;
+  padding:0;
+  display:inline-block;  
+}
+img.toggle {
+  margin:-1px 2px 0 0;
+}
+img.black {
+  background-color:#000000;
+  -o-transition:background-color .3s linear;
+  -moz-transition:background-color .3s linear;
+  -webkit-transition:background-color .3s linear;
+  transition:background-color .3s linear;
+}
+img.gray {
+  background-color:#909090;
+}
+img.white {
+  background-color:#FFFFFF;
+}
+
+input {
+  background-color:#D0D0D0;
+}
+input[disabled] {
+  color:#6D6D6D;
+}
+input[type="button"], input[type="text"] {
+  font-size:.875em;
+  margin:0 5px;
+}
+input[type="checkbox"] {
+  border:0px;
+  float:right;
+}
+input.score[type="number"] {
+  border:2px inset;
+  margin:2px 0;
+  width:2.6em;
+}
+input.wide[type="number"] {
+  width:3.2em;
+}
+input.score[type="text"]{
+  border:2px inset;
+  margin:2px 0;
+  padding-right:2px;
+  text-align:right;
+  width:1em;
+}
+input.wide[type="text"] {
+  text-align:right;
+  width:1.5em;
+}
+input.hidden {
+  display:none;
+}
+input.ruin {
+  margin:1px 0 0 0;
+  padding:0 1px 0 0;
+  text-align:center;
+  width:1.2em;
+}
+input.unsaved {
+  color:#FF0000;
+}
+input.warn[disabled]{
+  color:#6D6D6D;
+}
+
+p.testing {
+  position:absolute;
+  left:730px;
+  top:8px;
+}
+
+select {
+  font-size:.96em;
+  margin:0 5px;
+}
+
+span.ruined {
+  color:#E0E0E0;
+  font-weight:600;
+}
+
+table {
+  background-color:#111111px;
+  border-width:0;
+  font-size:1.15em;
+}
+table#upgradecontrol {
+  width:445px;
+}
+tr {
+  padding:2px;
+}
+tr :first-child {
+  border-left:0px;
+}
+td {
+  border-width:1px 0 0 1px;
+  color:inherit;
+  background-color:inherit;
+  padding:0 2px;
+  font-weight:600;
+}
+td.centered {
+  text-align:center;
+}
+th {
+  border-width:0 0 0 1px;
+  color:#E0E0E0;
+  background-color:#111111;
+  font-weight:800;
+}
+
+.clear {
+  clear:both;
+}
+.right {
+  float:right;
+}

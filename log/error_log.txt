@@ -1,0 +1,1 @@
+[04-Jan-2011 09:43:03] PHP Parse error:  syntax error, unexpected '{' in /hermes/bosweb/web072/b722/ipg.appliednerditrycom/chaos/savexml.php on line 59

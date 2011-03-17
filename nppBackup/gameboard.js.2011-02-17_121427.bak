@@ -1,0 +1,2439 @@
+/* http://appliednerditry.com/chaos/gameboard.js
+ * Created 8 Nov 2010
+ * These scripts draw map components for Chaos in the Old World.
+ */
+
+/* Read in the list of games for which
+ * gamestates exist, and fill the
+ * select dropdown accordingly.
+ */
+function getGames(){
+    xmlhttp = xmlRequest();
+    if (xmlhttp) {
+        xmlhttp.onreadystatechange = function(){
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
+                var templist = JSON.parse(xmlhttp.responseText);
+                var gamePick = document.getElementById("gamepick");
+                while(gamePick.hasChildNodes()){
+                    gamePick.removeChild(gamePick.lastChild);
+                }
+                var opt;
+                for (var i = 0; i < templist.length; i++){
+                    opt = document.createElement('option');
+                    opt.text = "Game " + Number(templist[i]);
+                    opt.value = templist[i];
+                    if (i == templist.length - 1){
+                        opt.selected = true;
+                    }
+                    gamePick.appendChild(opt);
+                }
+                getStates();
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        xmlhttp.open("GET", "gamelist.php?req=games", true);
+        xmlhttp.send();
+    }
+    else {
+        return false;
+    }
+}
+
+/* Read in the list of gamestates for
+ * the currently selected game.
+ */
+function getStates(){
+    xmlhttp = xmlRequest();
+    if (xmlhttp) {
+        xmlhttp.onreadystatechange = function(){
+            if (this.readyState == 4 && this.status == 200){
+                var templist = JSON.parse(this.responseText);
+                var statePick = document.getElementById("statepick");
+                while(statePick.hasChildNodes()){
+                    statePick.removeChild(statePick.lastChild);
+                }
+                var opt;
+                for (var i = 0; i < templist.length; i++){
+                    opt = document.createElement('option');
+                    opt.text = "State " + Number(templist[i]);
+                    opt.value = templist[i];
+                    if (i == templist.length - 1){
+                        opt.selected = true;
+                    }
+                    statePick.appendChild(opt);
+                }
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        var gamePick = document.getElementById("gamepick");
+        var game = gamePick[gamePick.selectedIndex].value;
+        xmlhttp.open("GET", "gamelist.php?req=states&gamenum=" + game, true);
+        xmlhttp.send();
+    }
+    else {
+        return false;
+    }
+}
+
+/* Get the next available state number
+ * for saving the current game.
+ */
+function nextState(game){
+    xmlhttp = xmlRequest();
+    if (xmlhttp) {
+        xmlhttp.open("GET", "gamelist.php?req=states&gamenum=" + game, false);
+        xmlhttp.send();
+        var templist = JSON.parse(xmlhttp.responseText);
+        //Sort the result in reverse order
+        templist.sort(function(a, b){ return (b - a); });
+        //Return the next state, if states exist
+        if (templist.length > 0){
+            return Number(templist[0]) + 1;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+}
+
+/* Read in the XML board state file.
+ */
+function getBoardState(blank){
+    var xmlhttp = xmlRequest();
+    var gamePick = document.getElementById("gamepick");
+    var game = gamePick.options[gamePick.selectedIndex].value;
+    var statePick = document.getElementById("statepick");
+    var state = statePick.options[statePick.selectedIndex].value;
+    var board = document.getElementById("board");
+    //Get the document (full URL is required due
+    //to a bug in Google Chrome)
+    var loc = "http://appliednerditry.com/chaos/saves/";
+    var url = loc + (blank ? "blankboard.xml" : "game" + game + "state" + state + ".xml");
+    xmlhttp.open("POST", url, false);
+    xmlhttp.send();
+    var xmlDoc = xmlhttp.responseXML;
+    board.game = game;
+    board.state = state;
+    //Read the board's creator from the XML
+    var root = xmlDoc.documentElement;
+    board.creator = root.getAttribute("creator");
+    //Update the save buttons
+    var saveXMLButton = document.getElementById("savexmlstate");
+    var overwriteXMLstate = document.getElementById("overwritestate");
+    if (!blank){
+        //Fill in the game and state number if an
+        //existing game was loaded
+        var gameNum = Number(game);
+        var stateNumNext = nextState(gameNum);
+        saveXMLButton.value = "Save as Game " + gameNum + ", State " + stateNumNext;
+        overwriteXMLstate.value = "Overwrite Game " + gameNum + ", State " + board.state;
+        //Check for username matching the board's
+        //creator, or a user with top-level permissions
+        var userLevel = document.getElementById("userlevel").value;
+        var userElement = document.getElementById("username");
+        var fail;
+        if (userElement){
+            var userName = userElement.firstChild.data;
+        }
+        else {
+            fail = true;
+        }
+        if (userLevel < 3 && !fail){
+            if (board.creator.toLowerCase() != userName.toLowerCase()){
+                fail = true;
+            }
+        }
+        //Enable the "Save as Game..." button for
+        //an appropriate user
+        if (!fail){
+            saveXMLButton.disabled = false;
+            overwriteXMLstate.disabled = false;
+        }
+        else {
+            saveXMLButton.disabled = true;
+            overwriteXMLstate.disabled = true;
+        }
+    }
+    else {
+        //Disable the "Save as Game..." button
+        saveXMLButton.value = "Save as";
+        overwriteXMLstate.value = "Overwrite";
+        saveXMLButton.disabled = true;
+        overwriteXMLstate.disabled = true;
+    }
+    return xmlDoc;
+}
+
+/* Read in the XML game setup file.
+ */
+function getGameSetup(){
+    var xmlhttp = xmlRequest();
+    //Get the document (full URL is required due
+    //to a bug in Google Chrome)
+    var loc = "http://appliednerditry.com/chaos/gamedata/";
+    var url = loc + "board.xml";
+    xmlhttp.open("POST", url, false);
+    xmlhttp.send();
+    var xmlDoc = xmlhttp.responseXML;
+    return xmlDoc;
+}
+
+/* Set up a toggle switch for the
+ * targeted object.
+ */
+function createToggleSwitch(target, display, displayArg, property){
+    var select = document.createElement("img");
+    select.src = 'icons/select.png';
+    select.className = "toggle";
+    select.height = 15;
+    select.width = 15;
+    var unselect = document.createElement("img");
+    unselect.src = 'icons/unselect.png';
+    unselect.className = "toggle";
+    unselect.height = 15;
+    unselect.width = 15;
+    var toggle = document.createElement("div");
+    toggle.className = "togglebox";
+    toggle.select = select;
+    toggle.unselect = unselect;
+    toggle.target = target;
+    toggle.display = display;
+    toggle.displayArg = displayArg;
+    toggle.property = property || "active";
+    //Set the initial state
+    if (target[toggle.property]){
+        toggle.appendChild(select);
+    }
+    else {
+        toggle.appendChild(unselect);
+    }
+    //Set methods
+    toggle.on = function(){
+        var node = this.firstElementChild;
+        this.replaceChild(this.select, node);
+    };
+    toggle.off = function(){
+        var node = this.firstElementChild;
+        this.replaceChild(this.unselect, node);
+    };
+    toggle.check = function(){
+        if (this.target[this.property]){
+            this.on();
+        }
+        else {
+            this.off();
+        }
+    };
+    //Set the handler
+    toggle.onmousedown = function(){
+        if (this.target){
+            this.target[this.property] = !this.target[this.property];
+            this.check();
+            if (this.display){
+                if (this.displayArg){
+                    this.display.draw(this.displayArg);
+                }
+                else {
+                    this.display.draw();
+                }
+            }
+        }
+        unsavedBoard();
+        return false;
+    };
+    return toggle;
+}
+
+/* Create up/down input arrows.
+ */
+function createUpDownButtons(target){
+    var player = target.owner;
+    var div = document.createElement("div");
+    div.className = "updown";
+    div.target = target;
+    //Create the image elements
+    var up = document.createElement("img");
+    up.style.backgroundColor = player.highlight;
+    up.srcData = {
+        base : "icons/up.png",
+        hover : "icons/up_hover.png",
+        press : "icons/up_press.png"    
+    };
+    up.src = up.srcData.base;
+    up.target = target;
+    div.up = up;
+    var down = document.createElement("img");
+    down.style.backgroundColor = player.highlight;
+    down.srcData = {
+        base : "icons/down.png",
+        hover : "icons/down_hover.png",
+        press : "icons/down_press.png"    
+    };
+    down.src = down.srcData.base;
+    down.target = target;
+    div.down = down;
+    //Set mouse handlers on the images
+    up.onmouseover = function(){
+        this.src = this.srcData.hover;
+    };
+    up.onmouseout = function(){
+        this.src = this.srcData.base;
+        clearInterval(this.interval);
+        clearTimeout(this.timer);
+        return false;
+    };
+    up.onmousedown = function(){
+        this.src = this.srcData.press;
+        if (this.target.max != this.target.value){
+            this.target.value += 1;
+            this.target.draw();
+            unsavedBoard();
+        }
+        //Repeat the increment on a
+        //press and hold
+        var button = this;
+        button.timer = setTimeout(function(){
+            clearInterval(button.interval);
+            button.interval = setInterval(function(){
+                if (button.target.max != button.target.value){
+                    button.target.value += 1;
+                    button.target.draw();
+                    unsavedBoard();
+                }
+            }, 60);
+        }, 300);
+        return false;
+    };
+    up.onmouseup = function(){
+        this.src = this.srcData.hover;
+        clearInterval(this.interval);
+        clearTimeout(this.timer);
+    };
+    down.onmouseover = function(){
+        this.src = this.srcData.hover;
+    };
+    down.onmouseout = function(){
+        this.src = this.srcData.base;
+        clearInterval(this.interval);
+        clearTimeout(this.timer);
+        return false;
+    };
+    down.onmousedown = function(){
+        this.src = this.srcData.press;
+        if (this.target.min != this.target.value){
+            this.target.value -= 1;
+            this.target.draw();
+            unsavedBoard();
+        }
+        //Repeat the decrement on a
+        //press and hold
+        var button = this;
+        button.timer = setTimeout(function(){
+            clearInterval(button.interval);
+            button.interval = setInterval(function(){
+                if (button.target.min != button.target.value){
+                    button.target.value -= 1;
+                    button.target.draw();
+                    unsavedBoard();
+                }
+            }, 60);
+        }, 300);
+        return false;
+    };
+    down.onmouseup = function(){
+        this.src = this.srcData.hover;
+        clearInterval(this.interval);
+        clearTimeout(this.timer);
+    };
+    //Set handlers on the div
+    div.onmousedown = function(){ return false; };
+    var stepMethod = function(amount){
+        this.target.value += amount;
+        this.target.value = (this.target.value > this.target.max) ? this.target.max : this.target.value;
+        this.target.value = (this.target.value < this.target.min) ? this.target.min : this.target.value;
+        this.target.draw();
+    };
+    //Enable mousewheel support
+    addMouseWheelListener(div, stepMethod);
+    //Insert the base buttons
+    div.appendChild(up);
+    div.appendChild(down);
+    return div;
+}
+
+/* Generate the list of Old World cards.
+ */
+function getOldWorldCards(){
+    var xmlhttp = xmlRequest();
+    if (xmlhttp){
+        //Get the document (full URL is required due
+        //to a bug in Google Chrome)
+        var loc = "http://appliednerditry.com/chaos/gamedata/";
+        var url = loc + "oldworld.xml";
+        xmlhttp.onreadystatechange = function(){
+            if (this.readyState == 4 && this.status == 200){
+                var xmlDoc = this.responseXML;
+                var oldWorldCards = xmlDoc.getElementsByTagName("card");
+                var owc = document.getElementById("owc");
+                var card;
+                for (var i = 0; i < oldWorldCards.length; i++){
+                    card = {
+                        xmlData : oldWorldCards[i],
+                        name : oldWorldCards[i].firstChild.data,
+                        event : (oldWorldCards[i].getAttribute("event") == "true"),
+                        active : true,
+                        draw : drawCard,
+                        symbol : {},
+                        symbol2 : {},
+                        type : "oldworld"
+                    };
+                    card.symbol.name = "smallcomet";
+                    card.symbol.draw = drawToken;
+                    card.symbol2.name = "darkcomet";
+                    card.symbol2.draw = drawToken;
+                    card.canvas = document.createElement("canvas");
+                    card.canvas.className = "card";
+                    card.canvas.width = 180;
+                    card.canvas.height = 17;
+                    card.canvas.card = card;
+                    var ctx = card.canvas.getContext('2d');
+                    owc.appendChild(card.canvas);
+                    card.draw(1, 0, ctx);
+                    card.canvas.cursorPos = getCursorPosition;
+                    card.canvas.onmousedown = function(evt){
+                        var pen = document.getElementById("pen");
+                        var card = this.card;
+                        //Check to be sure no object is held
+                        if (!pen.held){
+                            pen.held = copyObject(card);
+                            var coord = this.cursorPos(evt);
+                            xOffset = coord.x;
+                            yOffset = coord.y;
+                            //Assign a new object ID
+                            var map = document.getElementById("board").map;
+                            map.idOWC++;
+                            var idString = String(map.idOWC);
+                            idString = (idString.length == 1) ? "0" + idString : idString;
+                            pen.held.objectID = "owc" + idString;
+                            //Begin moving the card
+                            pen.move(evt, xOffset, yOffset);
+                        }
+                        var board = document.getElementById("board");
+                        document.onmouseup = function(evt){
+                            board.release(evt);
+                        };
+                        return false;
+                    }
+                }
+                var owchead = document.getElementById("owchead");
+            }
+        }
+        xmlhttp.open("POST", url, true);
+        xmlhttp.send();
+    }
+    return false;
+}
+
+/* Generate the list of Chaos cards.
+ */
+function getChaosCards(){
+    var xmlhttp = xmlRequest();
+    if (xmlhttp){
+        //Get the document (full URL is required due
+        //to a bug in Google Chrome)
+        var loc = "http://appliednerditry.com/chaos/gamedata/";
+        var url = loc + "chaos.xml";
+        xmlhttp.onreadystatechange = function(){
+            if (this.readyState == 4 && this.status == 200){
+                var i, j;
+                var xmlDoc = this.responseXML;
+                var chaosCards = xmlDoc.getElementsByTagName("card");
+                var board = document.getElementById("board");
+                var playersTemp = board.info.getElementsByTagName("player");
+                var players = [];
+                var xmlData;
+                for (i = 0; i < playersTemp.length; i++){
+                    xmlData = playersTemp[i];
+                    players.push({});
+                    players[i].xmlData = xmlData;
+                    players[i].name = xmlData.getElementsByTagName("name")[0].firstChild.data;
+                    players[i].highlight = xmlData.getAttribute("highlight");
+                    players[i].shadow = xmlData.getAttribute("shadow");
+                }
+                var cc = document.getElementById("cc");
+                var card;
+                for (i = 0; i < chaosCards.length; i++){
+                    card = {
+                        xmlData : chaosCards[i],
+                        name : chaosCards[i].firstChild.data,
+                        cost : chaosCards[i].getAttribute("cost"),
+                        power : chaosCards[i].getAttribute("owner"),
+                        draw : drawCard,
+                        magic : (chaosCards[i].getAttribute("magic") == "true"),
+                        magicIcon : {},
+                        type : "chaos"
+                    };
+                    card.magicIcon.name = "magic";
+                    card.magicIcon.draw = drawToken;
+                    for (j = 0; j < players.length; j++){
+                        if (card.power == players[j].name){
+                            card.owner = players[j];
+                            break;
+                        }
+                    }
+                    card.canvas = document.createElement("canvas");
+                    card.canvas.className = "card";
+                    card.canvas.width = 180;
+                    card.canvas.height = 17;
+                    card.canvas.card = card;
+                    var ctx = card.canvas.getContext('2d');
+                    cc.appendChild(card.canvas);
+                    card.draw(1, 0, ctx);
+                    card.canvas.cursorPos = getCursorPosition;
+                    card.canvas.onmousedown = function(evt){
+                        var pen = document.getElementById("pen");
+                        var card = this.card;
+                        //Check to be sure no object is held
+                        if (!pen.held){
+                            pen.held = copyObject(card);
+                            var coord = this.cursorPos(evt);
+                            xOffset = coord.x;
+                            yOffset = coord.y;
+                            //Assign a new object ID
+                            var map = document.getElementById("board").map;
+                            map.idCrd++;
+                            var idString = String(map.idCrd);
+                            idString = (idString.length == 1) ? "0" + idString : idString;
+                            pen.held.objectID = "crd" + idString;
+                            //Begin moving the card
+                            pen.move(evt, xOffset, yOffset);
+                        }
+                        var board = document.getElementById("board");
+                        document.onmouseup = function(evt){
+                            board.release(evt);
+                        };
+                        return false;
+                    }
+                }
+                var cchead = document.getElementById("cchead");
+            }
+        }
+        xmlhttp.open("POST", url, true);
+        xmlhttp.send();
+    }
+    return false;
+}
+
+/* Set up the Old World token pool.
+ */
+function buildTokenPool(){
+    var board = document.getElementById("board");
+    var pool = board.map.tokenPool;
+    var canvas = document.getElementById("pool");
+    var ctx = canvas.getContext('2d');
+    var pools = [pool.event, pool.hero, pool.noble, pool.peasant, pool.warpstone, pool.skaven];
+    canvas.pools = pools;
+    var endY = [25, 50, 75, 150, 200, 225];
+    var x0 = 3;
+    var i, j, y0, y1;
+    for (i = 0; i < pools.length; i++){
+        y1 = endY[i];
+        y0 = (i == 0) ? 3 : endY[i - 1] + 3;
+        pools[i].ctx = ctx;
+        pools[i].x0 = x0;
+        pools[i].x1 = 175;
+        pools[i].y0 = y0;
+        pools[i].y1 = y1;
+        pools[i].draw = drawOldWorldTokens;
+        pools[i].drag = dragObject;
+        pools[i].drop = dropObject;
+        pools[i].draw();
+    }
+    canvas.cursorPos = getCursorPosition;
+    var pen = document.getElementById("pen");
+    var parentDiv = canvas.parentNode;
+    var styles = getComputedStyle(parentDiv, null) || parentDiv.currentStyle;
+    var topPad = Number(styles.paddingTop.replace(/[^0-9]/g,""));
+    //Create the mousedown handler
+    canvas.press = function(evt){
+        //Check to be sure no object is held
+        if (!pen.held){
+            var i;
+            var coord = this.cursorPos(evt);
+            var x = coord.x;
+            var y = coord.y + topPad;
+            //Check for an object source
+            //area under the cursor
+            var areas = this.pools;
+            for (i = 0; i < areas.length; i++){
+                if (areas[i].x0 <= x && x < areas[i].x1 && areas[i].y0 <= y && y < areas[i].y1){
+                    areas[i].drag(evt, x, y);
+                    break;
+                }
+            }
+        }
+        var board = document.getElementById("board");
+        document.onmouseup = function(evt){
+            board.release(evt);
+        };
+        return false;
+    };
+    canvas.onmousedown = canvas.press;
+}
+
+/* Update the scoreboard values based
+ * on the control panel.
+ */
+function updateScoreBoard(){
+    var board = document.getElementById("board");
+    var score = board.map.score;
+    var players = score.players;
+    var rows = document.getElementById("scorebody").rows;
+    var playerName = this.id.match(/\w+(?=_)/)[0];
+    var target = this.id.replace(/\w+_/,'');
+    var i;
+    for (i = 0; i < players.length; i++){
+        if (playerName == players[i].name){
+            var currentPlayer = players[i];
+            break;
+        }
+    }
+    //Use special handling for peasants
+    if (target == "peasants"){
+        var diff = this.value - currentPlayer.peasants.length;
+        var pen = document.getElementById("pen");
+        var peasantPool = board.map.tokenPool.peasant.tokens;
+        var token;
+        //If peasants were lost, return them
+        //to the pool
+        if (diff < 0){
+            for (i = 0; i < -1 * diff; i++){
+                if (!pen.held){
+                    token = currentPlayer.peasants.pop();
+                    pen.held = token;
+                    token.home.drop();
+                    token.home.draw();
+                }
+            }
+        }
+        //If peasants were gained, take
+        //them from the pool
+        else if (diff > 0){
+            for (i = 0; i < diff; i++){
+                if (peasantPool.length > 0){
+                    token = peasantPool.pop();
+                    currentPlayer.peasants.push(token);
+                    token.home.draw();
+                }
+                else {
+                    break;
+                }
+            }
+        }
+        if (diff != 0){
+            //Reset the control field, in case the
+            //wrong number of peasants was moved
+            this.value = currentPlayer.peasants.length;
+            //Calculate remaining peasant tokens and
+            //set maximum values accordingly
+            var remaining = peasantPool.length;
+            var scorePeasants;
+            for (i = 0; i < rows.length; i++){
+                scorePeasants = rows[i].cells[1].firstElementChild;
+                scorePeasants.max = Number(scorePeasants.value) + remaining;
+            }
+            //Flag the board as unsaved
+            unsavedBoard();
+        }
+    }
+    //Handle other items
+    else {
+        switch(target){
+        case "pp":
+            if (currentPlayer.pp != this.value){
+                currentPlayer.pp = this.value
+                unsavedBoard();
+            }
+            break;
+        case "vp":
+            if (currentPlayer.vp != this.value){
+                currentPlayer.vp = this.value
+                unsavedBoard();
+            }
+            break;
+        case "dial":
+            if (currentPlayer.dialValue != this.value){
+                currentPlayer.dialValue = this.value
+                unsavedBoard();
+            }
+            break;
+        case "dacs":
+            if (currentPlayer.dacs != this.value){
+                currentPlayer.dacs = this.value
+                unsavedBoard();
+            }
+            break;
+        }
+    }
+    //Redraw the scoreboard
+    score.draw();
+}
+
+/* Create the control panel for
+ * the scoreboard.
+ */
+function buildScoreBoardControls(){
+    var board = document.getElementById("board");
+    var score = board.map.score;
+    var players = score.players;
+    var compat = checkCompatibility();
+    var row, cell, nameCell, peasantCell, upgradeRow, upgradeCell, ppCell, vpCell, dialCell, dacCell;
+    var upgrades, nameCell2, upgradeName, upgradeCheck, upgradeSwitch, upgradeSwitchText;
+    var i, j, text, name, peasants, pp, vp, dial, dacs;
+    //Check for support of the "number" 
+    //input type
+    var numType = (compat.inputNumber) ? "number" : "text";
+    //Create a value-incrementing method for
+    //use with mousewheel events if the
+    //"number" type isn't supported
+    var addValue = function(amount){
+        var newAmount = Number(this.value) + amount;
+        newAmount = (newAmount > this.max) ? this.max : newAmount;
+        newAmount = (newAmount < this.min) ? this.min : newAmount;
+        this.value = newAmount;
+        this.update();
+        return false;
+    };
+    /*** Upgrade controls ***/
+    //Clean up any old stuff
+    var upgradeControl = document.getElementById("upgradecontrol");
+    var upgradeHead = document.getElementById("upgradehead");
+    while (upgradeHead.childNodes.length > 0){
+        upgradeHead.removeChild(upgradeHead.firstChild);
+    }
+    var upgradeBody = document.getElementById("upgradebody");
+    while (upgradeBody.childNodes.length > 0){
+        upgradeBody.removeChild(upgradeBody.firstChild);
+    }
+    //Make the header row
+    upgradeRow = document.createElement("tr");
+    cell = document.createElement("th");
+    cell.colSpan = "6";
+    text = document.createTextNode("Upgrades");
+    cell.appendChild(text);
+    upgradeRow.appendChild(cell);
+    upgradeHead.appendChild(upgradeRow);
+    /*** Other score controls ***/
+    //Clean up any old stuff
+    var scoreControl = document.getElementById("scorecontrol");
+    var scoreHead = document.getElementById("scorehead");
+    while (scoreHead.childNodes.length > 0){
+        scoreHead.removeChild(scoreHead.firstChild);
+    }
+    var scoreBody = document.getElementById("scorebody");
+    while (scoreBody.childNodes.length > 0){
+        scoreBody.removeChild(scoreBody.firstChild);
+    }
+    //Make the header row
+    var headers = ["", "Peasants", "PP", "VP", "Dial", "DACs"];
+    row = document.createElement("tr");
+    for (i = 0; i < headers.length; i++){
+        cell = document.createElement("th");
+        text = document.createTextNode(headers[i]);
+        cell.appendChild(text);
+        row.appendChild(cell);
+    }
+    scoreHead.appendChild(row);
+    /*** Player Rows ***/
+    var playerName;
+    for (i = 0; i < players.length; i++){
+        row = document.createElement("tr");
+        row.style.color = players[i].highlight;
+        row.style.backgroundColor = players[i].shadow;
+        upgradeRow = document.createElement("tr");
+        upgradeRow.style.color = players[i].highlight;
+        upgradeRow.style.backgroundColor = players[i].shadow;
+        //Name (in both tables)
+        playerName = players[i].name;
+        name = document.createTextNode(playerName);
+        nameCell = document.createElement("td");
+        nameCell.appendChild(name);
+        row.appendChild(nameCell);
+        nameCell2 = nameCell.cloneNode(true);
+        upgradeRow.appendChild(nameCell2);
+        //Peasants
+        peasants = document.createElement("input");
+        peasants.update = updateScoreBoard;
+        peasants.addEventListener('input',peasants.update,false);
+        peasants.onpropertychange = function(evt){
+            var e = evt || window.event;
+            if (e.propertyName.toLowerCase() == "value"){
+                this.update();
+            }
+        };
+        peasants.id = playerName + "_peasants";
+        peasants.type = numType;
+        peasants.className = "score wide";
+        peasants.min = "0";
+        peasants.value = players[i].peasants.length;
+        peasantCell = document.createElement("td");
+        peasantCell.className = "centered";
+        peasantCell.appendChild(peasants);
+        row.appendChild(peasantCell);
+        //Upgrades (in a separate table)
+        upgrades = players[i].upgrades;
+        for (j = 0; j < upgrades.length; j++){
+            upgradeCheck = createToggleSwitch(upgrades[j], score);
+            upgradeCheck.id = playerName + "_upgrade" + j;
+            upgradeSwitch = document.createElement("div");
+            upgradeSwitch.className = "switch";
+            upgradeSwitch.appendChild(upgradeCheck);
+            upgradeName = document.createTextNode(upgrades[j].name);
+            upgradeSwitchText = document.createElement("div");
+            upgradeSwitchText.className = "switchtext";
+            upgradeSwitchText.appendChild(upgradeName);
+            upgradeCell = document.createElement("td");
+            upgradeCell.appendChild(upgradeSwitch);
+            upgradeCell.appendChild(upgradeSwitchText);
+            upgradeRow.appendChild(upgradeCell);
+        }
+        //PP
+        pp = document.createElement("input");
+        pp.update = updateScoreBoard;
+        pp.addEventListener('input',peasants.update,false);
+        pp.onpropertychange = function(evt){
+            var e = evt || window.event;
+            if (e.propertyName.toLowerCase() == "value"){
+                this.update();
+            }
+        };
+        pp.id = playerName + "_pp";
+        pp.type = numType;
+        pp.className = "score"
+        pp.min = "0";
+        pp.max = "9";
+        pp.value = players[i].pp;
+        ppCell = document.createElement("td");
+        ppCell.className = "centered";
+        ppCell.appendChild(pp);
+        row.appendChild(ppCell);
+        //VP
+        vp = document.createElement("input");
+        vp.update = updateScoreBoard;
+        vp.addEventListener('input',peasants.update,false);
+        vp.onpropertychange = function(evt){
+            var e = evt || window.event;
+            if (e.propertyName.toLowerCase() == "value"){
+                this.update();
+            }
+        };
+        vp.id = playerName + "_vp";
+        vp.type = numType;
+        vp.min = "0";
+        vp.max = "99";
+        vp.className = "score wide";
+        vp.value = players[i].vp;
+        vpCell = document.createElement("td");
+        vpCell.className = "centered";
+        vpCell.appendChild(vp);
+        row.appendChild(vpCell);
+        //Threat dial
+        dial = document.createElement("input");
+        dial.update = updateScoreBoard;
+        dial.addEventListener('input',peasants.update,false);
+        dial.onpropertychange = function(evt){
+            var e = evt || window.event;
+            if (e.propertyName.toLowerCase() == "value"){
+                this.update();
+            }
+        };
+        dial.id = playerName + "_dial";
+        dial.type = numType;
+        dial.className = "score"
+        dial.min = "0";
+        dial.max = players[i].dialCap;
+        dial.value = players[i].dialValue;
+        dialCell = document.createElement("td");
+        dialCell.className = "centered";
+        dialCell.appendChild(dial);
+        row.appendChild(dialCell);
+        //Dial Advancement Counters
+        dacs = document.createElement("input");
+        dacs.update = updateScoreBoard;
+        dacs.addEventListener('input',peasants.update,false);
+        dacs.onpropertychange = function(evt){
+            var e = evt || window.event;
+            if (e.propertyName.toLowerCase() == "value"){
+                this.update();
+            }
+        };
+        dacs.id = playerName + "_dacs";
+        dacs.type = numType;
+        dacs.className = "score"
+        dacs.min = "0";
+        dacs.max = "9";
+        dacs.value = players[i].dacs;
+        dacCell = document.createElement("td");
+        dacCell.className = "centered";
+        dacCell.appendChild(dacs);
+        row.appendChild(dacCell);
+        //Insert the rows into the tables
+        scoreBody.appendChild(row);
+        upgradeBody.appendChild(upgradeRow);
+        //Set mousewheel events if needed
+        if (numType != "number"){
+            addMouseWheelListener(peasants, addValue);
+            addMouseWheelListener(pp, addValue);
+            addMouseWheelListener(vp, addValue);
+            addMouseWheelListener(dial, addValue);
+            addMouseWheelListener(dacs, addValue);
+        }
+    }
+    //Set up the show/hide controls
+    var switchDiv = document.getElementById("scoreswitch");
+    switchDiv.panelId = "score";
+    switchDiv.closeOthers = closePanels;
+    switchDiv.onmousedown = function(evt){
+        var e = evt || window.event;
+        //Open the score control panels
+        var box = document.getElementById("scorebox");
+        var isOpen = toggleClass("z5", box);
+        var parent = this.parentNode;
+        toggleClass("stuck", parent);
+        //Make sure the other panels are closed
+        switchDiv.closeOthers();
+        //Set an event on the document to
+        //close the panel, if it is open
+        if (isOpen){
+            if (document.addEventListener){
+                //Decent browsers
+                document.addEventListener("mousedown", closePanels, false);
+            }
+            else if (document.attachEvent){
+                //Internet Explorer
+                document.attachEvent("onmousedown", closePanels);
+            }
+        }
+        //Stop event propagation
+        if (e.stopPropagation){
+            e.stopPropagation();
+        } 
+        else {
+            e.cancelBubble = true;
+        }
+        return false;
+    };
+    //Cancel event propagation on the controls
+    var boxes = document.getElementsByClassName("scoresubbox");
+    for (i = 0; i < boxes.length; i++){
+        boxes[i].onmousedown = function(evt){
+            var e = evt || window.event;
+            if (e.stopPropagation){
+                e.stopPropagation();
+            } 
+            else {
+                e.cancelBubble = true;
+            }
+        };
+    }
+}
+
+/* Set up the workshop for configuring
+ * effects and markers on figures.
+ */
+function buildWorkshop(){
+    var workshop = document.getElementById("workshop");
+    var switchList = document.getElementsByClassName("effect");
+    var switchText = document.getElementsByClassName("effecttext");
+    var switchData = [ ["shield", "Warp Shield"], ["musk", "Soporific Musk"], ["marker", "Upgrade Marker"] ];
+    var toggle, oldNode, node, i;
+    //Create toggles with null targets for
+    //the empty display, and label them
+    workshop.switches = [];
+    for (i = 0; i < switchData.length; i++){
+        toggle = createToggleSwitch('', workshop, null, switchData[i][0]);
+        toggle.id = "switch_" + switchData[i][0];
+        oldNode = switchList[i].firstElementChild;
+        if (oldNode){
+            switchList[i].replaceChild(toggle, oldNode);
+        }
+        else {
+            switchList[i].appendChild(toggle);
+        }
+        node = document.createTextNode('');
+        node.data = switchData[i][1];
+        oldNode = switchText[i].firstChild;
+        if (oldNode){
+            switchText[i].replaceChild(node, oldNode);
+        }
+        else {
+            switchText[i].appendChild(node);
+        }
+        workshop.switches.push(toggle);
+    }
+    workshop.type = "workshop";
+    if (!workshop.figures){
+        workshop.figures = [];
+    }
+    //Set the draw method
+    workshop.draw = function(){
+        var ctx = this.getContext('2d');
+        //Clear the box
+        ctx.clearRect(0, 0, this.width, this.height);
+        //Draw the figure, if one is held
+        if (this.figures[0]){
+            var figure = this.figures[0];
+            var figHeight = figure.y1 - figure.y0;
+            var figWidth = figure.x1 - figure.x0;
+            var padLeft = Math.floor((this.width - figWidth) / 2);
+            var padTop = Math.floor((this.height - figHeight) / 2);
+            figure.draw(padLeft, this.height - padTop, ctx);
+        }
+    };
+    //Set the drag and drop methods
+    workshop.drag = dragObject;
+    workshop.drop = dropObject;
+    //Set the mouseup handler, for 
+    //dropping figures in the shop
+    workshop.cursorPos = getCursorPosition;
+    workshop.release = function(evt){
+        var pen = document.getElementById("pen");
+        if (pen.held){
+            //Drop a held figure in the shop, or
+            //in its reserves if the shop is full
+            if (pen.held.type == "figure"){
+                if (this.figures.length == 0){
+                    var coord = this.cursorPos(evt);
+                    var x = coord.x;
+                    var y = coord.y;
+                    if (0 <= x && x < this.width && 0 <= y && y < this.height){
+                        this.drop();
+                        var i;
+                        for (i = 0; i < this.switches.length; i++){
+                            this.switches[i].target = this.figures[0];
+                            this.switches[i].check();
+                        }
+                    }
+                    else {
+                        pen.held.owner.drop();
+                    }
+                }
+                else {
+                    pen.held.owner.drop();
+                }
+            }
+        }
+    };
+    //Set the mousedown handler, for
+    //picking up a figure
+    workshop.press = function(evt){
+        var pen = document.getElementById("pen");
+        if (!pen.held){
+            var coord = this.cursorPos(evt);
+            var x = coord.x;
+            var y = coord.y;
+            this.drag(evt, x, y);
+            var i;
+            for (i = 0; i < this.switches.length; i++){
+                this.switches[i].target = null;
+                this.switches[i].off();
+            }
+        }
+        document.onmouseup = function(evt){
+            var board = document.getElementById("board");
+            board.release(evt);
+        };
+        return false;
+    };
+    workshop.onmousedown = workshop.press;
+    //Set up the show/hide controls
+    var switchDiv = document.getElementById("workswitch");
+    switchDiv.panelId = "work";
+    switchDiv.closeOthers = closePanels;
+    switchDiv.onmousedown = function(evt){
+        var e = evt || window.event;
+        //Open (or close) the workbox panel
+        var box = document.getElementById("workbox");
+        var isOpen = toggleClass("z5", box);
+        var parent = this.parentNode;
+        toggleClass("stuck", parent);
+        //Make sure the other panels are closed
+        switchDiv.closeOthers();
+        //Stop event propagation
+        if (e.stopPropagation){
+            e.stopPropagation();
+        } 
+        else {
+            e.cancelBubble = true;
+        }
+        return false;
+    };
+    //Cancel event propagation on the controls
+    var box = document.getElementById("workbox");
+    box.onmousedown = function(evt){
+        var e = evt || window.event;
+        if (e.stopPropagation){
+            e.stopPropagation();
+        } 
+        else {
+            e.cancelBubble = true;
+        }
+    };
+    return workshop;
+}
+
+/* Set up the controls for editing
+ * corruption and ruining regions
+ */
+function buildCorruption(){
+    var board = document.getElementById("board");
+    var regions = board.map.regions;
+    var players = board.map.players;
+    var box = document.getElementById("corruptbox");
+    var width = 220;
+    var height = 110;
+    var yOffset = 21;
+    var i, j, x, y, subBox, div, inputBox, input, inputUpDown;
+    var styles, lborder, lpadding, tborder, tpadding;
+    var ruinSpan, ruinText, ruinInput;
+    //Create a div for each region
+    for (i = 0; i < regions.length; i++){
+        //Set the position in the bottom portion
+        //of the region, where figures are
+        x = 10 + (regions[i].border.col * (width + 10));
+        y = 10 + (regions[i].border.row * (height + 10)) + yOffset;
+        //Set up a frame
+        subBox = document.createElement("div");
+        subBox.className = "corrupt";
+        subBox.style.position = "absolute";
+        subBox.style.left = x + "px";
+        subBox.style.top = y + "px";
+        //Set width for the inner div
+        div = document.createElement("div");
+        div.className = "corruptinner";
+        div.style.width = String(width - 12) + "px";
+        //Set up the corruption input buttons
+        inputBox = document.createElement("div");
+        inputBox.className = "right";
+        inputBox.onmousedown = function(){ return false; };
+        for (j = 0; j < regions[i].corruption.length; j++){
+            inputUpDown = createUpDownButtons(regions[i].corruption[j]);
+            inputBox.appendChild(inputUpDown);
+        }
+        //Set up the ruin input box
+        ruinSpan = document.createElement("span");
+        ruinSpan.className = "ruined";
+        ruinText = document.createTextNode("Ruined: ");
+        ruinSpan.appendChild(ruinText);
+        ruinInput = document.createElement("input");
+        ruinInput.className = "ruin";
+        ruinInput.size = 1;
+        ruinInput.value = regions[i].ruined;
+        ruinInput.region = regions[i];
+        ruinInput.update = function(){
+            var value = Number(this.value);
+            if (value >= 0 && value < 10){
+                this.region.ruined = value;
+                this.region.draw();
+            }
+            else {
+                this.value = this.region.ruined;
+            }
+        };
+        //Set the ruin event listener
+        ruinInput.addEventListener('input', ruinInput.update, false);
+        ruinInput.onpropertychange = function(evt){
+            var e = evt || window.event;
+            if (e.propertyName.toLowerCase() == "value"){
+                this.update();
+            }
+        };
+        //Insert the content
+        div.appendChild(ruinSpan);
+        div.appendChild(ruinInput);
+        div.appendChild(inputBox);
+        subBox.appendChild(div);
+        box.appendChild(subBox);
+    }
+    /*Set up the toggle to move the corruption controls*/
+    shiftBox = document.createElement("div");
+    shiftBox.className = "shiftbox";
+    corruptUp = document.createElement("img");
+    corruptUp.src = 'icons/corrupt_up.png';
+    corruptUp.height = 17;
+    corruptUp.width = 24;
+    corruptUp.className = "white";
+    corruptDown = document.createElement("img");
+    corruptDown.src = 'icons/corrupt_down.png';
+    corruptDown.height = 17;
+    corruptDown.width = 24;
+    corruptDown.className = "gray";
+    swap = document.createElement("img");
+    swap.src = 'icons/swap.png';
+    swap.height = 17;
+    swap.width = 13;
+    swap.className = "black";
+    //Set methods
+    shiftBox.moveDown = function(){
+        toggleClass("shift", box, "on");
+        corruptUp.className = "gray";
+        corruptDown.className = "white";
+        this.onclick = this.moveUp;
+        return false;
+    };
+    shiftBox.moveUp = function(){
+        toggleClass("shift", box, "off");
+        corruptUp.className = "white";
+        corruptDown.className = "gray";
+        this.onclick = this.moveDown;
+        return false;
+    };
+    shiftBox.onclick = shiftBox.moveDown;
+    shiftBox.onmouseover = function(){
+        swap.className = "white";
+    };
+    shiftBox.onmouseout = function(){
+        swap.className = "black";
+    };
+    shiftBox.onmousedown = function(evt){
+        var e = evt || window.event;
+        if (e.stopPropagation){
+            e.stopPropagation();
+        } 
+        else {
+            e.cancelBubble = true;
+        }
+    };
+    shiftBox.appendChild(corruptUp);
+    shiftBox.appendChild(swap);
+    shiftBox.appendChild(corruptDown);
+    box.appendChild(shiftBox);
+    /*Set up the show/hide controls*/
+    var switchDiv = document.getElementById("corruptswitch");
+    switchDiv.panelId = "corrupt";
+    switchDiv.closeOthers = closePanels;
+    switchDiv.onmousedown = function(evt){
+        var e = evt || window.event;
+        //Open the corruption control panel
+        var box = document.getElementById("corruptbox");
+        var isOpen = toggleClass("z5", box);
+        var parent = this.parentNode;
+        toggleClass("stuck", parent);
+        //Make sure the other panels are closed
+        switchDiv.closeOthers();
+        //Set an event on the document to
+        //close the panel, if it is open
+        if (isOpen){
+            if (document.addEventListener){
+                //Decent browsers
+                document.addEventListener("mousedown", closePanels, false);
+            }
+            else if (document.attachEvent){
+                //Internet Explorer
+                document.attachEvent("onmousedown", closePanels);
+            }
+        }
+        //Stop event propagation
+        if (e.stopPropagation){
+            e.stopPropagation();
+        } 
+        else {
+            e.cancelBubble = true;
+        }
+        return false;
+    };
+    //Cancel event propagation on the controls
+    var boxes = document.getElementsByClassName("corrupt");
+    for (i = 0; i < boxes.length; i++){
+        boxes[i].onmousedown = function(evt){
+            var e = evt || window.event;
+            if (e.stopPropagation){
+                e.stopPropagation();
+            } 
+            else {
+                e.cancelBubble = true;
+            }
+        };
+    }
+}
+
+/* Close one or more of the control panels.
+ */
+function closePanels(evt){
+    var e = evt || window.event;
+    //If one of the panels called the function,
+    //delete it from the close list
+    var keepOpen = this.panelId;
+    var panels = ["corrupt", "score", "work"];
+    var index = panels.indexOf(keepOpen);
+    if (index >= 0){
+        panels.remove(index);
+    }
+    //Close the panels
+    var currPanel;
+    for (var i = 0; i < panels.length; i++){
+        currPanel = document.getElementById(panels[i] + "box");
+        toggleClass("z5", currPanel, "off");
+        currParent = document.getElementById(panels[i] + "handle");
+        toggleClass("stuck", currParent, "off");
+    }
+    //Remove the handler from the document
+    if (document.removeEventListener){
+        //Decent browsers
+        document.removeEventListener("mousedown", closePanels, false);
+    }
+    else if (document.detachEvent){
+        //Internet Explorer
+        document.detachEvent("onmousedown", closePanels);
+    }
+}
+
+/* Build and draw a new board.  A value of true for
+ * the "blank" parameter draws a blank board.
+ */
+function drawBoard(blank){
+    var board = document.getElementById("board");
+    var ctx = board.getContext('2d');
+    //Clear the canvas
+    var width = board.width;
+    var height = board.height;
+    unsavedBoard(true);
+    ctx.fillStyle = "#332211";
+    ctx.fillRect(0, 0, width, height);
+    var state = getBoardState(blank);
+    var info = board.info;
+    var i, j, k;
+    //Create references to the XML setup data
+    var playerSetupXML = info.getElementsByTagName("player");
+    var playerCount = playerSetupXML.length;
+    var regionSetupXML = info.getElementsByTagName("region");
+    var regionCount = regionSetupXML.length;
+    var tokensTemp = info.getElementsByTagName("tokens")[0].childNodes;
+    var tokenSetupXML = [];
+    for (i = 0; i < tokensTemp.length; i++){
+        if (tokensTemp[i].nodeType == 1){
+            tokenSetupXML.push(tokensTemp[i]);
+        }
+    }
+    var regionCount = regionSetupXML.length;
+    //Create references to the XML gamestate data
+    var mapXML = state.getElementsByTagName("map")[0];
+    board.map = {};
+    var map = board.map;
+    map.xmlData = mapXML;
+    var regionsXML = mapXML.getElementsByTagName("region");
+    var scoreXML = state.getElementsByTagName("scoreboard")[0];
+    var playersXML = scoreXML.getElementsByTagName("player");
+    var oldWorldXML = state.getElementsByTagName("oldworld")[0];
+    //Set up the old world tokens pool
+    map.tokenPool = {};
+    var tokenName, token, supply, tempArray;
+    map.tokenPool.event = {
+        name : "event",
+        type : "pool",
+        tokens : []
+    };
+    map.tokenPool.hero = {
+        name : "hero",
+        type : "pool",
+        tokens : []
+    };
+    map.tokenPool.noble = {
+        name : "noble",
+        type : "pool",
+        tokens : []
+    };
+    map.tokenPool.peasant = {
+        name : "peasant",
+        type : "pool",
+        tokens : []
+    };
+    map.tokenPool.skaven = {
+        name : "skaven",
+        type : "pool",
+        tokens : []
+    };
+    map.tokenPool.warpstone = {
+        name : "warpstone",
+        type : "pool",
+        tokens : []
+    };
+    var pool = map.tokenPool;
+    var tokenSet = [pool.event, pool.hero, pool.noble, pool.peasant, pool.skaven, pool.warpstone];
+    for (i = 0; i < tokenSet.length; i++){
+        tokenName = tokenSet[i].name;
+        for (j = 0; j < tokenSetupXML.length; j++){
+            if (tokenSetupXML[j].nodeName == tokenName){
+                supply = tokenSetupXML[j].firstChild.data;
+            }
+        }
+        for (j = 0; j < supply; j++){
+            token = {
+                draw : drawToken,
+                name : tokenName,
+                type : "token",
+                home : tokenSet[i]
+            };
+            idString = String(supply + 1);
+            idString = (idString.length == 1) ? "0" + idString : idString;
+            token.objectID = token.name.substr(0,3) + idString;
+            token.objectID.toUpperCase();
+            tokenSet[i].tokens.push(token);
+        }
+    }
+    //Set up the players array
+    var players = [];
+    map.players = players;
+    var newPlayer, figCount, figTypes;
+    var modelTypes = ["cultist", "warrior", "daemon"];
+    for (i = 0; i < playerCount; i++){
+        newPlayer = {
+            name : playerSetupXML[i].getElementsByTagName("name")[0].firstChild.data,
+            idNum : i,
+            highlight : playerSetupXML[i].getAttribute("highlight"),
+            shadow : playerSetupXML[i].getAttribute("shadow"),
+            ctx : ctx,
+            xmlData : playersXML[i],
+            map : map,
+            type : "player",
+            cultists : [],
+            warriors : [],
+            daemons : []
+        };
+        //Total figure counts
+        newPlayer.figures = {
+            cultists : playerSetupXML[i].getElementsByTagName("cultists")[0].firstChild.data,
+            warriors : playerSetupXML[i].getElementsByTagName("warriors")[0].firstChild.data,
+            daemons : playerSetupXML[i].getElementsByTagName("daemons")[0].firstChild.data,
+        };
+        //Create figures of each type
+        //and put them in reserves
+        for (j = 0; j < modelTypes.length; j++){
+            figTypes = modelTypes[j] + "s";
+            for (k = 0; k < newPlayer.figures[figTypes]; k++){
+                figure = {
+                    draw : drawFigure,
+                    model : modelTypes[j],
+                    owner : newPlayer,
+                    type : "figure",
+                    marker : false,
+                    musk : false,
+                    shield : false
+                };
+                figCount = (k < 10) ? "0" + String(k) : String(k);
+                figure.objectID = modelTypes[j].substr(0,3) + figCount + newPlayer.name.substr(0,3);
+                figure.objectID.toUpperCase();
+                newPlayer[figTypes].push(figure);
+            }
+        }
+        players.push(newPlayer);
+    }
+    //Set up the regions array,
+    //and draw the regions
+    var regions = [];
+    map.regions = regions;
+    var newRegion, playerName;
+    var idString;
+    var borderXML, tempLinkList;
+    var corruptionXML, ruinTemp;
+    var tempFigureList, tempEffects, figure, figureXML, tempPlayers;
+    var tempCardList, tempOwner, cards, newCard, magicIcon;
+    var tempTokenList, tokenXML;
+    map.idCrd = 0;
+    map.idOWC = 0;
+    for (i = 0; i < regionCount; i++){
+        //Set up basic region information
+        //and region methods
+        newRegion = {
+            name : regionSetupXML[i].getElementsByTagName("name")[0].firstChild.data,
+            idNum : i,
+            draw : drawRegion,
+            drag : dragObject,
+            drop : dropObject,
+            ctx : ctx,
+            players : players,
+            xmlData : regionsXML[i],
+            populated : (regionSetupXML[i].getAttribute("populated") == "true"),
+            resistance : regionSetupXML[i].getElementsByTagName("resistance")[0].firstChild.data,
+            type : "region"
+        };
+        regions.push(newRegion);
+        //Set up the region's border and links
+        //to adjacent regions
+        borderXML = regionSetupXML[i].getElementsByTagName("border")[0];
+        newRegion.border = {
+            row : Number(borderXML.getAttribute("row")),
+            col : Number(borderXML.getAttribute("col"))
+        };
+        tempLinkList = borderXML.getElementsByTagName("link");
+        newRegion.links = [];
+        for (j = 0; j < tempLinkList.length; j++){
+            newRegion.links.push(tempLinkList[j].firstChild.data);
+        }
+        //Set up the region's corruption
+        corruptionXML = newRegion.xmlData.getElementsByTagName("corruption");
+        newRegion.corruption = [];
+        for (j = 0; j < playerCount; j++){
+            newRegion.corruption.push({});
+            newRegion.corruption[j].owner = players[j];
+            newRegion.corruption[j].value = 0;
+            newRegion.corruption[j].min = 0;
+            newRegion.corruption[j].max = 20;
+            newRegion.corruption[j].region = newRegion;
+            newRegion.corruption[j].draw = function(){
+                this.region.draw();
+            };
+            for (k = 0; k < corruptionXML.length; k++){
+                if (newRegion.corruption[j].owner.name == corruptionXML[k].getAttribute("owner")){
+                    newRegion.corruption[j].value = Number(corruptionXML[k].firstChild.data);
+                    break;
+                }
+            }
+        }
+        //Set the region's ruination rank, if ruined
+        ruinTemp = newRegion.xmlData.getElementsByTagName("ruined")[0];
+        newRegion.ruined = ruinTemp ? ruinTemp.firstChild.data : 0;
+        //Set up the region's chaos cards
+        newRegion.cards = [];
+        tempCardList = newRegion.xmlData.getElementsByTagName("card");
+        magicIcon = {
+            draw : drawToken,
+            name : "magic"
+        };
+        for (j = 0; j < tempCardList.length; j++){
+            var newCard = {
+                cost : tempCardList[j].getAttribute("cost"),
+                magic : (tempCardList[j].getAttribute("magic") == "true"),
+                magicIcon : magicIcon,
+                name : tempCardList[j].firstChild.data,
+                type : "chaos"
+            };
+            newRegion.cards.push(newCard);
+            tempOwner = tempCardList[j].getAttribute("owner");
+            for (k = 0; k < playerCount; k++){
+                if (tempOwner == players[k].name){
+                    newCard.owner = players[k];
+                    map.idCrd++;
+                    idString = String(map.idCrd);
+                    idString = (idString.length == 1) ? "0" + idString : idString;
+                    newCard.objectID = "crd" + idString + tempOwner.substr(0,3);
+                    newCard.objectID.toUpperCase();
+                    newCard.draw = drawCard;
+                }
+            }
+        }
+        //Assign the old world tokens
+        tempTokenList = newRegion.xmlData.getElementsByTagName("tokens")[0].childNodes;
+        newRegion.tokens = [];
+        for (j = 0; j < tempTokenList.length; j++){
+            tokenXML = tempTokenList[j];
+            if (tokenXML.nodeType == 1){
+                tokenName = tokenXML.nodeName;
+                switch (tokenName){
+                case "event":
+                    token = map.tokenPool.event.tokens.shift();
+                    break;
+                case "hero":
+                    token = map.tokenPool.hero.tokens.shift();
+                    break;
+                case "noble":
+                    token = map.tokenPool.noble.tokens.shift();
+                    break;
+                case "peasant":
+                    token = map.tokenPool.peasant.tokens.shift();
+                    break;
+                case "skaven":
+                    token = map.tokenPool.skaven.tokens.shift();
+                    break;
+                case "warpstone":
+                    token = map.tokenPool.warpstone.tokens.shift();
+                    break;
+                }
+                if (token){
+                    newRegion.tokens.push(token);
+                }
+            }
+        }
+        /***Set up the region's figures***/
+        tempFigureList = newRegion.xmlData.getElementsByTagName("figures")[0].childNodes;
+        newRegion.figures = [];
+        //Set up name-keyed references 
+        //to the players
+        tempPlayers = {};
+        for (j = 0; j < playerCount; j++){
+            tempPlayers[players[j].name] = players[j];
+        }
+        //Divvy up the models
+        for (j = 0; j < tempFigureList.length; j++){
+            figureXML = tempFigureList[j];
+            if (figureXML.nodeType == 1){
+                playerName = figureXML.getAttribute("owner");
+                figTypes = figureXML.nodeName + "s";
+                figure = tempPlayers[playerName][figTypes].shift();
+                if (figure){
+                    figure.shield = (figureXML.getAttribute("shield") == "true");
+                    figure.musk = (figureXML.getAttribute("musk") == "true");
+                    figure.marker = (figureXML.getAttribute("marker") == "true");
+                }
+                newRegion.figures.push(figure);
+            }
+        }
+        //Draw the region
+        newRegion.draw();
+    }
+    //Set up and draw the scoreboard
+    var score = {};
+    map.score = score;
+    score.draw = drawScoreBoard;
+    score.ctx = ctx;
+    score.players = players;
+    score.xmlData = scoreXML;
+    var tempPeasants, tempUpgrades, allUpgrades, heldUpgrades, numHeld, obj, currentObj;
+    var dialSetupXML, dialXML, threat, tempDACs;
+    for (i = 0; i < playerCount; i++){
+        //Set up peasants
+        tempPeasants = players[i].xmlData.getElementsByTagName("peasant");
+        players[i].peasants = [];
+        for (j = 0; j < tempPeasants.length; j++){
+            token = map.tokenPool.peasant.tokens.shift();
+            if (token){
+                players[i].peasants.push(token);
+            }
+            else {
+                break;
+            }
+        }
+        //Set up upgrades
+        allUpgrades = playerSetupXML[i].getElementsByTagName("upgrades")[0].childNodes;
+        tempUpgrades = players[i].xmlData.getElementsByTagName("upgrades")[0].childNodes;
+        players[i].upgrades = [];
+        //Clean non-element nodes from the game state upgrades
+        heldUpgrades = [];
+        for (j = 0; j < tempUpgrades.length; j++){
+            currentObj = tempUpgrades[j];
+            if (currentObj.nodeType == 1){
+                heldUpgrades.push(currentObj.nodeName);
+            }
+        }
+        numHeld = heldUpgrades.length;
+        //Create an array of all upgrades, flagging
+        //those that are currently held
+        for (j = 0; j < allUpgrades.length; j++){
+            currentObj = allUpgrades[j];
+            if (currentObj.nodeType == 1){
+                obj = {
+                    draw : drawToken,
+                    name : currentObj.nodeName,
+                    active : false
+                };
+                players[i].upgrades.push(obj);
+                for (k = 0; k < numHeld; k++){
+                    if (heldUpgrades[k] == obj.name){
+                        obj.active = true;
+                        break;
+                    }
+                }
+            }
+        }
+        //Set up scores
+        players[i].pp = players[i].xmlData.getElementsByTagName("pp")[0].firstChild.data;
+        players[i].vp = players[i].xmlData.getElementsByTagName("vp")[0].firstChild.data;
+        //Set up the dial
+        dialSetupXML = playerSetupXML[i].getElementsByTagName("dial")[0];
+        players[i].dialCap = dialSetupXML.getAttribute("cap");
+        threat = dialSetupXML.firstChild.data;
+        players[i].threat = threat.split(',');
+        dialXML = playersXML[i].getElementsByTagName("dial")[0];
+        players[i].dialValue = dialXML.getElementsByTagName("value")[0].firstChild.data;
+        players[i].dacs = dialXML.getElementsByTagName("dac")[0].firstChild.data;
+    }
+    score.draw();
+    //Set up the scoreboard controls
+    buildScoreBoardControls();
+    //Draw the Old World track
+    var oldWorld = {};
+    map.oldWorld = oldWorld;
+    oldWorld.type = "oldworldtrack";
+    oldWorld.draw = drawOldWorld;
+    oldWorld.drag = dragObject;
+    oldWorld.drop = dropObject;
+    oldWorld.ctx = ctx;
+    oldWorld.xmlData = oldWorldXML;
+    var oldWorldCards = oldWorldXML.getElementsByTagName("card");
+    oldWorld.cards = [];
+    var symbol = {
+        name : "smallcomet",
+        draw : drawToken
+    };
+    var symbol2 = {
+        name : "darkcomet",
+        draw : drawToken
+    };
+    for (i = 0; i < oldWorldCards.length; i++){
+        newCard = {
+            name : oldWorldCards[i].firstChild.data,
+            event : (oldWorldCards[i].getAttribute("event") == "true"),
+            active : (oldWorldCards[i].getAttribute("active") == "true"),
+            ctx : ctx,
+            draw : drawCard,
+            symbol : symbol,
+            symbol2 : symbol2,
+            type : "oldworld"
+        };
+        map.idOWC++
+        idString = String(map.idOWC);
+        idString = (idString.length == 1) ? "0" + idString : idString;
+        newCard.objectID = "owc" + idString;
+        oldWorld.cards.push(newCard);
+    }
+    //Set up the Old World active card
+    //selection slider
+    var owActive = document.getElementById("activate");
+    owActive.cards = oldWorld.cards;
+    owActive.draw = drawOldWorldActive;
+    oldWorld.slider = owActive;
+    owActive.oldWorld = oldWorld;
+    oldWorld.draw();
+    //Draw the remaining Old World tokens
+    buildTokenPool();
+    //Associate the draw method with
+    //the player, then draw reserves
+    for (i = 0; i < playerCount; i++){
+         players[i].draw = drawReserves;
+         players[i].draw();
+         players[i].drag = dragObject;
+         players[i].drop = dropObject;
+    }
+    //Set up the figure workshop
+    board.workshop = buildWorkshop();
+    //Set up the corruption controls;
+    board.corruption = buildCorruption();
+    //Set event handlers on the canvas and
+    //on the holding pen
+    board.cursorPos = getCursorPosition;
+    var pen = document.getElementById("pen");
+    pen.move = mobileCanvas;
+    //Create the mousedown handler
+    board.press = function(evt){
+        //Check to be sure no object is held
+        if (!pen.held){
+            var l;
+            var coord = this.cursorPos(evt);
+            var x = coord.x;
+            var y = coord.y;
+            //Check for an object source
+            //area under the cursor
+            var areas = this.map.regions.concat(this.map.players);
+            areas.push(this.map.oldWorld);
+            for (l = 0; l < areas.length; l++){
+                if (areas[l].x0 <= x && x < areas[l].x1 && areas[l].y0 <= y && y < areas[l].y1){
+                    areas[l].drag(evt, x, y);
+                    break;
+                }
+            }
+        }
+        var board = this;
+        document.onmouseup = function(evt){
+            var board = document.getElementById("board");
+            board.release(evt);
+        };
+        return false;
+    };
+    //Create the mouseup handler
+    board.release = function(evt){
+        var pen = document.getElementById("pen");
+        //Check for a held object
+        if (pen.held){
+            var i, j;
+            var coord = this.cursorPos(evt);
+            var x = coord.x;
+            var y = coord.y;
+            //Check for an object target
+            //area under the cursor
+            var areas = this.map.regions.concat([this.map.oldWorld]);
+            for (i = 0; i < areas.length; i++){
+                if (areas[i].x0 <= x && x < areas[i].x1 && areas[i].y0 <= y && y < areas[i].y1){
+                    areas[i].drop();
+                    break;
+                }
+            }
+            if (i == areas.length){
+                //Attempt to drop a figure in
+                //the workshop
+                if (pen.held.model){
+                    var workshop = document.getElementById("workshop");
+                    workshop.release(evt);
+                }
+                else if (pen.held.type == "token"){
+                    //Score peasants dropped on the scoreboard
+                    if (pen.held.name == "peasant"){
+                        var players = this.map.players;
+                        for (i = 0; i < players.length; i++){
+                            if (players[i].peasantDrop.x0 <= x && x < players[i].peasantDrop.x1 && players[i].peasantDrop.y0 <= y && y < players[i].peasantDrop.y1){
+                                players[i].peasantDrop.drop();
+                                var fieldName = players[i].name + "_peasants";
+                                var control = document.getElementById(fieldName);
+                                control.value = players[i].peasants.length;
+                                break;
+                            }
+                        }
+                        if (i == players.length){
+                            pen.held.home.drop();
+                        }
+                    }
+                    else {
+                        //Return stray tokens to their pool
+                        pen.held.home.drop();
+                    }
+                }
+                //Clear any object other than a figure
+                else {
+                    pen.held = null;
+                    pen.source = null;
+                }
+            }
+        }
+        document.onmouseup = null;
+    };
+    board.onmousedown = board.press;
+}
+
+/* Find the object (if any) that is the target
+ * of a mouseclick within an area, and
+ * activate it or begin dragging it.
+ */
+function dragObject(evt, x, y){
+    var pen = document.getElementById("pen");
+    //Figures in a region
+    var figs = this.figures || [];
+    //Figures in reserves
+    var culs = this.cultists || [];
+    var wars = this.warriors || [];
+    var daes = this.daemons || [];
+    var toks = this.tokens || [];
+    var crds = this.cards || [];
+    var objects = [figs, culs, wars, daes, toks, crds];
+    var i, j, xOffset, yOffset, nullCard;
+    for (i = 0; i < objects.length; i++){
+        for (j = 0; j < objects[i].length; j++){
+            if (objects[i][j].x0 <= x && x < objects[i][j].x1 && objects[i][j].y0 <= y && y < objects[i][j].y1){
+                pen.held = objects[i].splice(j, 1)[0];
+                pen.source = this;
+                xOffset = x - pen.held.x0;
+                yOffset = y - pen.held.y0;
+                pen.move(evt, xOffset, yOffset);
+                break;
+            }
+        }
+    }
+}
+
+/* Attempt to place the held object in
+ * the invoking container.
+ */
+function dropObject(){
+    var pen = document.getElementById("pen");
+    //Identify the type of object
+    var type = pen.held.type;
+    var name = pen.held.name;
+    var objects;
+    if (type == "chaos" && this.type == "region"){
+        objects = this.cards;
+    }
+    else if (type == "oldworld" && this.type == "oldworldtrack"){
+        objects = this.cards;
+    }
+    else if (type == "token" && (this.type == "region" || this.type == "pool")){
+        objects = this.tokens;
+    }
+    else if (type == "token" && name == "peasant" && this.type == "peasantdrop"){
+        objects = this.tokens;
+    }
+    else if (type == "figure" && (this.type == "region" || this.type == "workshop")){
+        objects = this.figures;
+    }
+    else if (type == "figure" && this.type == "player"){
+        var figTypes = pen.held.model + "s";
+        objects = this[figTypes];
+        //Strip effects when returning a
+        //figure to reserves
+        pen.held.shield = false;
+        pen.held.musk = false;
+        pen.held.marker = false;
+    }
+    //If the destination matches the object,
+    //place it and redraw the destination
+    if (objects){
+        objects.push(pen.held);
+        this.draw();
+        //If the destination is different than
+        //the source, flag the board as "unsaved"
+        if (this !== pen.source){
+            unsavedBoard();
+        }
+    }
+    else if (pen.source){
+        pen.source.draw();
+    }
+    pen.held = null;
+    pen.source = null;
+}
+
+/* Create a draggable canvas, and draw
+ * the object being dragged on it.
+ */
+function mobileCanvas(evt, xOffset, yOffset){
+    var body = document.getElementById("body");
+    //Create the canvas element
+    this.canvas = document.createElement("canvas");
+    var ctx = this.canvas.getContext('2d');
+    this.canvas.id = "mobile";
+    this.canvas.className = "drag";
+    //Create a div to put the canvas in
+    var dragDiv = document.createElement("div");
+    dragDiv.className = "dragframe";
+    dragDiv.appendChild(this.canvas);
+    body.appendChild(dragDiv);
+    body.cursorPos = getCursorPosition;
+    var coord = body.cursorPos(evt);
+    //Retrieve the relevant style measures
+    //from the div
+    var styles = getComputedStyle(dragDiv, null) || dragDiv.currentStyle;
+    var lborder = Number(styles.borderLeftWidth.replace(/[^0-9]/g,""));
+    var lpadding = Number(styles.paddingLeft.replace(/[^0-9]/g,""));
+    var tborder = Number(styles.borderTopWidth.replace(/[^0-9]/g,""));
+    var tpadding = Number(styles.paddingTop.replace(/[^0-9]/g,""));
+    //Set the initial position of the div
+    var xOffsetEff = xOffset + lborder + lpadding;
+    var yOffsetEff = yOffset + tborder + tpadding;
+    var moveLeft = coord.x - xOffsetEff - 13;
+    var moveTop = coord.y - yOffsetEff - 11;
+    dragDiv.style.left = moveLeft + "px";
+    dragDiv.style.top = moveTop + "px";
+    this.canvas.width = 200;
+    this.canvas.height = 50;
+    var pen = this;
+    //pen.held.moving = true;
+    //Draw the held object
+    //Figure
+    if (pen.held.model){
+        var height = pen.held.y1 - pen.held.y0;
+        pen.held.draw(13, height + 10, ctx);
+    }
+    //Token
+    else if (pen.held.icon){
+        pen.held.draw(13, 11, ctx);
+    }
+    //Card
+    else {
+        pen.held.draw(13, 11, ctx);
+    }
+    //Move the containing div with
+    //the mouse.  Redraw the source
+    //area on the first movement.
+    var source = pen.source;
+    dragDiv.onmousemove = function(evt){
+        if (source && source.draw){
+            source.draw();
+            source = null;
+        }
+        var bodyCoord = body.cursorPos(evt);
+        var x = bodyCoord.x - xOffsetEff - 10;
+        var y = bodyCoord.y - yOffsetEff - 10;
+        this.style.left = x + "px";
+        this.style.top = y + "px";
+    };
+    //Stop moving the div on mouseup, and
+    //get rid of the div and canvas
+    dragDiv.onmouseup = function(){
+        if (source && source.draw){
+            source.draw();
+        }
+        document.onmousemove = null;
+        body.removeChild(this);
+        pen.canvas = null;
+    };
+}
+
+/* Set handlers to open one of the
+ * card or token lists.
+ */
+function clickOpen(){
+    this.className = this.className + " down";
+    this.onmouseup = function(){
+        var obj = this;
+        obj.next.close();
+        obj.next.onmouseup();
+        obj.next.next.close();
+        obj.next.next.onmouseup();
+        var openTimer = setTimeout(function(){
+            obj.items.className = obj.items.className + " open";
+            obj.items.parentNode.className = obj.items.parentNode.className + " upper";
+            obj.onmousedown = clickClosed;
+            obj.onmouseup = null;
+            obj.onmouseout = null;
+        }, 200);
+    }
+    this.onmouseout = function(){
+        this.className = this.className.replace(/( )?down/g,"");
+        this.onmousedown = clickOpen;
+        this.onmouseup = null;
+        this.onmouseout = null;
+    }
+    return false;
+}
+
+/* Set handlers to close one of the
+ * card or token lists.
+ */
+function clickClosed(){
+    this.onmouseup = function(){
+        this.className = this.className.replace(/( )?down/g,"");
+        this.items.className = this.items.className.replace(/( )?open/g,"");
+        this.items.parentNode.className = this.items.parentNode.className.replace(/( )?upper/g,"");
+        this.onmousedown = clickOpen;
+        this.onmouseup = null;
+        this.onmouseout = null;
+    }
+    this.onmouseout = function(){
+        this.onmousedown = clickClosed;
+        this.onmouseup = null;
+        this.onmouseout = null;
+    }
+    return false;
+}
+
+/* Save the current board state to the server
+ * as an XML document.
+ */
+function saveBoardXML(saveType){
+    var board = document.getElementById("board");
+    var fail, i, gameNumber, gameState;
+    //Verify that the user is logged in
+    var userLevel = document.getElementById("userlevel").value;
+    var userName = document.getElementById("username").firstChild.data;
+    if (!(userLevel > 0)){
+        fail = true;
+        showMessage("ERROR: Must be logged in to save", "error");
+    }
+    //New game
+    else if (saveType == "newgame"){
+        //Verify permission level for a user
+        //trying to save a new 0000-series game
+        gameState = "01";
+        gameNumber = document.getElementById("savegamenum").value;
+        while (gameNumber.length < 4){
+            gameNumber = "0" + gameNumber;
+        }
+        if (gameNumber < 1000 && userLevel < 2){
+            fail = true;
+            showMessage("ERROR: Insufficient user permissions", "error");
+        }
+        //Check to be sure the game doesn't
+        //exist already
+        else {
+            var gamePick = document.getElementById("gamepick");
+            for (i = 0; i < gamePick.options.length; i++){
+                if (gamePick.options[i].value == gameNumber){
+                    fail = true;
+                    showMessage("ERROR: Specified gamestate file already exists", "error");
+                    break;
+                }
+            }
+        }
+    }
+    //Existing game
+    else {
+        gameNumber = board.game;
+        //Get the state number, depending on whether
+        //the save type is "newstate" or "overwrite"
+        gameState = (saveType == "newstate") ? nextState(gameNumber) : board.state;
+        if (gameState > 0){
+            while (gameState.length < 2){
+                gameState = "0" + gameState;
+            }
+            while (gameNumber.length < 4){
+                gameNumber = "0" + gameNumber;
+            }
+            //Verify that a user trying to save a
+            //new state for an existing game is 
+            //the creator or an admin
+            if (userLevel < 3){
+                var creatorName = board.creator;
+                if (creatorName.toLowerCase() != userName.toLowerCase()){
+                    fail = true;
+                    showMessage("ERROR: User name mismatch", "error");
+                }
+            }
+        }
+        else {
+            fail = true;
+            showMessage("ERROR: No states for that game exist", "error");
+        }
+    }
+    //Proceed, if everything is in order
+    if (!fail){
+        var i, j, node, node2, node3, textNode, value;
+        //Create the board and find the root element
+        var xmlDoc = newXMLDocument("boardstate");
+        var boardState = xmlDoc.documentElement;
+        //Set the board's creator
+        if (saveType == "newgame"){
+            boardState.setAttribute("creator", userName);
+        }
+        else {
+            boardState.setAttribute("creator", board.creator);
+        }
+        //Old World cards
+        var oldWorld = xmlDoc.createElement("oldworld");
+        var cards = board.map.oldWorld.cards;
+        for (i = 0; i < cards.length; i++){
+            node = xmlDoc.createElement("card");
+            textNode = xmlDoc.createTextNode('');
+            textNode.data = cards[i].name;
+            node.appendChild(textNode);
+            if (cards[i].active){
+                node.setAttribute("active","true");
+            }
+            if (cards[i].event){
+                node.setAttribute("event","true");
+            }
+            oldWorld.appendChild(node);
+        }
+        boardState.appendChild(oldWorld);
+        //Scoreboard
+        var scoreBoard = xmlDoc.createElement("scoreboard");
+        var players = board.map.players;
+        for (i = 0; i < players.length; ++i){
+            node = xmlDoc.createElement("player");
+            node.setAttribute("name", players[i].name);
+            //Peasants
+            node2 = xmlDoc.createElement("tokens");
+            for (j = 0; j < players[i].peasants.length; j++){
+                node3 = xmlDoc.createElement("peasant");
+                node2.appendChild(node3);
+            }
+            node.appendChild(node2);
+            //Upgrades
+            node2 = xmlDoc.createElement("upgrades");
+            for (j = 0; j < players[i].upgrades.length; j++){
+                if (players[i].upgrades[j].active){
+                    node3 = xmlDoc.createElement(players[i].upgrades[j].name);
+                    node2.appendChild(node3);
+                }
+            }
+            node.appendChild(node2);
+            //PP7
+            node2 = xmlDoc.createElement("pp");
+            textNode = xmlDoc.createTextNode('');
+            textNode.data = players[i].pp;
+            node2.appendChild(textNode);
+            node.appendChild(node2);
+            //VP
+            node2 = xmlDoc.createElement("vp");
+            textNode = xmlDoc.createTextNode('');
+            textNode.data = players[i].vp;
+            node2.appendChild(textNode);
+            node.appendChild(node2);
+            //Threat dial
+            node2 = xmlDoc.createElement("dial");
+            node2.setAttribute("cap", players[i].dialCap);
+            node3 = xmlDoc.createElement("value");
+            textNode = xmlDoc.createTextNode('');
+            textNode.data = players[i].dialValue;
+            node3.appendChild(textNode);
+            node2.appendChild(node3);
+            node3 = xmlDoc.createElement("dac");
+            textNode = xmlDoc.createTextNode('');
+            textNode.data = players[i].dacs;
+            node3.appendChild(textNode);
+            node2.appendChild(node3);
+            node.appendChild(node2);
+            scoreBoard.appendChild(node);
+        }
+        boardState.appendChild(scoreBoard);
+        //Regions map
+        var map = xmlDoc.createElement("map");
+        var regions = board.map.regions;
+        for (i = 0; i < regions.length; i++){
+            //Region name
+            node = xmlDoc.createElement("region");
+            node.setAttribute("name", regions[i].name);
+            //Old World tokens
+            node2 = xmlDoc.createElement("tokens");
+            for (j = 0; j < regions[i].tokens.length; j++){
+                node3 = xmlDoc.createElement(regions[i].tokens[j].name);
+                node2.appendChild(node3);
+            }
+            node.appendChild(node2);
+            //Chaos cards
+            node2 = xmlDoc.createElement("chaos");
+            for (j = 0; j < regions[i].cards.length; j++){
+                node3 = xmlDoc.createElement("card");
+                node3.setAttribute("cost", regions[i].cards[j].cost);
+                node3.setAttribute("owner", regions[i].cards[j].owner.name);
+                if (regions[i].cards[j].magic){
+                    node3.setAttribute("magic", true);
+                }
+                textNode = xmlDoc.createTextNode('');
+                textNode.data = regions[i].cards[j].name;
+                node3.appendChild(textNode);
+                node2.appendChild(node3);
+            }
+            node.appendChild(node2);
+            //Corruption
+            for (j = 0; j < regions[i].corruption.length; j++){
+                value = regions[i].corruption[j].value;
+                if (value > 0){
+                    node2 = xmlDoc.createElement("corruption");
+                    node2.setAttribute("owner", regions[i].corruption[j].owner.name);
+                    textNode = xmlDoc.createTextNode('');
+                    textNode.data = value;
+                    node2.appendChild(textNode);
+                    node.appendChild(node2);
+                }
+            }
+            //Ruin
+            value = regions[i].ruined;
+            if (value > 0){
+                node2 = xmlDoc.createElement("ruined");
+                textNode = xmlDoc.createTextNode('');
+                textNode.data = value;
+                node2.appendChild(textNode);
+                node.appendChild(node2);
+            }
+            //Figures
+            node2 = xmlDoc.createElement("figures");
+            for (j = 0; j < regions[i].figures.length; j++){
+                node3 = xmlDoc.createElement(regions[i].figures[j].model);
+                node3.setAttribute("owner", regions[i].figures[j].owner.name);
+                if (regions[i].figures[j].shield){
+                    node3.setAttribute("shield", "true");
+                }
+                if (regions[i].figures[j].musk){
+                    node3.setAttribute("musk", "true");
+                }
+                if (regions[i].figures[j].marker){
+                    node3.setAttribute("marker", "true");
+                }
+                node2.appendChild(node3);
+            }
+            node.appendChild(node2);
+            map.appendChild(node);
+        }
+        boardState.appendChild(map);
+        //Serialize the document
+        var serializer = new XMLSerializer();
+        var xmlString = encodeURIComponent(serializer.serializeToString(boardState));
+        //Send the serialized XML document
+        //to the server with an AJAX request
+        xmlhttp = xmlRequest();
+        if (xmlhttp) {
+            xmlhttp.onreadystatechange = function(){
+                if (this.readyState == 4 && this.status == 200){
+                    if (this.responseText.search("ERROR") >= 0){
+                        showMessage(this.responseText, "error");
+                    }
+                    else {
+                        showMessage(this.responseText, "okay");
+                        //Turn off the "unsaved" flags
+                        unsavedBoard(true); 
+                    }
+                }
+            };
+            var overwrite = (saveType == "overwrite") ? 1 : 0;
+            xmlhttp.open("POST", "savexml.php", true);
+            xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xmlhttp.send('game=' + gameNumber + '&state=' + gameState + '&user=' + userName + '&over=' + overwrite + '&data='+ xmlString);
+        }
+        else {
+            //return false;
+        }
+    }
+    else {
+        //return false;
+    }
+}
+
+/* Flag the board as saved or unsaved.
+ */
+function unsavedBoard(saved){
+    var buttons = document.getElementsByClassName("warn");
+    var status = saved ? "off" : "on";
+    for (var i = 0; i < buttons.length; i++){
+        toggleClass("unsaved", buttons[i], status);
+    }    
+}
+
+/* Display error or status messages.
+ */
+function showMessage(content, type){
+    var message = document.getElementById("message");
+    var frame = message.firstElementChild;
+    var messageSpan = document.getElementById("messagespan");
+    //Set the message type
+    if (type == "okay"){
+        frame.className = "okay";
+    }
+    else if (type == "error"){
+        frame.className = "error";
+    }
+    //Set the message content
+    var text = document.createTextNode(content);
+    messageSpan.appendChild(text);
+    //Set the top margin based on the
+    //message height;
+    var styles = getComputedStyle(frame, null) || frame.currentStyle;
+    var height = Number(styles.height.replace(/[^0-9]/g,""));
+    var border = Number(styles.borderTopWidth.replace(/[^0-9]/g,""))
+    var margin = Number(styles.marginTop.replace(/[^0-9]/g,""))
+    var padding = Number(styles.paddingTop.replace(/[^0-9]/g,""))
+    var topMargin = Math.floor(height / 2) + border + margin + padding;
+    frame.style.marginTop = "-" + topMargin + "px";
+    //Move the message div to the front
+    toggleClass("underbox", message, "off");
+    //Set a handler to clear the message
+    if (document.addEventListener){
+        //Decent browsers
+        document.addEventListener("click", hideMessage, false);
+    }
+    else if (document.attachEvent){
+        //Internet Explorer
+        document.attachEvent("onclick", hideMessage);
+    }
+}
+
+/* Hide the message box.
+ */
+function hideMessage(){
+    var message = document.getElementById("message");
+    var frame = message.firstElementChild;
+    var messageSpan = document.getElementById("messagespan");
+    //Reset everything
+    frame.className = "";
+    while (messageSpan.firstChild){
+        messageSpan.removeChild(messageSpan.firstChild);
+    }
+    frame.style.marginTop = "0px";
+    toggleClass("underbox", message, "on");
+    //Remove the handler
+    if (document.removeEventListener){
+        //Decent browsers
+        document.removeEventListener("click", hideMessage, false);
+    }
+    else if (document.detachEvent){
+        //Internet Explorer
+        document.detachEvent("onclick", hideMessage);
+    }
+}
+
+/* Set up the board.
+ */
+function initialize(){
+    var board = document.getElementById("board");
+    var body = document.getElementById("body");
+    //Set up the various controls and
+    //components, and draw the initial board
+    if (board.getContext){
+        //Get the standard board setup
+        board.info = getGameSetup();
+        //Set handlers for the dropdown lists
+        var gamePick = document.getElementById("gamepick");
+        gamePick.onchange = getStates;
+        var drawNow = document.getElementById("drawnow");
+        drawNow.onclick = function(){
+            //Draw a saved board
+            drawBoard(false);
+        }
+        //Set up the "New Board" button
+        var newBoard = document.getElementById("newboard");
+        newBoard.onclick = function(){
+            //Draw a blank board
+            drawBoard(true);
+        }
+        //Set up the save game/state buttons
+        var saveXMLstate = document.getElementById("savexmlstate");
+        saveXMLstate.onclick = function(){
+            saveBoardXML("newstate");
+        };
+        var saveXMLgame = document.getElementById("savexmlgame");
+        saveXMLgame.onclick = function(){
+            saveBoardXML("newgame");
+        };
+        var overwriteXMLstate = document.getElementById("overwritestate");
+        overwriteXMLstate.onclick = function(){
+            saveBoardXML("overwrite");
+        };
+        //Set up the holding pen for
+        //object drag-and-drop
+        var pen = document.createElement("div");
+        pen.className = "holding";
+        pen.id = "pen";
+        body.appendChild(pen);
+        //Set up the testing display
+        var test = document.createElement("p");
+        test.className = "testing";
+        test.id = "testpar";
+        body.appendChild(test);
+        //Draw the starting board
+        drawBoard();
+        //Set up the list of Chaos cards
+        getChaosCards();
+        var cchead = document.getElementById("cchead");
+        cchead.items =  document.getElementById("cc");
+        cchead.open = clickOpen;
+        cchead.close = clickClosed;
+        cchead.onmousedown = cchead.open;
+        //Set up the list of Old World cards
+        getOldWorldCards();
+        var owchead = document.getElementById("owchead");
+        owchead.items =  document.getElementById("owc");
+        owchead.open = clickOpen;
+        owchead.close = clickClosed;
+        owchead.onmousedown = owchead.open;
+        //Draw the remaining Old World tokens
+        var owthead = document.getElementById("owthead");
+        owthead.items =  document.getElementById("owt");
+        owthead.open = clickOpen;
+        owthead.close = clickClosed;
+        owthead.onmousedown = owthead.open;
+        //Set relations so that the reserve
+        //drawers can close each other
+        cchead.next = owchead;
+        owchead.next = owthead;
+        owthead.next = cchead;
+        //Set up the save PNG button
+        var savePNG = document.getElementById("savepng");
+        savePNG.onclick = function(){
+            var board = document.getElementById("board");
+            var canvasData = board.toDataURL("image/png");
+            var postData = "canvas=" + canvasData;
+            xmlhttp = xmlRequest();
+            if (xmlhttp) {
+                xmlhttp.onreadystatechange = function(){
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
+                        var board = document.getElementById("board");
+                        window.open("getmap.php?game=" + board.game + "&state=" + board.state, "_self");
+                        return true;
+                    }
+                };
+                xmlhttp.open("POST",'savepng.php',true);
+                xmlhttp.setRequestHeader('Content-Type', 'canvas/upload');
+                xmlhttp.send(postData);
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+    }
+}
