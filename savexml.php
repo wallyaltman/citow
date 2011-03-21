@@ -15,7 +15,7 @@ session_start();
 $user = $_SESSION['username'];
 $userlevel = $_SESSION['privileges'];
 //Set the save directory
-$dir = realpath($docroot.'/chaos/saves/');
+$dir = realpath($docroot.'/chaos/saves/').'/';
 //Retrieve the POST variables
 $game = $_POST['game'];
 $state = $_POST['state'];

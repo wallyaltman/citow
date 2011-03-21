@@ -7,7 +7,7 @@
 $slash = strpos(getcwd(), '/') === false ? '\\' : '/';
 $docroot = realpath(getcwd() . $slash . '..');
 
-$dir = realpath($docroot.'/chaos/capture/');
+$dir = realpath($docroot.'/chaos/capture/').'/';
 
 $game = $_REQUEST['game'];
 $state = $_REQUEST['state'];

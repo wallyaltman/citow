@@ -7,7 +7,7 @@
 $slash = strpos(getcwd(), '/') === false ? '\\' : '/';
 $docroot = realpath(getcwd() . $slash . '..');
 
-$dir = realpath($docroot.'/chaos/capture/');
+$dir = realpath($docroot.'/chaos/capture/').'/';
 
 //Get the raw POST data
 if (isset($GLOBALS["HTTP_RAW_POST_DATA"])){
@@ -22,9 +22,14 @@ if (isset($GLOBALS["HTTP_RAW_POST_DATA"])){
     $unencodedData = base64_decode($canvasFiltered);
 
     //Save the file
-    $fp = fopen($dir . 'tmp.png', 'wb');
+    $fp = fopen($dir . 'tmp0.png', 'wb');
     fwrite($fp, $unencodedData);
     fclose($fp);
+    
+    //Convert the image to use an indexed colormap,
+    //no dithering, 128 colors (to save space)
+    $command = 'convert '.$dir.'tmp0.png -dither None -colors 128 '.$dir.'tmp.png';
+    exec($command);
 
     echo $canvas;
 }
