@@ -5,7 +5,8 @@
  * gameboard.js and saves it as a file on the server.
  */
 
-$docroot = getcwd() . '/..';
+$slash = strpos(getcwd(), '/') === false ? '\\' : '/';
+$docroot = realpath(getcwd() . $slash . '..');
 
 //Set the session path
 session_save_path(realpath(dirname($_SERVER['DOCUMENT_ROOT']) . '/../var/php_sessions'));
@@ -14,7 +15,7 @@ session_start();
 $user = $_SESSION['username'];
 $userlevel = $_SESSION['privileges'];
 //Set the save directory
-$dir = $docroot . '/chaos/saves/';
+$dir = realpath($docroot.'/chaos/saves/');
 //Retrieve the POST variables
 $game = $_POST['game'];
 $state = $_POST['state'];

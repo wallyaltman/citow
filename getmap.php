@@ -4,9 +4,10 @@
  * Created on: 7 Dec 2010
  */
 
-$docroot = getcwd() . '/..';
+$slash = strpos(getcwd(), '/') === false ? '\\' : '/';
+$docroot = realpath(getcwd() . $slash . '..');
 
-$dir = $docroot . '/chaos/capture/';
+$dir = realpath($docroot.'/chaos/capture/');
 
 $game = $_REQUEST['game'];
 $state = $_REQUEST['state'];

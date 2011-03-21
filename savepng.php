@@ -4,9 +4,10 @@
  * Created on: 7 Dec 2010
  */
 
-$docroot = getcwd() . '/..';
+$slash = strpos(getcwd(), '/') === false ? '\\' : '/';
+$docroot = realpath(getcwd() . $slash . '..');
 
-$dir = $docroot . '/chaos/capture/';
+$dir = realpath($docroot.'/chaos/capture/');
 
 //Get the raw POST data
 if (isset($GLOBALS["HTTP_RAW_POST_DATA"])){

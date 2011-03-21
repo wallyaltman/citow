@@ -3,9 +3,10 @@
  * to gameboard.js
 */
 
-$docroot = getcwd() . '/..';
+$slash = strpos(getcwd(), '/') === false ? '\\' : '/';
+$docroot = realpath(getcwd() . $slash . '..');
 
-$dir = $docroot . '/chaos/saves/';
+$dir = realpath($docroot.'/chaos/saves/');
 
 $request = $_GET['req'];
 $gamenum = $_GET['gamenum'];

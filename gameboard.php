@@ -7,10 +7,11 @@
  * a link to a specific game and state.
  */
 
-$docroot = getcwd() . '/..';
-$rooturl = '..';
+$slash = strpos(getcwd(), '/') === false ? '\\' : '/';
+$docroot = realpath(getcwd() . $slash . '..');
+$rooturl = 'http://'.$_SERVER['HTTP_HOST'];
 
-$headerurl = $docroot.'/header.php';
+$headerurl = realpath($docroot.'/header.php');
 include $headerurl;
 ?>
 <!DOCTYPE html>
@@ -127,7 +128,7 @@ echo '        <img src="'.$rooturl.'/chaos/icons/figure_effects_txt2.png" id="wo
   <div class="floatbox buttons clear">
     <div class="spacer"></div>
 <?php
-$dir = $docroot.'/chaos/saves';
+$dir = $docroot.$slash.'chaos'.$slash.'saves';
 
 $gamenum = $_GET['game'];
 $statenum = $_GET['state'];
