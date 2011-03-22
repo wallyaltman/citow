@@ -74,6 +74,30 @@ function xmlRequest(){
     return obj;
 }
 
+/* Create an XML string parser.
+ */
+function xmlParser(){
+    var parser;
+    //Use the DOMParser if available
+    if (window.DOMParser){
+        parser = new DOMParser();
+        parser.readXML = function(textInput){
+            return this.parseFromString(textInput, "text/xml");
+        };
+    }
+    //Otherwise, use an ActiveXObject
+    else if (window.ActiveXObject){
+        parser = {};
+        parser.readXML = function(textInput){
+            var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+            xmlDoc.async = "false";
+            xmlDoc.loadXML(textInput);
+            return xmlDoc;
+        }
+    }
+    return parser;
+}
+
 /* Check for browser compatibility of a given event.
  */
 function isEventSupported(eventName){
