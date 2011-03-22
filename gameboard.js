@@ -1376,7 +1376,7 @@ function drawBoard(blank){
     //Clear the canvas
     var width = board.width;
     var height = board.height;
-    unsavedBoard(true);
+    unsavedBoard(true, true);
     ctx.fillStyle = "#332211";
     ctx.fillRect(0, 0, width, height);
     var state = getBoardState(blank);
@@ -2380,14 +2380,23 @@ function saveBoardXML(saveType){
     }
 }
 
-/* Flag the board as saved or unsaved.
+/* Flag the board as saved or unsaved, and display a
+ * warning the first time a move is made when the
+ * user isn't logged in
  */
-function unsavedBoard(saved){
+function unsavedBoard(saved, stifle){
     var buttons = document.getElementsByClassName("warn");
+    var board = document.getElementById("board");
+    var userLevel = document.getElementById("userlevel").value;
     var status = saved ? "off" : "on";
     for (var i = 0; i < buttons.length; i++){
         toggleClass("unsaved", buttons[i], status);
-    }    
+    }
+    //Show the warning message
+    if (!(userLevel > 0 || board.gaveNotice || saved || stifle)){
+        showMessage("Warning: You are not logged in, and will not be able to save your changes.", "warning");
+        board.gaveNotice = true;
+    }
 }
 
 /* Display error or status messages.
@@ -2399,6 +2408,9 @@ function showMessage(content, type){
     //Set the message type
     if (type == "okay"){
         frame.className = "okay";
+    }
+    else if (type == "warning"){
+        frame.className = "warning";
     }
     else if (type == "error"){
         frame.className = "error";
