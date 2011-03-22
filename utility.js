@@ -107,6 +107,13 @@ function checkCompatibility(){
     catch(err) {
         obj.inputNumber = false;
     }
+    //Local storage
+    try {
+        obj.localStorage = ('localStorage' in window && window['localStorage'] !== null);
+    }
+    catch(err) {
+        obj.localStorage = false;
+    }
     return obj;
 }
 

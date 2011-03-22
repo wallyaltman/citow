@@ -2130,7 +2130,7 @@ function saveBoardXML(saveType){
     var fail, i, gameNumber, gameState;
     //Verify that the user is logged in
     var userLevel = document.getElementById("userlevel").value;
-    var userName = document.getElementById("username").firstChild.data;
+    var userName = document.getElementById("username") ? document.getElementById("username").firstChild.data : null;
     if (!(userLevel > 0)){
         fail = true;
         showMessage("ERROR: Must be logged in to save", "error");
@@ -2190,168 +2190,176 @@ function saveBoardXML(saveType){
             showMessage("ERROR: No states for that game exist", "error");
         }
     }
-    //Proceed, if everything is in order
-    if (!fail){
-        var i, j, node, node2, node3, textNode, value;
-        //Create the board and find the root element
-        var xmlDoc = newXMLDocument("boardstate");
-        var boardState = xmlDoc.documentElement;
-        //Set the board's creator
-        if (saveType == "newgame"){
-            boardState.setAttribute("creator", userName);
+    //Create the XML save data (regardless of
+    //whether there was an error that will
+    //prevent saving on the server
+    var i, j, node, node2, node3, textNode, value;
+    //Create the board and find the root element
+    var xmlDoc = newXMLDocument("boardstate");
+    var boardState = xmlDoc.documentElement;
+    //Set the board's creator
+    if (saveType == "newgame"){
+        boardState.setAttribute("creator", userName);
+    }
+    else {
+        boardState.setAttribute("creator", board.creator);
+    }
+    //Old World cards
+    var oldWorld = xmlDoc.createElement("oldworld");
+    var cards = board.map.oldWorld.cards;
+    for (i = 0; i < cards.length; i++){
+        node = xmlDoc.createElement("card");
+        textNode = xmlDoc.createTextNode('');
+        textNode.data = cards[i].name;
+        node.appendChild(textNode);
+        if (cards[i].active){
+            node.setAttribute("active","true");
         }
-        else {
-            boardState.setAttribute("creator", board.creator);
+        if (cards[i].event){
+            node.setAttribute("event","true");
         }
-        //Old World cards
-        var oldWorld = xmlDoc.createElement("oldworld");
-        var cards = board.map.oldWorld.cards;
-        for (i = 0; i < cards.length; i++){
-            node = xmlDoc.createElement("card");
-            textNode = xmlDoc.createTextNode('');
-            textNode.data = cards[i].name;
-            node.appendChild(textNode);
-            if (cards[i].active){
-                node.setAttribute("active","true");
-            }
-            if (cards[i].event){
-                node.setAttribute("event","true");
-            }
-            oldWorld.appendChild(node);
+        oldWorld.appendChild(node);
+    }
+    boardState.appendChild(oldWorld);
+    //Scoreboard
+    var scoreBoard = xmlDoc.createElement("scoreboard");
+    var players = board.map.players;
+    for (i = 0; i < players.length; ++i){
+        node = xmlDoc.createElement("player");
+        node.setAttribute("name", players[i].name);
+        //Peasants
+        node2 = xmlDoc.createElement("tokens");
+        for (j = 0; j < players[i].peasants.length; j++){
+            node3 = xmlDoc.createElement("peasant");
+            node2.appendChild(node3);
         }
-        boardState.appendChild(oldWorld);
-        //Scoreboard
-        var scoreBoard = xmlDoc.createElement("scoreboard");
-        var players = board.map.players;
-        for (i = 0; i < players.length; ++i){
-            node = xmlDoc.createElement("player");
-            node.setAttribute("name", players[i].name);
-            //Peasants
-            node2 = xmlDoc.createElement("tokens");
-            for (j = 0; j < players[i].peasants.length; j++){
-                node3 = xmlDoc.createElement("peasant");
+        node.appendChild(node2);
+        //Upgrades
+        node2 = xmlDoc.createElement("upgrades");
+        for (j = 0; j < players[i].upgrades.length; j++){
+            if (players[i].upgrades[j].active){
+                node3 = xmlDoc.createElement(players[i].upgrades[j].name);
                 node2.appendChild(node3);
             }
-            node.appendChild(node2);
-            //Upgrades
-            node2 = xmlDoc.createElement("upgrades");
-            for (j = 0; j < players[i].upgrades.length; j++){
-                if (players[i].upgrades[j].active){
-                    node3 = xmlDoc.createElement(players[i].upgrades[j].name);
-                    node2.appendChild(node3);
-                }
+        }
+        node.appendChild(node2);
+        //PP
+        node2 = xmlDoc.createElement("pp");
+        textNode = xmlDoc.createTextNode('');
+        textNode.data = players[i].pp;
+        node2.appendChild(textNode);
+        node.appendChild(node2);
+        //VP
+        node2 = xmlDoc.createElement("vp");
+        textNode = xmlDoc.createTextNode('');
+        textNode.data = players[i].vp;
+        node2.appendChild(textNode);
+        node.appendChild(node2);
+        //Threat dial
+        node2 = xmlDoc.createElement("dial");
+        node2.setAttribute("cap", players[i].dialCap);
+        node3 = xmlDoc.createElement("value");
+        textNode = xmlDoc.createTextNode('');
+        textNode.data = players[i].dialValue;
+        node3.appendChild(textNode);
+        node2.appendChild(node3);
+        node3 = xmlDoc.createElement("dac");
+        textNode = xmlDoc.createTextNode('');
+        textNode.data = players[i].dacs;
+        node3.appendChild(textNode);
+        node2.appendChild(node3);
+        node.appendChild(node2);
+        scoreBoard.appendChild(node);
+    }
+    boardState.appendChild(scoreBoard);
+    //Regions map
+    var map = xmlDoc.createElement("map");
+    var regions = board.map.regions;
+    for (i = 0; i < regions.length; i++){
+        //Region name
+        node = xmlDoc.createElement("region");
+        node.setAttribute("name", regions[i].name);
+        //Old World tokens
+        node2 = xmlDoc.createElement("tokens");
+        for (j = 0; j < regions[i].tokens.length; j++){
+            node3 = xmlDoc.createElement(regions[i].tokens[j].name);
+            node2.appendChild(node3);
+        }
+        node.appendChild(node2);
+        //Chaos cards
+        node2 = xmlDoc.createElement("chaos");
+        for (j = 0; j < regions[i].cards.length; j++){
+            node3 = xmlDoc.createElement("card");
+            node3.setAttribute("cost", regions[i].cards[j].cost);
+            node3.setAttribute("owner", regions[i].cards[j].owner.name);
+            if (regions[i].cards[j].magic){
+                node3.setAttribute("magic", true);
             }
-            node.appendChild(node2);
-            //PP
-            node2 = xmlDoc.createElement("pp");
             textNode = xmlDoc.createTextNode('');
-            textNode.data = players[i].pp;
-            node2.appendChild(textNode);
-            node.appendChild(node2);
-            //VP
-            node2 = xmlDoc.createElement("vp");
-            textNode = xmlDoc.createTextNode('');
-            textNode.data = players[i].vp;
-            node2.appendChild(textNode);
-            node.appendChild(node2);
-            //Threat dial
-            node2 = xmlDoc.createElement("dial");
-            node2.setAttribute("cap", players[i].dialCap);
-            node3 = xmlDoc.createElement("value");
-            textNode = xmlDoc.createTextNode('');
-            textNode.data = players[i].dialValue;
+            textNode.data = regions[i].cards[j].name;
             node3.appendChild(textNode);
             node2.appendChild(node3);
-            node3 = xmlDoc.createElement("dac");
-            textNode = xmlDoc.createTextNode('');
-            textNode.data = players[i].dacs;
-            node3.appendChild(textNode);
-            node2.appendChild(node3);
-            node.appendChild(node2);
-            scoreBoard.appendChild(node);
         }
-        boardState.appendChild(scoreBoard);
-        //Regions map
-        var map = xmlDoc.createElement("map");
-        var regions = board.map.regions;
-        for (i = 0; i < regions.length; i++){
-            //Region name
-            node = xmlDoc.createElement("region");
-            node.setAttribute("name", regions[i].name);
-            //Old World tokens
-            node2 = xmlDoc.createElement("tokens");
-            for (j = 0; j < regions[i].tokens.length; j++){
-                node3 = xmlDoc.createElement(regions[i].tokens[j].name);
-                node2.appendChild(node3);
-            }
-            node.appendChild(node2);
-            //Chaos cards
-            node2 = xmlDoc.createElement("chaos");
-            for (j = 0; j < regions[i].cards.length; j++){
-                node3 = xmlDoc.createElement("card");
-                node3.setAttribute("cost", regions[i].cards[j].cost);
-                node3.setAttribute("owner", regions[i].cards[j].owner.name);
-                if (regions[i].cards[j].magic){
-                    node3.setAttribute("magic", true);
-                }
-                textNode = xmlDoc.createTextNode('');
-                textNode.data = regions[i].cards[j].name;
-                node3.appendChild(textNode);
-                node2.appendChild(node3);
-            }
-            node.appendChild(node2);
-            //Corruption
-            for (j = 0; j < regions[i].corruption.length; j++){
-                value = regions[i].corruption[j].value;
-                if (value > 0){
-                    node2 = xmlDoc.createElement("corruption");
-                    node2.setAttribute("owner", regions[i].corruption[j].owner.name);
-                    textNode = xmlDoc.createTextNode('');
-                    textNode.data = value;
-                    node2.appendChild(textNode);
-                    node.appendChild(node2);
-                }
-            }
-            //Ruin
-            value = regions[i].ruined;
+        node.appendChild(node2);
+        //Corruption
+        for (j = 0; j < regions[i].corruption.length; j++){
+            value = regions[i].corruption[j].value;
             if (value > 0){
-                node2 = xmlDoc.createElement("ruined");
+                node2 = xmlDoc.createElement("corruption");
+                node2.setAttribute("owner", regions[i].corruption[j].owner.name);
                 textNode = xmlDoc.createTextNode('');
                 textNode.data = value;
                 node2.appendChild(textNode);
                 node.appendChild(node2);
             }
-            //Figures
-            node2 = xmlDoc.createElement("figures");
-            for (j = 0; j < regions[i].figures.length; j++){
-                node3 = xmlDoc.createElement(regions[i].figures[j].model);
-                node3.setAttribute("owner", regions[i].figures[j].owner.name);
-                if (regions[i].figures[j].shield){
-                    node3.setAttribute("shield", "true");
-                }
-                if (regions[i].figures[j].musk){
-                    node3.setAttribute("musk", "true");
-                }
-                if (regions[i].figures[j].marker){
-                    node3.setAttribute("marker", "true");
-                }
-                node2.appendChild(node3);
-            }
-            node.appendChild(node2);
-            map.appendChild(node);
         }
-        boardState.appendChild(map);
-        //Serialize the document
-        var serializer = new XMLSerializer();
-        var xmlString = encodeURIComponent(serializer.serializeToString(boardState));
-        //Send the serialized XML document
-        //to the server with an AJAX request
+        //Ruin
+        value = regions[i].ruined;
+        if (value > 0){
+            node2 = xmlDoc.createElement("ruined");
+            textNode = xmlDoc.createTextNode('');
+            textNode.data = value;
+            node2.appendChild(textNode);
+            node.appendChild(node2);
+        }
+        //Figures
+        node2 = xmlDoc.createElement("figures");
+        for (j = 0; j < regions[i].figures.length; j++){
+            node3 = xmlDoc.createElement(regions[i].figures[j].model);
+            node3.setAttribute("owner", regions[i].figures[j].owner.name);
+            if (regions[i].figures[j].shield){
+                node3.setAttribute("shield", "true");
+            }
+            if (regions[i].figures[j].musk){
+                node3.setAttribute("musk", "true");
+            }
+            if (regions[i].figures[j].marker){
+                node3.setAttribute("marker", "true");
+            }
+            node2.appendChild(node3);
+        }
+        node.appendChild(node2);
+        map.appendChild(node);
+    }
+    boardState.appendChild(map);
+    //Serialize the document
+    var serializer = new XMLSerializer();
+    var xmlString = encodeURIComponent(serializer.serializeToString(boardState));
+    //Send the serialized XML document
+    //to the server with an AJAX request,
+    //if there are no show-stopping problems
+    if (!fail) {
         var xmlhttp = xmlRequest();
         if (xmlhttp) {
             xmlhttp.onreadystatechange = function(){
                 if (this.readyState == 4 && this.status == 200){
                     if (this.responseText.search("ERROR") >= 0){
                         showMessage(this.responseText, "error");
+                        //Save the XML document to local storage
+                        //if there was a problem
+                        if (checkCompatibility().localStorage){
+                            localStorage["gameboard"] = xmlString;
+                        }
                     }
                     else {
                         //Update the HTML controls
@@ -2371,12 +2379,14 @@ function saveBoardXML(saveType){
             xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xmlhttp.send('game=' + gameNumber + '&state=' + gameState + '&user=' + userName + '&over=' + overwrite + '&data='+ xmlString);
         }
-        else {
-            //return false;
-        }
     }
+    //Save the XML document to local
+    //storage if it can't be saved
+    //on the server
     else {
-        //return false;
+        if (checkCompatibility().localStorage){
+            localStorage["gameboard"] = xmlString;
+        }
     }
 }
 
