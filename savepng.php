@@ -28,7 +28,7 @@ if (isset($GLOBALS["HTTP_RAW_POST_DATA"])){
     
     //Convert the image to use an indexed colormap,
     //no dithering, 128 colors (to save space)
-    $command = 'convert '.$dir.'tmp0.png -dither None -colors 128 '.$dir.'tmp.png';
+    $command = 'convert '.$dir.'tmp0.png -dither None -colors 256 '.$dir.'tmp.png';
     exec($command);
 
     echo $canvas;
