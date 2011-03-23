@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<boardstate creator="stever777">
+  <oldworld>
+    <card active="true" event="true">The Grail is Found</card>
+    <card>Up From Skavenblight</card>
+  </oldworld>
+  <scoreboard>
+    <player name="Khorne">
+      <tokens>
+        <peasant/>
+      </tokens>
+      <upgrades/>
+      <pp>5</pp>
+      <vp>4</vp>
+      <dial cap="9">
+        <value>1</value>
+        <dac>0</dac>
+      </dial>
+    </player>
+    <player name="Nurgle">
+      <tokens/>
+      <upgrades/>
+      <pp>6</pp>
+      <vp>3</vp>
+      <dial cap="10">
+        <value>1</value>
+        <dac>0</dac>
+      </dial>
+    </player>
+    <player name="Tzeentch">
+      <tokens/>
+      <upgrades>
+        <cultist/>
+      </upgrades>
+      <pp>6</pp>
+      <vp>0</vp>
+      <dial cap="8">
+        <value>2</value>
+        <dac>0</dac>
+      </dial>
+    </player>
+    <player name="Slaanesh">
+      <tokens/>
+      <upgrades/>
+      <pp>6</pp>
+      <vp>5</vp>
+      <dial cap="7">
+        <value>1</value>
+        <dac>0</dac>
+      </dial>
+    </player>
+  </scoreboard>
+  <map>
+    <region name="Norsca">
+      <tokens>
+        <peasant/>
+      </tokens>
+      <chaos/>
+      <figures/>
+    </region>
+    <region name="Troll Country">
+      <tokens>
+        <peasant/>
+      </tokens>
+      <chaos/>
+      <figures/>
+    </region>
+    <region name="Kislev">
+      <tokens>
+        <warpstone/>
+        <warpstone/>
+        <skaven/>
+      </tokens>
+      <chaos/>
+      <corruption owner="Tzeentch">2</corruption>
+      <figures>
+        <cultist owner="Tzeentch"/>
+        <cultist owner="Tzeentch"/>
+      </figures>
+    </region>
+    <region name="The Empire">
+      <tokens>
+        <warpstone/>
+      </tokens>
+      <chaos/>
+      <figures>
+        <daemon owner="Khorne"/>
+      </figures>
+    </region>
+    <region name="Bretonnia">
+      <tokens>
+        <skaven/>
+        <event/>
+      </tokens>
+      <chaos/>
+      <figures>
+        <warrior owner="Khorne"/>
+      </figures>
+    </region>
+    <region name="Estalia">
+      <tokens>
+        <warpstone/>
+        <skaven/>
+      </tokens>
+      <chaos>
+        <card cost="0" owner="Nurgle" magic="true">Plague Aura</card>
+        <card cost="0" owner="Tzeentch">Warp Shield</card>
+      </chaos>
+      <corruption owner="Nurgle">2</corruption>
+      <corruption owner="Tzeentch">2</corruption>
+      <figures>
+        <cultist owner="Nurgle"/>
+        <cultist owner="Nurgle"/>
+        <warrior owner="Khorne"/>
+        <cultist owner="Tzeentch"/>
+        <cultist owner="Tzeentch" shield="true"/>
+      </figures>
+    </region>
+    <region name="Tilea">
+      <tokens>
+        <noble/>
+      </tokens>
+      <chaos>
+        <card cost="3" owner="Slaanesh">Degenerate Royalty</card>
+      </chaos>
+      <corruption owner="Nurgle">1</corruption>
+      <corruption owner="Slaanesh">2</corruption>
+      <figures>
+        <cultist owner="Nurgle"/>
+        <warrior owner="Khorne"/>
+        <cultist owner="Slaanesh"/>
+      </figures>
+    </region>
+    <region name="The Border Princes">
+      <tokens>
+        <peasant/>
+        <event/>
+      </tokens>
+      <chaos/>
+      <figures>
+        <cultist owner="Slaanesh"/>
+      </figures>
+    </region>
+    <region name="The Badlands">
+      <tokens>
+        <noble/>
+      </tokens>
+      <chaos/>
+      <corruption owner="Slaanesh">2</corruption>
+      <figures>
+        <cultist owner="Slaanesh"/>
+        <cultist owner="Slaanesh"/>
+      </figures>
+    </region>
+  </map>
+</boardstate>

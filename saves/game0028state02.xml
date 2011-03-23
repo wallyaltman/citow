@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<boardstate>
+  <oldworld>
+    <card active="true">Warpstone Discovery</card>
+  </oldworld>
+  <scoreboard>
+    <player name="Khorne">
+      <tokens>
+        <peasant />
+      </tokens>
+      <upgrades>
+      </upgrades>
+      <pp>0</pp>
+      <vp>0</vp>
+      <dial cap="9">
+        <value>0</value>
+      </dial>
+    </player>
+    <player name="Nurgle">
+      <tokens>
+      </tokens>
+      <upgrades>
+      </upgrades>
+      <pp>0</pp>
+      <vp>0</vp>
+      <dial cap="10">
+        <value>0</value>
+      </dial>
+    </player>
+    <player name="Tzeentch">
+      <tokens>
+      </tokens>
+      <upgrades>
+      </upgrades>
+      <pp>0</pp>
+      <vp>0</vp>
+      <dial cap="8">
+        <value>0</value>
+      </dial>
+    </player>
+    <player name="Slaanesh">
+      <tokens>
+      </tokens>
+      <upgrades>
+      </upgrades>
+      <pp>0</pp>
+      <vp>0</vp>
+      <dial cap="7">
+        <value>0</value>
+      </dial>
+    </player>
+  </scoreboard>
+  <map>
+    <region name="Norsca">
+      <tokens>
+        <noble />
+      </tokens>
+      <chaos>
+        <card cost="1" owner="Slaanesh">Insidious Lies</card>
+        <card cost="0" owner="Slaanesh">Perverse Infiltration</card>
+      </chaos>
+      <figures>
+        <cultist owner="Slaanesh" />
+        <cultist owner="Slaanesh" />
+      </figures>
+    </region>
+    <region name="Troll Country">
+      <tokens>
+        <warpstone />
+      </tokens>
+      <chaos>
+        <card cost="0" owner="Nurgle">Plague Touch</card>
+        <card cost="0" owner="Tzeentch" magic="true">Changer of Ways</card>
+      </chaos>
+      <figures>
+        <warrior owner="Nurgle" />
+        <cultist owner="Tzeentch" />
+        <cultist owner="Tzeentch" />
+        <cultist owner="Slaanesh" />
+        <cultist owner="Slaanesh" />
+        <cultist owner="Slaanesh" />
+      </figures>
+    </region>
+    <region name="Kislev">
+      <tokens>
+        <warpstone />
+      </tokens>
+      <chaos>
+        <card cost="1" owner="Tzeentch" magic="true">Temporal Stasis</card>
+        <card cost="1" owner="Tzeentch">The Meddling of Skaven</card>
+      </chaos>
+      <figures>
+        <cultist owner="Nurgle" />
+        <cultist owner="Nurgle" />
+        <cultist owner="Tzeentch" />
+        <cultist owner="Tzeentch" />
+      </figures>
+    </region>
+    <region name="The Empire">
+      <tokens>
+      </tokens>
+      <chaos>
+        <card cost="0" owner="Khorne">Blood Frenzy</card>
+      </chaos>
+      <figures>
+        <warrior owner="Khorne" />
+      </figures>
+    </region>
+    <region name="Bretonnia">
+      <tokens>
+        <peasant />
+      </tokens>
+      <chaos>
+      </chaos>
+      <figures>
+      </figures>
+    </region>
+    <region name="Estalia">
+      <tokens>
+        <noble />
+        <warpstone />
+        <warpstone />
+      </tokens>
+      <chaos>
+      </chaos>
+      <figures>
+        <warrior owner="Khorne" />
+      </figures>
+    </region>
+    <region name="Tilea">
+      <tokens>
+        <peasant />
+      </tokens>
+      <chaos>
+      </chaos>
+      <figures>
+      </figures>
+    </region>
+    <region name="The Border Princes">
+      <tokens>
+        <peasant />
+      </tokens>
+      <chaos>
+      </chaos>
+      <figures>
+        <cultist owner="Khorne" />
+      </figures>
+    </region>
+    <region name="The Badlands">
+      <tokens>
+        <warpstone />
+      </tokens>
+      <chaos>
+        <card cost="1" owner="Khorne">Battle Cry</card>
+      </chaos>
+      <figures>
+      </figures>
+    </region>
+  </map>
+  <reserves>
+    <cultist owner="Khorne" />
+    <cultist owner="Khorne" />
+    <cultist owner="Khorne" />
+    <warrior owner="Khorne" />
+    <warrior owner="Khorne" />
+    <warrior owner="Khorne" />
+    <warrior owner="Khorne" />
+    <daemon owner="Khorne" />
+    <cultist owner="Nurgle" />
+    <cultist owner="Nurgle" />
+    <cultist owner="Nurgle" />
+    <cultist owner="Nurgle" />
+    <warrior owner="Nurgle" />
+    <warrior owner="Nurgle" />
+    <warrior owner="Nurgle" />
+    <warrior owner="Nurgle" />
+    <daemon owner="Nurgle" />
+    <cultist owner="Tzeentch" />
+    <cultist owner="Tzeentch" />
+    <cultist owner="Tzeentch" />
+    <cultist owner="Tzeentch" />
+    <warrior owner="Tzeentch" />
+    <warrior owner="Tzeentch" />
+    <warrior owner="Tzeentch" />
+    <daemon owner="Tzeentch" />
+    <cultist owner="Slaanesh" />
+    <warrior owner="Slaanesh" />
+    <warrior owner="Slaanesh" />
+    <warrior owner="Slaanesh" />
+    <daemon owner="Slaanesh" />
+  </reserves>
+</boardstate>

@@ -1,0 +1,18 @@
+### Archive files ###
+*.7z
+*.gz
+*.rar
+*.tar
+*.zip
+
+### Error log ###
+phperrors.txt
+
+### Temp image ###
+capture/*
+
+### Np++ backkups ###
+*.bak
+
+### php.ini ###
+php.ini

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<boardstate creator="Darian">
+  <oldworld>
+    <card>Franz's Decree</card>
+    <card>Plunged Into Chaos</card>
+    <card active="true">Dwarf Trollslayers</card>
+  </oldworld>
+  <scoreboard>
+    <player name="Khorne">
+      <tokens/>
+      <upgrades/>
+      <pp>1</pp>
+      <vp>4</vp>
+      <dial cap="9">
+        <value>1</value>
+        <dac>0</dac>
+      </dial>
+    </player>
+    <player name="Nurgle">
+      <tokens/>
+      <upgrades/>
+      <pp>3</pp>
+      <vp>4</vp>
+      <dial cap="10">
+        <value>0</value>
+        <dac>0</dac>
+      </dial>
+    </player>
+    <player name="Tzeentch">
+      <tokens/>
+      <upgrades/>
+      <pp>5</pp>
+      <vp>0</vp>
+      <dial cap="8">
+        <value>0</value>
+        <dac>0</dac>
+      </dial>
+    </player>
+    <player name="Slaanesh">
+      <tokens/>
+      <upgrades/>
+      <pp>5</pp>
+      <vp>6</vp>
+      <dial cap="7">
+        <value>1</value>
+        <dac>0</dac>
+      </dial>
+    </player>
+  </scoreboard>
+  <map>
+    <region name="Norsca">
+      <tokens>
+        <peasant/>
+      </tokens>
+      <chaos/>
+      <figures/>
+    </region>
+    <region name="Troll Country">
+      <tokens>
+        <warpstone/>
+        <hero/>
+      </tokens>
+      <chaos/>
+      <figures/>
+    </region>
+    <region name="Kislev">
+      <tokens>
+        <peasant/>
+      </tokens>
+      <chaos/>
+      <figures/>
+    </region>
+    <region name="The Empire">
+      <tokens>
+        <noble/>
+        <hero/>
+      </tokens>
+      <chaos/>
+      <figures>
+        <warrior owner="Khorne"/>
+      </figures>
+    </region>
+    <region name="Bretonnia">
+      <tokens>
+        <peasant/>
+      </tokens>
+      <chaos>
+        <card cost="1" owner="Nurgle">Rain of Pus</card>
+      </chaos>
+      <figures>
+        <cultist owner="Nurgle"/>
+        <cultist owner="Nurgle"/>
+      </figures>
+    </region>
+    <region name="Estalia">
+      <tokens>
+        <warpstone/>
+      </tokens>
+      <chaos>
+        <card cost="1" owner="Khorne">Ritual Slaying</card>
+        <card cost="1" owner="Tzeentch" magic="true">The Persistence of Change</card>
+      </chaos>
+      <corruption owner="Nurgle">1</corruption>
+      <figures>
+        <daemon owner="Khorne"/>
+        <warrior owner="Nurgle"/>
+        <warrior owner="Nurgle"/>
+        <warrior owner="Tzeentch"/>
+      </figures>
+    </region>
+    <region name="Tilea">
+      <tokens>
+        <noble/>
+      </tokens>
+      <chaos>
+        <card cost="0" owner="Tzeentch">Warp Shield</card>
+        <card cost="0" owner="Slaanesh">Perverse Infiltration</card>
+      </chaos>
+      <corruption owner="Tzeentch">1</corruption>
+      <corruption owner="Slaanesh">6</corruption>
+      <figures>
+        <warrior owner="Khorne"/>
+        <warrior owner="Khorne"/>
+        <cultist owner="Tzeentch" shield="true"/>
+        <cultist owner="Slaanesh"/>
+        <cultist owner="Slaanesh"/>
+        <cultist owner="Slaanesh"/>
+        <cultist owner="Slaanesh"/>
+      </figures>
+    </region>
+    <region name="The Border Princes">
+      <tokens>
+        <peasant/>
+      </tokens>
+      <chaos/>
+      <corruption owner="Khorne">1</corruption>
+      <figures>
+        <cultist owner="Khorne"/>
+        <cultist owner="Tzeentch"/>
+        <cultist owner="Slaanesh"/>
+      </figures>
+    </region>
+    <region name="The Badlands">
+      <tokens>
+        <warpstone/>
+      </tokens>
+      <chaos/>
+      <figures/>
+    </region>
+  </map>
+</boardstate>

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<boardstate creator="testplayer">
+  <oldworld>
+    <card>Plunged Into Chaos</card>
+    <card event="true">The Grail is Found</card>
+    <card active="true">Witch Hunters</card>
+    <card>Plunged Into Chaos</card>
+    <card active="true">Peasant Uprising</card>
+    <card>Plunged Into Chaos</card>
+  </oldworld>
+  <scoreboard>
+    <player name="Khorne">
+      <tokens>
+        <peasant/>
+        <peasant/>
+        <peasant/>
+        <peasant/>
+        <peasant/>
+      </tokens>
+      <upgrades>
+        <cultist/>
+        <pp1/>
+        <cards/>
+      </upgrades>
+      <pp>6</pp>
+      <vp>33</vp>
+      <dial cap="9">
+        <value>8</value>
+        <dac>0</dac>
+      </dial>
+    </player>
+    <player name="Nurgle">
+      <tokens>
+        <peasant/>
+      </tokens>
+      <upgrades>
+        <daemon/>
+      </upgrades>
+      <pp>5</pp>
+      <vp>46</vp>
+      <dial cap="10">
+        <value>4</value>
+        <dac>0</dac>
+      </dial>
+    </player>
+    <player name="Tzeentch">
+      <tokens/>
+      <upgrades>
+        <cultist/>
+        <pp1/>
+      </upgrades>
+      <pp>6</pp>
+      <vp>36</vp>
+      <dial cap="8">
+        <value>5</value>
+        <dac>0</dac>
+      </dial>
+    </player>
+    <player name="Slaanesh">
+      <tokens>
+        <peasant/>
+      </tokens>
+      <upgrades>
+        <cultist/>
+        <pp1/>
+      </upgrades>
+      <pp>5</pp>
+      <vp>36</vp>
+      <dial cap="7">
+        <value>4</value>
+        <dac>0</dac>
+      </dial>
+    </player>
+  </scoreboard>
+  <map>
+    <region name="Norsca">
+      <tokens>
+        <noble/>
+      </tokens>
+      <chaos>
+        <card cost="1" owner="Khorne">Field of Carnage</card>
+        <card cost="2" owner="Slaanesh">Field of Ecstasy</card>
+      </chaos>
+      <corruption owner="Khorne">3</corruption>
+      <corruption owner="Slaanesh">6</corruption>
+      <figures>
+        <cultist owner="Slaanesh"/>
+        <cultist owner="Khorne"/>
+        <warrior owner="Khorne"/>
+        <cultist owner="Khorne"/>
+      </figures>
+    </region>
+    <region name="Troll Country">
+      <tokens>
+        <noble/>
+      </tokens>
+      <chaos/>
+      <corruption owner="Slaanesh">3</corruption>
+      <figures>
+        <warrior owner="Khorne"/>
+      </figures>
+    </region>
+    <region name="Kislev">
+      <tokens>
+        <hero/>
+      </tokens>
+      <chaos/>
+      <corruption owner="Khorne">2</corruption>
+      <corruption owner="Nurgle">1</corruption>
+      <corruption owner="Tzeentch">5</corruption>
+      <corruption owner="Slaanesh">6</corruption>
+      <ruined>1</ruined>
+      <figures>
+        <cultist owner="Slaanesh"/>
+      </figures>
+    </region>
+    <region name="The Empire">
+      <tokens>
+        <event/>
+        <noble/>
+        <hero/>
+      </tokens>
+      <chaos/>
+      <corruption owner="Slaanesh">1</corruption>
+      <figures>
+        <warrior owner="Khorne"/>
+        <warrior owner="Khorne"/>
+        <cultist owner="Slaanesh"/>
+      </figures>
+    </region>
+    <region name="Bretonnia">
+      <tokens>
+        <event/>
+        <noble/>
+        <peasant/>
+        <warpstone/>
+      </tokens>
+      <chaos>
+        <card cost="1" owner="Khorne">Battle Cry</card>
+      </chaos>
+      <figures>
+        <cultist owner="Nurgle"/>
+        <cultist owner="Tzeentch"/>
+      </figures>
+    </region>
+    <region name="Estalia">
+      <tokens>
+        <hero/>
+      </tokens>
+      <chaos/>
+      <corruption owner="Nurgle">10</corruption>
+      <corruption owner="Slaanesh">5</corruption>
+      <ruined>2</ruined>
+      <figures>
+        <cultist owner="Nurgle"/>
+        <cultist owner="Nurgle"/>
+      </figures>
+    </region>
+    <region name="Tilea">
+      <tokens>
+        <peasant/>
+        <warpstone/>
+        <warpstone/>
+      </tokens>
+      <chaos/>
+      <corruption owner="Nurgle">3</corruption>
+      <corruption owner="Slaanesh">1</corruption>
+      <figures/>
+    </region>
+    <region name="The Border Princes">
+      <tokens>
+        <peasant/>
+      </tokens>
+      <chaos/>
+      <corruption owner="Nurgle">4</corruption>
+      <corruption owner="Tzeentch">7</corruption>
+      <ruined>3</ruined>
+      <figures>
+        <cultist owner="Tzeentch"/>
+        <cultist owner="Tzeentch"/>
+      </figures>
+    </region>
+    <region name="The Badlands">
+      <tokens>
+        <warpstone/>
+        <warpstone/>
+        <warpstone/>
+      </tokens>
+      <chaos/>
+      <corruption owner="Khorne">2</corruption>
+      <corruption owner="Nurgle">3</corruption>
+      <corruption owner="Tzeentch">4</corruption>
+      <ruined>4</ruined>
+      <figures>
+        <daemon owner="Khorne"/>
+        <daemon owner="Nurgle"/>
+      </figures>
+    </region>
+  </map>
+</boardstate>
