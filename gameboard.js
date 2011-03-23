@@ -1370,13 +1370,14 @@ function closePanels(evt){
 /* Build and draw a new board.  A value of true for
  * the "blank" parameter draws a blank board.
  */
-function drawBoard(blank){
+function drawBoard(blank, local){
     var board = document.getElementById("board");
     var ctx = board.getContext('2d');
     //Clear the canvas
     var width = board.width;
     var height = board.height;
-    unsavedBoard(true, true);
+    //Flag the board as saved
+    unsavedBoard(true);
     ctx.fillStyle = "#332211";
     ctx.fillRect(0, 0, width, height);
     var state = getBoardState(blank);
@@ -2204,6 +2205,9 @@ function saveBoardXML(saveType){
     else {
         boardState.setAttribute("creator", board.creator);
     }
+    //Set the game and state numbers
+    boardState.setAttribute("game", gameNumber || board.game);
+    boardState.setAttribute("state", gameState || board.state);
     //Old World cards
     var oldWorld = xmlDoc.createElement("oldworld");
     var cards = board.map.oldWorld.cards;
@@ -2390,6 +2394,21 @@ function saveBoardXML(saveType){
     }
 }
 
+/* Check local storage to see if a game board is
+ * stored, and if one is, prompt the user to
+ * restore it.
+ */
+function checkLocalStorage(){
+    var parser, xmlDoc, board;
+    //Check for a board in local storage
+    if (typeof(localStorage["gameboard"]) == "string"){
+        //Parse the board as XML, if one is found
+        if (parser = xmlParser()){
+            xmlDoc = parser.readXML(localStorage["gameboard"]);
+        }        
+    }    
+}
+
 /* Flag the board as saved or unsaved, and display a
  * warning the first time a move is made when the
  * user isn't logged in
@@ -2448,6 +2467,33 @@ function showMessage(content, type){
         //Internet Explorer
         document.attachEvent("onclick", hideMessage);
     }
+}
+
+/* Prompt the user for a yes/no or 
+ * multiple-choice response.
+ */
+function showPrompt(content, options){
+    var message = document.getElementById("message");
+    var frame = message.firstElementChild;
+    var messageSpan = document.getElementById("messagespan");
+    frame.className = "question";
+    //Set the message content
+    var text = document.createTextNode(content);
+    messageSpan.appendChild(text);
+    //Set the top margin based on the
+    //message height;
+    var styles = getComputedStyle(frame, null) || frame.currentStyle;
+    var height = Number(styles.height.replace(/[^0-9]/g,""));
+    var border = Number(styles.borderTopWidth.replace(/[^0-9]/g,""))
+    var margin = Number(styles.marginTop.replace(/[^0-9]/g,""))
+    var padding = Number(styles.paddingTop.replace(/[^0-9]/g,""))
+    var topMargin = Math.floor(height / 2) + border + margin + padding;
+    frame.style.marginTop = "-" + topMargin + "px";
+    //Move the message div to the front
+    toggleClass("underbox", message, "off");
+    
+    
+
 }
 
 /* Hide the message box.
@@ -2573,5 +2619,10 @@ function initialize(){
                 return false;
             }
         };
+        //Check for a board in local storage, and
+        //prompt to restore it if one is found
+        if (checkCompatibility().localStorage){
+            checkLocalStorage();
+        }
     }
 }

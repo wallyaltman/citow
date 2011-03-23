@@ -214,6 +214,16 @@ div.warning {
   padding:4px;
   width:400px;
 }
+div.prompt {
+  background-color:#C2D8EA;
+  position:absolute;
+  top:50%;
+  right:0px;
+  left:0px;
+  margin:0px auto;
+  padding:4px;
+  width:400px;
+}
 div.error p {
   background-image:url('http://appliednerditry.com/graphics/error.png');
   border:4px #9F0000 inset;
@@ -231,6 +241,15 @@ div.warning p {
   border:4px #423900 inset;
   color:#423900;
   margin:0;
+}
+div.question p {
+  background-image:url('http://appliednerditry.com/graphics/question.png');
+  border:4px #05365E inset;
+  color:#05365E;
+  margin:0;
+}
+div.question p div.messagefoot {
+  visibility:hidden;
 }
 div.messagebox div p {
   background-position:8px;
