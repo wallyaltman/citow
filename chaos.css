@@ -214,7 +214,7 @@ div.warning {
   padding:4px;
   width:400px;
 }
-div.prompt {
+div.question {
   background-color:#C2D8EA;
   position:absolute;
   top:50%;
@@ -224,40 +224,44 @@ div.prompt {
   padding:4px;
   width:400px;
 }
-div.error p {
+div.error div.messageframe {
   background-image:url('http://appliednerditry.com/graphics/error.png');
   border:4px #9F0000 inset;
   color:#9F0000;
-  margin:0;
 }
-div.okay p {
+div.okay div.messageframe {
   background-image:url('http://appliednerditry.com/graphics/check.png');
   border:4px #2A5E05 inset;
   color:#2A5E05;
-  margin:0;
 }
-div.warning p {
+div.warning div.messageframe {
   background-image:url('http://appliednerditry.com/graphics/warning.png');
   border:4px #423900 inset;
   color:#423900;
-  margin:0;
 }
-div.question p {
+div.question div.messageframe {
   background-image:url('http://appliednerditry.com/graphics/question.png');
   border:4px #05365E inset;
   color:#05365E;
-  margin:0;
 }
-div.question p div.messagefoot {
-  visibility:hidden;
-}
-div.messagebox div p {
+div.messageframe {
   background-position:8px;
   background-repeat:no-repeat;
-  padding:8px 8px 8px 45px;
-  font-weight:bold;
+  padding:0 8px 0 48px;
+  margin:0;
 }
-span.messagefoot {
+div.messageframe p {
+  font-weight:bold;
+  margin-top:6px;
+  margin-bottom:6px;
+}
+div#messagebuttons input {
+  margin:8px 8px 8px 0;
+}
+div.question p.messagefoot {
+  display:none;
+}
+p.messagefoot {
   font-weight:normal;
   font-style:italic;
   font-size:.75em;

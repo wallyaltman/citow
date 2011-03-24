@@ -95,11 +95,11 @@ echo '        <img src="'.$rooturl.'/chaos/icons/figure_effects_txt2.png" id="wo
     </div>
     <div id="message" class="messagebox underbox">
       <div>
-        <p>
-          <span id="messagespan"></span>
-          <br />
-          <span class="messagefoot">Click to close</span>
-        </p>
+        <div class="messageframe">
+          <p id="messagecontent"></p>
+          <div id="messagebuttons"></div>
+          <p class="messagefoot">Click to close</p>
+        </div>
       </div>
     </div>
     <div class="spacer tall"></div>
