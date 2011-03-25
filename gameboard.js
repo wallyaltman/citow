@@ -2290,7 +2290,9 @@ function saveBoardXML(saveType){
         for (j = 0; j < regions[i].cards.length; j++){
             node3 = xmlDoc.createElement("card");
             node3.setAttribute("cost", regions[i].cards[j].cost);
-            node3.setAttribute("owner", regions[i].cards[j].owner.name);
+            if (regions[i].cards[j].owner){
+                node3.setAttribute("owner", regions[i].cards[j].owner.name);
+            }
             if (regions[i].cards[j].magic){
                 node3.setAttribute("magic", true);
             }
