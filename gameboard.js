@@ -1599,6 +1599,15 @@ function drawBoard(blank){
                     newCard.draw = drawCard;
                 }
             }
+            if (!newCard.owner){
+                newCard.owner = null;
+                map.idCrd++;
+                idString = String(map.idCrd);
+                idString = (idString.length == 1) ? "0" + idString : idString;
+                newCard.objectID = "crd" + idString + "old";
+                newCard.objectID.toUpperCase();
+                newCard.draw = drawCard;
+            }
         }
         //Assign the old world tokens
         tempTokenList = newRegion.xmlData.getElementsByTagName("tokens")[0].childNodes;
@@ -2290,7 +2299,9 @@ function saveBoardXML(saveType){
         for (j = 0; j < regions[i].cards.length; j++){
             node3 = xmlDoc.createElement("card");
             node3.setAttribute("cost", regions[i].cards[j].cost);
-            node3.setAttribute("owner", regions[i].cards[j].owner.name);
+            if (regions[i].cards[j].owner){
+                node3.setAttribute("owner", regions[i].cards[j].owner.name);
+            }
             if (regions[i].cards[j].magic){
                 node3.setAttribute("magic", true);
             }
