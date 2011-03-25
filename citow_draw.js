@@ -59,8 +59,8 @@ function drawCard(x, y, ctx){
     //Draw the fill for a Chaos card
     if (card.type == "chaos"){
         //Check for card data
-        var highlight = !card.placeholder ? card.owner.highlight : null;
-        var shadow = !card.placeholder ? card.owner.shadow : null;
+        var highlight = !card.placeholder ? (card.owner ? card.owner.highlight : "#CCA477") : null;
+        var shadow = !card.placeholder ? (card.owner ? card.owner.shadow : "#3D3322") : null;
         //Draw the fill
         ctx.fillStyle = shadow || card.bgcolor;
         ctx.fillRect(x1 + 8, y1 + 2, 9, 13);

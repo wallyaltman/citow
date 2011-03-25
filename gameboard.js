@@ -405,9 +405,8 @@ function createUpDownButtons(target){
 function getOldWorldCards(){
     var xmlhttp = xmlRequest();
     if (xmlhttp){
-        //Get the document (full URL is required due
-        //to a bug in Google Chrome)
-        var loc = "../chaos/gamedata/";
+        //Get the document 
+        var loc = "gamedata/";
         var url = loc + "oldworld.xml";
         xmlhttp.onreadystatechange = function(){
             if (this.readyState == 4 && this.status == 200){
@@ -480,7 +479,7 @@ function getChaosCards(){
     if (xmlhttp){
         //Get the document (full URL is required due
         //to a bug in Google Chrome)
-        var loc = "../chaos/gamedata/";
+        var loc = "gamedata/";
         var url = loc + "chaos.xml";
         xmlhttp.onreadystatechange = function(){
             if (this.readyState == 4 && this.status == 200){
@@ -2518,10 +2517,10 @@ function initialize(){
         pen.id = "pen";
         body.appendChild(pen);
         //Set up the testing display
-        var test = document.createElement("p");
-        test.className = "testing";
-        test.id = "testpar";
-        body.appendChild(test);
+        //var test = document.createElement("p");
+        //test.className = "testing";
+        //test.id = "testpar";
+        //body.appendChild(test);
         //Draw the starting board
         drawBoard();
         //Set up the list of Chaos cards
