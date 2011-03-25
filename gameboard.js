@@ -1599,6 +1599,15 @@ function drawBoard(blank){
                     newCard.draw = drawCard;
                 }
             }
+            if (!newCard.owner){
+                newCard.owner = null;
+                map.idCrd++;
+                idString = String(map.idCrd);
+                idString = (idString.length == 1) ? "0" + idString : idString;
+                newCard.objectID = "crd" + idString + "old";
+                newCard.objectID.toUpperCase();
+                newCard.draw = drawCard;
+            }
         }
         //Assign the old world tokens
         tempTokenList = newRegion.xmlData.getElementsByTagName("tokens")[0].childNodes;
