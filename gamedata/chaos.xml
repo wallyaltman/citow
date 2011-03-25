@@ -31,4 +31,5 @@
   <card owner="Slaanesh" cost="2">Field of Ecstasy</card>
   <card owner="Slaanesh" cost="2" magic="true">Soporific Musk</card>
   <card owner="Slaanesh" cost="3">Degenerate Royalty</card>
+  <card cost="-">------Horned One's Due------</card>
 </chaoscards>
