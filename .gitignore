@@ -16,3 +16,6 @@ capture/*
 
 ### php.ini ###
 php.ini
+
+### save files (tracked separately) ###
+saves
