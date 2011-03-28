@@ -156,7 +156,7 @@ function updateSaveButtons(game, state){
     }
 }
 
-/* Read in the XML board state file.
+/* Read in a saved XML board state file.
  */
 function getBoardState(blank){
     var xmlhttp = xmlRequest();
@@ -178,7 +178,7 @@ function getBoardState(blank){
     board.creator = root.getAttribute("creator");
     //Update the save buttons
     if (!blank){
-        updateSaveButtons(board.game, board.state);
+        updateSaveButtons();
     }
     else {
         var saveXMLButton = document.getElementById("savexmlstate");
@@ -1375,11 +1375,27 @@ function drawBoard(blank, local){
     //Clear the canvas
     var width = board.width;
     var height = board.height;
-    //Flag the board as saved
-    unsavedBoard(true);
+    var state;
+    if (local){
+        //Flag the board as unsaved if
+        //from local storage
+        unsavedBoard();
+        state = local;
+        //Update the HTML controls
+        var gameOption = document.getElementById("game" + board.game);
+        gameOption.selected = true;
+        getStates(null, board.game, board.state);
+        //Update the save buttons
+        updateSaveButtons();
+    }
+    else {
+        //Flag the board as saved, if loading
+        //from a save file
+        unsavedBoard(true);
+        state = getBoardState(blank);
+    }
     ctx.fillStyle = "#332211";
     ctx.fillRect(0, 0, width, height);
-    var state = getBoardState(blank);
     var info = board.info;
     var i, j, k;
     //Create references to the XML setup data
@@ -1920,6 +1936,15 @@ function drawBoard(blank, local){
         return false;
     };
     addMouseWheelListener(board, wheelPP);
+    //Set a handler for the onunload event that
+    //saves the board to local storage if it
+    //reports that it is unsaved
+    window.onunload = function(){
+        board = document.getElementById("board");
+        if (!board.saved){
+            saveBoardXML("local");
+        }
+    };
 }
 
 /* Find the object (if any) that is the target
@@ -2137,66 +2162,73 @@ function clickClosed(){
 function saveBoardXML(saveType){
     var board = document.getElementById("board");
     var fail, i, gameNumber, gameState;
-    //Verify that the user is logged in
-    var userLevel = document.getElementById("userlevel").value;
-    var userName = document.getElementById("username") ? document.getElementById("username").firstChild.data : null;
-    if (!(userLevel > 0)){
+    //"Fail" directly to local storage if
+    //saveType == "local"
+    if (saveType == "local"){
         fail = true;
-        showMessage("ERROR: Must be logged in to save", "error");
     }
-    //New game
-    else if (saveType == "newgame"){
-        //Verify permission level for a user
-        //trying to save a new 0000-series game
-        gameState = "01";
-        gameNumber = document.getElementById("savegamenum").value;
-        while (gameNumber.length < 4){
-            gameNumber = "0" + gameNumber;
-        }
-        if (gameNumber < 1000 && userLevel < 2){
-            fail = true;
-            showMessage("ERROR: Insufficient user permissions", "error");
-        }
-        //Check to be sure the game doesn't
-        //exist already
-        else {
-            var gamePick = document.getElementById("gamepick");
-            for (i = 0; i < gamePick.options.length; i++){
-                if (gamePick.options[i].value == gameNumber){
-                    fail = true;
-                    showMessage("ERROR: Specified gamestate file already exists", "error");
-                    break;
-                }
-            }
-        }
-    }
-    //Existing game
     else {
-        gameNumber = board.game;
-        //Get the state number, depending on whether
-        //the save type is "newstate" or "overwrite"
-        gameState = (saveType == "newstate") ? nextState(gameNumber) : board.state;
-        if (gameState > 0){
-            while (gameState.length < 2){
-                gameState = "0" + gameState;
-            }
+        //Verify that the user is logged in
+        var userLevel = document.getElementById("userlevel").value;
+        var userName = document.getElementById("username") ? document.getElementById("username").firstChild.data : null;
+        if (!(userLevel > 0)){
+            fail = true;
+            showMessage("ERROR: Must be logged in to save", "error");
+        }
+        //New game
+        else if (saveType == "newgame"){
+            //Verify permission level for a user
+            //trying to save a new 0000-series game
+            gameState = "01";
+            gameNumber = document.getElementById("savegamenum").value;
             while (gameNumber.length < 4){
                 gameNumber = "0" + gameNumber;
             }
-            //Verify that a user trying to save a
-            //new state for an existing game is 
-            //the creator or an admin
-            if (userLevel < 3){
-                var creatorName = board.creator;
-                if (creatorName.toLowerCase() != userName.toLowerCase()){
-                    fail = true;
-                    showMessage("ERROR: User name mismatch", "error");
+            if (gameNumber < 1000 && userLevel < 2){
+                fail = true;
+                showMessage("ERROR: Insufficient user permissions", "error");
+            }
+            //Check to be sure the game doesn't
+            //exist already
+            else {
+                var gamePick = document.getElementById("gamepick");
+                for (i = 0; i < gamePick.options.length; i++){
+                    if (gamePick.options[i].value == gameNumber){
+                        fail = true;
+                        showMessage("ERROR: Specified gamestate file already exists", "error");
+                        break;
+                    }
                 }
             }
         }
+        //Existing game
         else {
-            fail = true;
-            showMessage("ERROR: No states for that game exist", "error");
+            gameNumber = board.game;
+            //Get the state number, depending on whether
+            //the save type is "newstate" or "overwrite"
+            gameState = (saveType == "newstate") ? nextState(gameNumber) : board.state;
+            if (gameState > 0){
+                while (gameState.length < 2){
+                    gameState = "0" + gameState;
+                }
+                while (gameNumber.length < 4){
+                    gameNumber = "0" + gameNumber;
+                }
+                //Verify that a user trying to save a
+                //new state for an existing game is 
+                //the creator or an admin
+                if (userLevel < 3){
+                    var creatorName = board.creator;
+                    if (creatorName.toLowerCase() != userName.toLowerCase()){
+                        fail = true;
+                        showMessage("ERROR: User name mismatch", "error");
+                    }
+                }
+            }
+            else {
+                fail = true;
+                showMessage("ERROR: No states for that game exist", "error");
+            }
         }
     }
     //Create the XML save data (regardless of
@@ -2405,35 +2437,34 @@ function saveBoardXML(saveType){
 }
 
 /* Check local storage to see if a game board is
- * stored, and if one is, prompt the user to
- * restore it.
+ * stored, and if one is, restore it.
  */
 function checkLocalStorage(){
-    var options;
+    var xmlDoc, root;
     var board = document.getElementById("board");
     //Check for a board in local storage
     if (typeof(localStorage["gameboard"]) == "string"){
-        //Parse the board as XML, if one is found
+        //If the parser can be found, load
+        //the locally stored board
         if (board.parser){
-            xmlDoc = board.parser.readXML(localStorage["gameboard"]);
-            options = ["Load", "Discard", "Ask me later"];
-            showPrompt("An unsaved board was found in local storage.  What should we do?", options, function(){});
-        }        
-    }    
-}
-
-/* Load or discard a board in local storage, or
- * defer the decision (i.e. do nothing)
- */
-function handleLocalStorage(){
-    var xmlDoc;
-    var board = document.getElementById("board");
-    if (this.value.toLowerCase == "load"){
-        
+            xmlDoc = board.parser.readXML(unescape(localStorage["gameboard"].replace(/\+/g, " ")));
+            //Read the board's game number, state number,
+            //and creator from the XML doc
+            root = xmlDoc.getElementsByTagName("boardstate")[0];
+            if (root && root.getAttribute){
+                board.game = Number(root.getAttribute("game"));
+                board.state = Number(root.getAttribute("state"));
+                board.creator = root.getAttribute("creator");
+                //Clear out the local copy
+                delete localStorage["gameboard"];
+                //Return the board
+                return xmlDoc;
+            }
+        }
     }
-    else if (this.value.toLowerCase == "discard"){
-        //delete localStorage["gameboard"];
-    }
+    //Return false if no board was found, or
+    //if it could not be loaded for some reason
+    return false;
 }
 
 /* Flag the board as saved or unsaved, and display a
@@ -2448,6 +2479,7 @@ function unsavedBoard(saved, stifle){
     for (var i = 0; i < buttons.length; i++){
         toggleClass("unsaved", buttons[i], status);
     }
+    board.saved = saved ? true : false;
     //Show the warning message
     if (!(userLevel > 0 || board.gaveNotice || saved || stifle)){
         showMessage("Warning: You are not logged in, and will not be able to save your changes.", "warning");
@@ -2620,13 +2652,14 @@ function initialize(){
         pen.className = "holding";
         pen.id = "pen";
         body.appendChild(pen);
-        //Set up the testing display
-        //var test = document.createElement("p");
-        //test.className = "testing";
-        //test.id = "testpar";
-        //body.appendChild(test);
-        //Draw the starting board
-        drawBoard();
+        //Check for a board in local storage,
+        //and restore it if one is found
+        if (checkCompatibility().localStorage){
+            var localBoard = checkLocalStorage();
+        }
+        //Draw the starting board (either the locally
+        //stored board, or the selected saved one)
+        drawBoard(false, localBoard);        
         //Set up the list of Chaos cards
         getChaosCards();
         var cchead = document.getElementById("cchead");
@@ -2676,10 +2709,5 @@ function initialize(){
                 return false;
             }
         };
-        //Check for a board in local storage, and
-        //prompt to restore it if one is found
-        if (checkCompatibility().localStorage){
-            checkLocalStorage();
-        }
     }
 }
