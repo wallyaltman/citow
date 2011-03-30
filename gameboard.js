@@ -2411,8 +2411,13 @@ function saveBoardXML(saveType){
                         //Update the HTML controls
                         var gameOption = document.getElementById("game" + gameNumber);
                         gameOption.selected = true;
+                        //Update the object game and save numbers
+                        //for the current game
+                        var board = document.getElementById("board");
+                        board.game = gameNumber;
+                        board.state = gameState;
                         getStates(null, gameNumber, gameState);
-                        updateSaveButtons(gameNumber, gameState);
+                        updateSaveButtons();
                         //Show the "Success!" message
                         showMessage(this.responseText, "okay");
                         //Turn off the "unsaved" flags
