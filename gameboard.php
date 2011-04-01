@@ -27,7 +27,6 @@ echo '  <link rel="stylesheet" href="chaos.css?t='.$t.'" />'."\n";
 echo '  <script src="utility.js" type="text/javascript"></script>'."\n";
 echo '  <script src="citow_draw.js" type="text/javascript"></script>'."\n";
 echo '  <script src="gameboard.js?t='.$t.'" type="text/javascript"></script>'."\n";
-echo '  <script src="'.$rooturl.'/library/json2.js" type="text/javascript"></script>'."\n";
 echo '</head>'."\n";
 echo '<body id="body">'."\n";
 //Header bar is from header.php, included at the top
