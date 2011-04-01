@@ -1,15 +1,13 @@
 <?php
-/* This program returns a list of games or gamestates
- * to gameboard.js
-*/
+/* This program generates a list of games/gamestates
+ * and stores it on the server in JSON format, as
+ * well as returning the list.
+ */
 
 $slash = strpos(getcwd(), '/') === false ? '\\' : '/';
 $docroot = realpath(getcwd() . $slash . '..');
 
-$dir = realpath($docroot.'/chaos/saves/');
-
-$request = $_GET['req'];
-$gamenum = $_GET['gamenum'];
+$dir = realpath($docroot . '/chaos/saves/') . '/';
 
 //Read the file list
 $files = array();
@@ -19,48 +17,38 @@ if ($handle = opendir($dir)){
     }
     closedir($handle);
 }
-
-//Identify CitOW game files
-
+//Identify game saves
 $gamefiles = preg_grep('/game[0-9]+state[0-9]+\.xml/', $files);
-
-//Pull and return the games list or the states list
-//for a given game, depending on the request
-
+//Put games and saves into a
+//two-dimensional array
+$games = array();
 $matches = array();
-if ($request == 'games'){
-    //Create separate arrays for games
-    //under and over 1000
-    $games = array();
-    $games2 = array();
-    foreach ($gamefiles as $filename){
-        preg_match('/game([0-9]+)/', $filename, $matches);
-        if ($matches[1] < 1000){
-            $games[] = $matches[1];
+foreach ($gamefiles as $filename){
+    if (preg_match('/game([0-9]+)state([0-9]+)/', $filename, $matches)){
+        $gnum = (int) $matches[1];
+        $snum = (int) $matches[2];
+        if (!isset($games[$gnum])){
+            $games[$gnum] = array();
         }
-        else {
-            $games2[] = $matches[1];
-        }
+        $games[$gnum][] = $snum;
     }
-    $games = array_unique($games);
-    sort($games);
-    $games2 = array_unique($games2);
-    sort($games2);
-    //Append the 1000+ games to the
-    //end of the array
-    $games = array_merge($games, $games2);
-    echo json_encode($games);
 }
-elseif ($request == "states"){
-    $states = array();
-    foreach ($gamefiles as $filename){
-        preg_match('/game([0-9]+)state([0-9]+)/', $filename, $matches);
-        if ($matches[1] == $gamenum){
-            $states[] = $matches[2];
-        }
-    }
-    $states = array_unique($states);
+//Sort the states in each game
+foreach ($games as &$states){
     sort($states);
-    echo json_encode($states);
 }
+//Sort the games
+ksort($games);
+//Write out the list
+$file = 'save_manifest.json';
+$output = json_encode($games);
+file_put_contents($dir.$file, $output, LOCK_EX);
+if (file_exists($dir.$file)){
+    $returnmsg = $output;
+}
+else {
+    $x = new stdClass();
+    $returnmsg = json_encode($x);
+}
+echo $returnmsg;
 ?>
