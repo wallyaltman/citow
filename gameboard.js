@@ -3,39 +3,75 @@
  * These scripts draw map components for Chaos in the Old World.
  */
 
+/*** need to rewrite getGames, getStates, nextState ***/ 
+
 /* Read in the list of games for which
  * gamestates exist, and fill the
  * select dropdown accordingly.
  */
 function getGames(){
     var xmlhttp = xmlRequest();
+    //File location
+    var loc = "../chaos/saves/";
+    var file = "save_manifest.json";
     if (xmlhttp) {
         xmlhttp.onreadystatechange = function(){
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
-                var templist = JSON.parse(xmlhttp.responseText);
+            if (this.readyState == 4 && this.status == 200){
+                //Read the game list
+                var gamesObject = JSON.parse(this.responseText);
                 var gamePick = document.getElementById("gamepick");
+                var statePick = document.getElementById("statepick");
+                //Reset the select elements
                 while(gamePick.hasChildNodes()){
                     gamePick.removeChild(gamePick.lastChild);
                 }
-                var opt;
-                for (var i = 0; i < templist.length; i++){
+                while(statePick.hasChildNodes()){
+                    statePick.removeChild(statePick.lastChild);
+                }
+                var opt, key, maxKey = 0, selectedOpt, selectedStates;
+                //Iterate over the games and make
+                //select options for them
+                for (key in gamesObject){
+                    if (gamesObject.hasOwnProperty(key)){
+                        opt = document.createElement('option');
+                        opt.text = "Game " + key
+                        opt.id = "game" + key
+                        opt.value = key;
+                        //Select the option with maximum
+                        //key < 1000
+                        if (key > maxKey && key < 1000){
+                            maxKey = key;
+                        }
+                        gamePick.appendChild(opt);
+                    }
+                }
+                selectedOpt = document.getElementById("game" + maxKey);
+                selectedOpt.selected = true;
+                //Retrieve states for the selected game
+                var state;
+                selectedStates = gamesObject["maxKey"];
+                for (var i = 0; i < selectedStates.length; i++){
                     opt = document.createElement('option');
-                    opt.text = "Game " + Number(templist[i]);
-                    opt.id = "game" + Number(templist[i]);
-                    opt.value = templist[i];
-                    if (i == templist.length - 1){
+                    state = String(selectedStates[i]);
+                    while (state.length < 2){
+                        state = "0" + state;
+                    }
+                    opt.text = "State " + +state;
+                    opt.id = "state" + state;
+                    opt.value = state;
+                    //Select the last option
+                    if (i == selectedStates.length){
                         opt.selected = true;
                     }
-                    gamePick.appendChild(opt);
+                    statePick.appendChild(opt);
                 }
-                getStates();
                 return true;
             }
             else {
                 return false;
             }
         };
-        xmlhttp.open("GET", "gamelist.php?req=games", true);
+        xmlhttp.open("GET", loc + file, true);
         xmlhttp.send();
     }
     else {
@@ -48,22 +84,36 @@ function getGames(){
  */
 function getStates(evt, game, state){
     var xmlhttp = xmlRequest();
+    //File location
+    var loc = "../chaos/saves/";
+    var file = "save_manifest.json";
     if (xmlhttp) {
         xmlhttp.onreadystatechange = function(){
             if (this.readyState == 4 && this.status == 200){
-                var templist = JSON.parse(this.responseText);
+                //Read the game lsit
+                var gamesObject = JSON.parse(this.responseText);
                 var statePick = document.getElementById("statepick");
+                //Identify the desired game
+                var selectedStates = gamesObject[+game];
+                //Reset the select options
                 while(statePick.hasChildNodes()){
                     statePick.removeChild(statePick.lastChild);
                 }
-                var opt;
-                optState = state ? state - 1 : templist.length - 1;
-                for (var i = 0; i < templist.length; i++){
+                var opt, currState;
+                //If no state was specified, then set
+                //the last state to be selected
+                optState = state ? state : selectedStates[selectedStates.length - 1];
+                //Create a select option for each state
+                for (var i = 0; i < selectedStates.length; i++){
                     opt = document.createElement('option');
-                    opt.text = "State " + Number(templist[i]);
-                    opt.id = "state" + Number(templist[i]);
-                    opt.value = templist[i];
-                    if (i == optState){
+                    currState = String(selectedStates[i]);
+                    while (currState.length < 2){
+                        currState = "0" + currState;
+                    }
+                    opt.text = "State " + +currState;
+                    opt.id = "state" + currState;
+                    opt.value = currState;
+                    if (+currState == optState){
                         opt.selected = true;
                     }
                     statePick.appendChild(opt);
@@ -74,11 +124,13 @@ function getStates(evt, game, state){
                 return false;
             }
         };
+        //If no game was specified, read the gamePick
+        //select element to get one
         if (!game){
             var gamePick = document.getElementById("gamepick");
             game = gamePick[gamePick.selectedIndex].value;
         }
-        xmlhttp.open("GET", "gamelist.php?req=states&gamenum=" + game, true);
+        xmlhttp.open("GET", loc + file, true);
         xmlhttp.send();
     }
     else {
@@ -89,25 +141,99 @@ function getStates(evt, game, state){
 /* Get the next available state number
  * for saving the current game.
  */
-function nextState(game){
+function nextState(game, callBackFunc, passAlong){
     var xmlhttp = xmlRequest();
-    if (xmlhttp) {
-        xmlhttp.open("GET", "gamelist.php?req=states&gamenum=" + game, false);
+    //File location
+    var loc = "../chaos/saves/";
+    var file = "save_manifest.json";
+    if (xmlhttp && game) {
+        xmlhttp.onreadystatechange = function(){
+            if (this.readyState == 4 && this.status == 200){
+                var gamesObject = JSON.parse(this.responseText);
+                //Identify the desired game
+                var selectedStates = gamesObject[+game];
+                //Sort the result in reverse order
+                selectedStates.sort(function(a, b){ return (b - a); });
+                //Return the next state, if states exist
+                if (selectedStates.length > 0){
+                    var returnValue = String(+selectedStates[0] + 1);
+                    while (returnValue.length < 2){
+                        returnValue = "0" + returnValue;
+                    }
+                    if (callBackFunc){
+                        return callBackFunc(game, returnValue, passAlong);
+                    }
+                    else {
+                        return returnValue;
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }
+        };
+        xmlhttp.open("GET", loc + file, true);
         xmlhttp.send();
-        var templist = JSON.parse(xmlhttp.responseText);
-        //var templist = [0, 1, 3, 7];
-        //Sort the result in reverse order
-        templist.sort(function(a, b){ return (b - a); });
-        //Return the next state, if states exist
-        if (templist.length > 0){
-            return Number(templist[0]) + 1;
-        }
-        else {
-            return false;
-        }
     }
     else {
         return false;
+    }
+}
+
+/* Update the list of gamestates.
+ */
+function updateGameStateList(game, state){
+    var xmlhttp = xmlRequest();
+    if (xmlhttp) {
+        xmlhttp.onreadystatechange = function(){
+            if (this.readyState == 4 && this.status == 200){
+                //Read the game list
+                var gamesObject = JSON.parse(this.responseText);
+                var statePick = document.getElementById("statepick");
+                //Identify the desired game
+                var selectedStates = gameObject[game];
+                //Reset the select options
+                while(statePick.hasChildNodes()){
+                    statePick.removeChild(statePick.lastChild);
+                }
+                var opt;
+                //If no state was specified, then set
+                //the last state to be selected
+                optState = state ? state : selectedStates[selectedStates.length - 1];
+                //Create a select option for each state
+                for (var i = 0; i < selectedStates.length; i++){
+                    opt = document.createElement('option');
+                    currState = String(selectedStates[i]);
+                    while (currState.length < 2){
+                        currState = "0" + currState;
+                    }
+                    opt.text = "State " + +currState;
+                    opt.id = "state" + currState;
+                    opt.value = currState;
+                    if (+currState == optState){
+                        opt.selected = true;
+                    }
+                    statePick.appendChild(opt);
+                }
+                //Update the save buttons
+                updateSaveButtons();
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        //If no game was specified, read the gamePick
+        //select element to get one
+        if (!game){
+            var gamePick = document.getElementById("gamepick");
+            game = gamePick[gamePick.selectedIndex].value;
+        }
+        xmlhttp.open("GET", "gamelist.php" + game, true);
+        xmlhttp.send;
     }
 }
 
@@ -121,39 +247,42 @@ function updateSaveButtons(game, state){
     if (!state){
         state = board.state;
     }
-    var saveXMLButton = document.getElementById("savexmlstate");
-    var overwriteXMLstate = document.getElementById("overwritestate");
-    //Fill in the game and state number
-    var gameNum = Number(game);
-    var stateNumNext = nextState(gameNum);
-    saveXMLButton.value = "Save as Game " + gameNum + ", State " + stateNumNext;
-    overwriteXMLstate.value = "Overwrite Game " + gameNum + ", State " + state;
-    //Check for username matching the board's
-    //creator, or a user with top-level permissions
-    var userLevel = document.getElementById("userlevel").value;
-    var userElement = document.getElementById("username");
-    var fail;
-    if (userElement){
-        var userName = userElement.firstChild.data;
-    }
-    else {
-        fail = true;
-    }
-    if (userLevel < 3 && !fail){
-        if (board.creator.toLowerCase() != userName.toLowerCase()){
+    //Make a callback function to do the work
+    var buttonUpdate = function(game, stateNumNext, stateNum){
+        var board = document.getElementById("board");
+        var saveXMLButton = document.getElementById("savexmlstate");
+        var overwriteXMLstate = document.getElementById("overwritestate");
+        saveXMLButton.value = "Save as Game " + +game + ", State " + +stateNumNext;
+        overwriteXMLstate.value = "Overwrite Game " + +game + ", State " + +state;
+        //Check for username matching the board's
+        //creator, or a user with top-level permissions
+        var userLevel = document.getElementById("userlevel").value;
+        var userElement = document.getElementById("username");
+        var fail;
+        if (userElement){
+            var userName = userElement.firstChild.data;
+        }
+        else {
             fail = true;
         }
+        if (userLevel < 3 && !fail){
+            if (board.creator.toLowerCase() != userName.toLowerCase()){
+                fail = true;
+            }
+        }
+        //Enable the "Save as Game..." button for
+        //an appropriate user
+        if (!fail){
+            saveXMLButton.disabled = false;
+            overwriteXMLstate.disabled = false;
+        }
+        else {
+            saveXMLButton.disabled = true;
+            overwriteXMLstate.disabled = true;
+        }
     }
-    //Enable the "Save as Game..." button for
-    //an appropriate user
-    if (!fail){
-        saveXMLButton.disabled = false;
-        overwriteXMLstate.disabled = false;
-    }
-    else {
-        saveXMLButton.disabled = true;
-        overwriteXMLstate.disabled = true;
-    }
+    //Fill in the game and state number
+    nextState(game, buttonUpdate, state);
 }
 
 /* Read in a saved XML board state file.
@@ -2160,8 +2289,217 @@ function clickClosed(){
  * as an XML document.
  */
 function saveBoardXML(saveType){
-    var board = document.getElementById("board");
     var fail, i, gameNumber, gameState;
+    //Create the XML save data (regardless of
+    //whether there was an error that will
+    //prevent saving on the server)
+    var makeXML = function(gameNumber, gameState){
+        var board = document.getElementById("board");
+        var i, j, node, node2, node3, textNode, value;
+        //Create the board and find the root element
+        var xmlDoc = newXMLDocument("boardstate");
+        var boardState = xmlDoc.documentElement;
+        //Set the board's creator
+        if (saveType == "newgame"){
+            boardState.setAttribute("creator", userName);
+        }
+        else {
+            boardState.setAttribute("creator", board.creator);
+        }
+        //Set the game and state numbers
+        boardState.setAttribute("game", gameNumber || board.game);
+        boardState.setAttribute("state", gameState || board.state);
+        //Old World cards
+        var oldWorld = xmlDoc.createElement("oldworld");
+        var cards = board.map.oldWorld.cards;
+        for (i = 0; i < cards.length; i++){
+            node = xmlDoc.createElement("card");
+            textNode = xmlDoc.createTextNode('');
+            textNode.data = cards[i].name;
+            node.appendChild(textNode);
+            if (cards[i].active){
+                node.setAttribute("active","true");
+            }
+            if (cards[i].event){
+                node.setAttribute("event","true");
+            }
+            oldWorld.appendChild(node);
+        }
+        boardState.appendChild(oldWorld);
+        //Scoreboard
+        var scoreBoard = xmlDoc.createElement("scoreboard");
+        var players = board.map.players;
+        for (i = 0; i < players.length; ++i){
+            node = xmlDoc.createElement("player");
+            node.setAttribute("name", players[i].name);
+            //Peasants
+            node2 = xmlDoc.createElement("tokens");
+            for (j = 0; j < players[i].peasants.length; j++){
+                node3 = xmlDoc.createElement("peasant");
+                node2.appendChild(node3);
+            }
+            node.appendChild(node2);
+            //Upgrades
+            node2 = xmlDoc.createElement("upgrades");
+            for (j = 0; j < players[i].upgrades.length; j++){
+                if (players[i].upgrades[j].active){
+                    node3 = xmlDoc.createElement(players[i].upgrades[j].name);
+                    node2.appendChild(node3);
+                }
+            }
+            node.appendChild(node2);
+            //PP
+            node2 = xmlDoc.createElement("pp");
+            textNode = xmlDoc.createTextNode('');
+            textNode.data = players[i].pp;
+            node2.appendChild(textNode);
+            node.appendChild(node2);
+            //VP
+            node2 = xmlDoc.createElement("vp");
+            textNode = xmlDoc.createTextNode('');
+            textNode.data = players[i].vp;
+            node2.appendChild(textNode);
+            node.appendChild(node2);
+            //Threat dial
+            node2 = xmlDoc.createElement("dial");
+            node2.setAttribute("cap", players[i].dialCap);
+            node3 = xmlDoc.createElement("value");
+            textNode = xmlDoc.createTextNode('');
+            textNode.data = players[i].dialValue;
+            node3.appendChild(textNode);
+            node2.appendChild(node3);
+            node3 = xmlDoc.createElement("dac");
+            textNode = xmlDoc.createTextNode('');
+            textNode.data = players[i].dacs;
+            node3.appendChild(textNode);
+            node2.appendChild(node3);
+            node.appendChild(node2);
+            scoreBoard.appendChild(node);
+        }
+        boardState.appendChild(scoreBoard);
+        //Regions map
+        var map = xmlDoc.createElement("map");
+        var regions = board.map.regions;
+        for (i = 0; i < regions.length; i++){
+            //Region name
+            node = xmlDoc.createElement("region");
+            node.setAttribute("name", regions[i].name);
+            //Old World tokens
+            node2 = xmlDoc.createElement("tokens");
+            for (j = 0; j < regions[i].tokens.length; j++){
+                node3 = xmlDoc.createElement(regions[i].tokens[j].name);
+                node2.appendChild(node3);
+            }
+            node.appendChild(node2);
+            //Chaos cards
+            node2 = xmlDoc.createElement("chaos");
+            for (j = 0; j < regions[i].cards.length; j++){
+                node3 = xmlDoc.createElement("card");
+                node3.setAttribute("cost", regions[i].cards[j].cost);
+                if (regions[i].cards[j].owner){
+                    node3.setAttribute("owner", regions[i].cards[j].owner.name);
+                }
+                if (regions[i].cards[j].magic){
+                    node3.setAttribute("magic", true);
+                }
+                textNode = xmlDoc.createTextNode('');
+                textNode.data = regions[i].cards[j].name;
+                node3.appendChild(textNode);
+                node2.appendChild(node3);
+            }
+            node.appendChild(node2);
+            //Corruption
+            for (j = 0; j < regions[i].corruption.length; j++){
+                value = regions[i].corruption[j].value;
+                if (value > 0){
+                    node2 = xmlDoc.createElement("corruption");
+                    node2.setAttribute("owner", regions[i].corruption[j].owner.name);
+                    textNode = xmlDoc.createTextNode('');
+                    textNode.data = value;
+                    node2.appendChild(textNode);
+                    node.appendChild(node2);
+                }
+            }
+            //Ruin
+            value = regions[i].ruined;
+            if (value > 0){
+                node2 = xmlDoc.createElement("ruined");
+                textNode = xmlDoc.createTextNode('');
+                textNode.data = value;
+                node2.appendChild(textNode);
+                node.appendChild(node2);
+            }
+            //Figures
+            node2 = xmlDoc.createElement("figures");
+            for (j = 0; j < regions[i].figures.length; j++){
+                node3 = xmlDoc.createElement(regions[i].figures[j].model);
+                node3.setAttribute("owner", regions[i].figures[j].owner.name);
+                if (regions[i].figures[j].shield){
+                    node3.setAttribute("shield", "true");
+                }
+                if (regions[i].figures[j].musk){
+                    node3.setAttribute("musk", "true");
+                }
+                if (regions[i].figures[j].marker){
+                    node3.setAttribute("marker", "true");
+                }
+                node2.appendChild(node3);
+            }
+            node.appendChild(node2);
+            map.appendChild(node);
+        }
+        boardState.appendChild(map);
+        //Serialize the document
+        var serializer = new XMLSerializer();
+        var xmlString = encodeURIComponent(serializer.serializeToString(boardState));
+        //Send the serialized XML document
+        //to the server with an AJAX request,
+        //if there are no show-stopping problems
+        if (!fail) {
+            var xmlhttp = xmlRequest();
+            if (xmlhttp) {
+                xmlhttp.onreadystatechange = function(){
+                    if (this.readyState == 4 && this.status == 200){
+                        if (this.responseText.search("ERROR") >= 0){
+                            showMessage(this.responseText, "error");
+                            //Save the XML document to local storage
+                            //if there was a problem
+                            if (checkCompatibility().localStorage){
+                                localStorage["gameboard"] = xmlString;
+                            }
+                        }
+                        else {
+                            //Update the HTML controls
+                            var gameOption = document.getElementById("game" + gameNumber);
+                            gameOption.selected = true;
+                            //Update the object game and save numbers
+                            //for the current game
+                            var board = document.getElementById("board");
+                            board.game = gameNumber;
+                            board.state = gameState;
+                            updateGameStateList(gameNumber, gameState);
+                            //Show the "Success!" message
+                            showMessage(this.responseText, "okay");
+                            //Turn off the "unsaved" flags
+                            unsavedBoard(true); 
+                        }
+                    }
+                };
+                var overwrite = (saveType == "overwrite") ? 1 : 0;
+                xmlhttp.open("POST", "savexml.php", true);
+                xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xmlhttp.send('game=' + gameNumber + '&state=' + gameState + '&user=' + userName + '&over=' + overwrite + '&data='+ xmlString);
+            }
+        }
+        //Save the XML document to local
+        //storage if it can't be saved
+        //on the server
+        else {
+            if (checkCompatibility().localStorage){
+                localStorage["gameboard"] = xmlString;
+            }
+        }
+    }
     //"Fail" directly to local storage if
     //saveType == "local"
     if (saveType == "local"){
@@ -2200,13 +2538,15 @@ function saveBoardXML(saveType){
                     }
                 }
             }
+            //Call the function to make the XML data
+            makeXML();
         }
-        //Existing game
-        else {
+        //Overwrite an existing gamestate
+        else if (saveType == "overwrite"){
             gameNumber = board.game;
             //Get the state number, depending on whether
             //the save type is "newstate" or "overwrite"
-            gameState = (saveType == "newstate") ? nextState(gameNumber) : board.state;
+            gameState = board.state;
             if (gameState > 0){
                 while (gameState.length < 2){
                     gameState = "0" + gameState;
@@ -2230,213 +2570,31 @@ function saveBoardXML(saveType){
                 showMessage("ERROR: No states for that game exist", "error");
             }
         }
-    }
-    //Create the XML save data (regardless of
-    //whether there was an error that will
-    //prevent saving on the server
-    var i, j, node, node2, node3, textNode, value;
-    //Create the board and find the root element
-    var xmlDoc = newXMLDocument("boardstate");
-    var boardState = xmlDoc.documentElement;
-    //Set the board's creator
-    if (saveType == "newgame"){
-        boardState.setAttribute("creator", userName);
-    }
-    else {
-        boardState.setAttribute("creator", board.creator);
-    }
-    //Set the game and state numbers
-    boardState.setAttribute("game", gameNumber || board.game);
-    boardState.setAttribute("state", gameState || board.state);
-    //Old World cards
-    var oldWorld = xmlDoc.createElement("oldworld");
-    var cards = board.map.oldWorld.cards;
-    for (i = 0; i < cards.length; i++){
-        node = xmlDoc.createElement("card");
-        textNode = xmlDoc.createTextNode('');
-        textNode.data = cards[i].name;
-        node.appendChild(textNode);
-        if (cards[i].active){
-            node.setAttribute("active","true");
-        }
-        if (cards[i].event){
-            node.setAttribute("event","true");
-        }
-        oldWorld.appendChild(node);
-    }
-    boardState.appendChild(oldWorld);
-    //Scoreboard
-    var scoreBoard = xmlDoc.createElement("scoreboard");
-    var players = board.map.players;
-    for (i = 0; i < players.length; ++i){
-        node = xmlDoc.createElement("player");
-        node.setAttribute("name", players[i].name);
-        //Peasants
-        node2 = xmlDoc.createElement("tokens");
-        for (j = 0; j < players[i].peasants.length; j++){
-            node3 = xmlDoc.createElement("peasant");
-            node2.appendChild(node3);
-        }
-        node.appendChild(node2);
-        //Upgrades
-        node2 = xmlDoc.createElement("upgrades");
-        for (j = 0; j < players[i].upgrades.length; j++){
-            if (players[i].upgrades[j].active){
-                node3 = xmlDoc.createElement(players[i].upgrades[j].name);
-                node2.appendChild(node3);
+        //Make a new save for an existing game
+        else if (saveType == "newstate"){
+            gameNumber = board.game;
+            while (gameNumber.length < 4){
+                gameNumber = "0" + gameNumber;
             }
-        }
-        node.appendChild(node2);
-        //PP
-        node2 = xmlDoc.createElement("pp");
-        textNode = xmlDoc.createTextNode('');
-        textNode.data = players[i].pp;
-        node2.appendChild(textNode);
-        node.appendChild(node2);
-        //VP
-        node2 = xmlDoc.createElement("vp");
-        textNode = xmlDoc.createTextNode('');
-        textNode.data = players[i].vp;
-        node2.appendChild(textNode);
-        node.appendChild(node2);
-        //Threat dial
-        node2 = xmlDoc.createElement("dial");
-        node2.setAttribute("cap", players[i].dialCap);
-        node3 = xmlDoc.createElement("value");
-        textNode = xmlDoc.createTextNode('');
-        textNode.data = players[i].dialValue;
-        node3.appendChild(textNode);
-        node2.appendChild(node3);
-        node3 = xmlDoc.createElement("dac");
-        textNode = xmlDoc.createTextNode('');
-        textNode.data = players[i].dacs;
-        node3.appendChild(textNode);
-        node2.appendChild(node3);
-        node.appendChild(node2);
-        scoreBoard.appendChild(node);
-    }
-    boardState.appendChild(scoreBoard);
-    //Regions map
-    var map = xmlDoc.createElement("map");
-    var regions = board.map.regions;
-    for (i = 0; i < regions.length; i++){
-        //Region name
-        node = xmlDoc.createElement("region");
-        node.setAttribute("name", regions[i].name);
-        //Old World tokens
-        node2 = xmlDoc.createElement("tokens");
-        for (j = 0; j < regions[i].tokens.length; j++){
-            node3 = xmlDoc.createElement(regions[i].tokens[j].name);
-            node2.appendChild(node3);
-        }
-        node.appendChild(node2);
-        //Chaos cards
-        node2 = xmlDoc.createElement("chaos");
-        for (j = 0; j < regions[i].cards.length; j++){
-            node3 = xmlDoc.createElement("card");
-            node3.setAttribute("cost", regions[i].cards[j].cost);
-            if (regions[i].cards[j].owner){
-                node3.setAttribute("owner", regions[i].cards[j].owner.name);
-            }
-            if (regions[i].cards[j].magic){
-                node3.setAttribute("magic", true);
-            }
-            textNode = xmlDoc.createTextNode('');
-            textNode.data = regions[i].cards[j].name;
-            node3.appendChild(textNode);
-            node2.appendChild(node3);
-        }
-        node.appendChild(node2);
-        //Corruption
-        for (j = 0; j < regions[i].corruption.length; j++){
-            value = regions[i].corruption[j].value;
-            if (value > 0){
-                node2 = xmlDoc.createElement("corruption");
-                node2.setAttribute("owner", regions[i].corruption[j].owner.name);
-                textNode = xmlDoc.createTextNode('');
-                textNode.data = value;
-                node2.appendChild(textNode);
-                node.appendChild(node2);
-            }
-        }
-        //Ruin
-        value = regions[i].ruined;
-        if (value > 0){
-            node2 = xmlDoc.createElement("ruined");
-            textNode = xmlDoc.createTextNode('');
-            textNode.data = value;
-            node2.appendChild(textNode);
-            node.appendChild(node2);
-        }
-        //Figures
-        node2 = xmlDoc.createElement("figures");
-        for (j = 0; j < regions[i].figures.length; j++){
-            node3 = xmlDoc.createElement(regions[i].figures[j].model);
-            node3.setAttribute("owner", regions[i].figures[j].owner.name);
-            if (regions[i].figures[j].shield){
-                node3.setAttribute("shield", "true");
-            }
-            if (regions[i].figures[j].musk){
-                node3.setAttribute("musk", "true");
-            }
-            if (regions[i].figures[j].marker){
-                node3.setAttribute("marker", "true");
-            }
-            node2.appendChild(node3);
-        }
-        node.appendChild(node2);
-        map.appendChild(node);
-    }
-    boardState.appendChild(map);
-    //Serialize the document
-    var serializer = new XMLSerializer();
-    var xmlString = encodeURIComponent(serializer.serializeToString(boardState));
-    //Send the serialized XML document
-    //to the server with an AJAX request,
-    //if there are no show-stopping problems
-    if (!fail) {
-        var xmlhttp = xmlRequest();
-        if (xmlhttp) {
-            xmlhttp.onreadystatechange = function(){
-                if (this.readyState == 4 && this.status == 200){
-                    if (this.responseText.search("ERROR") >= 0){
-                        showMessage(this.responseText, "error");
-                        //Save the XML document to local storage
-                        //if there was a problem
-                        if (checkCompatibility().localStorage){
-                            localStorage["gameboard"] = xmlString;
-                        }
-                    }
-                    else {
-                        //Update the HTML controls
-                        var gameOption = document.getElementById("game" + gameNumber);
-                        gameOption.selected = true;
-                        //Update the object game and save numbers
-                        //for the current game
-                        var board = document.getElementById("board");
-                        board.game = gameNumber;
-                        board.state = gameState;
-                        getStates(null, gameNumber, gameState);
-                        updateSaveButtons();
-                        //Show the "Success!" message
-                        showMessage(this.responseText, "okay");
-                        //Turn off the "unsaved" flags
-                        unsavedBoard(true); 
-                    }
+            //Verify that a user trying to save a
+            //new state for an existing game is 
+            //the creator or an admin
+            if (userLevel < 3){
+                var creatorName = board.creator;
+                if (creatorName.toLowerCase() != userName.toLowerCase()){
+                    fail = true;
+                    showMessage("ERROR: User name mismatch", "error");
                 }
-            };
-            var overwrite = (saveType == "overwrite") ? 1 : 0;
-            xmlhttp.open("POST", "savexml.php", true);
-            xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xmlhttp.send('game=' + gameNumber + '&state=' + gameState + '&user=' + userName + '&over=' + overwrite + '&data='+ xmlString);
-        }
-    }
-    //Save the XML document to local
-    //storage if it can't be saved
-    //on the server
-    else {
-        if (checkCompatibility().localStorage){
-            localStorage["gameboard"] = xmlString;
+                else {
+                    //Get the state number and pass it to the
+                    //makeXML function
+                    nextState(gameNumber, makeXML);
+                }
+            }
+            else {
+                fail = true;
+                showMessage("ERROR: No states for that game exist", "error");
+            }
         }
     }
 }
