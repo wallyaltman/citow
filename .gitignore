@@ -14,6 +14,9 @@ capture/*
 ### Np++ backkups ###
 *.bak
 
+### Eclipse project file ###
+.project
+
 ### php.ini ###
 php.ini
 
