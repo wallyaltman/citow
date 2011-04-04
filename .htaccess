@@ -2,3 +2,12 @@ AddCharset UTF-8 .xml
 AddType 'text/xml; charset=UTF-8' citow 
 AddType image/vnd.microsoft.icon cur
 DirectoryIndex gameboard.php
+
+# Cache control
+<FilesMatch ".(php|json)$">
+	Header unset Cache-Control
+	Header unset Expires
+	Header unset Last-Modified
+	FileETag None
+	Header unset Pragma
+</FilesMatch>

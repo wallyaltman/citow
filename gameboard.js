@@ -194,7 +194,7 @@ function updateGameStateList(game, state){
                 var gamesObject = JSON.parse(this.responseText);
                 var statePick = document.getElementById("statepick");
                 //Identify the desired game
-                var selectedStates = gameObject[game];
+                var selectedStates = gamesObject[game];
                 //Reset the select options
                 while(statePick.hasChildNodes()){
                     statePick.removeChild(statePick.lastChild);
@@ -232,8 +232,9 @@ function updateGameStateList(game, state){
             var gamePick = document.getElementById("gamepick");
             game = gamePick[gamePick.selectedIndex].value;
         }
-        xmlhttp.open("GET", "gamelist.php" + game, true);
-        xmlhttp.send;
+        xmlhttp.open("GET", "gamelist.php", true);
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+        xmlhttp.send();
     }
 }
 
@@ -280,7 +281,7 @@ function updateSaveButtons(game, state){
             saveXMLButton.disabled = true;
             overwriteXMLstate.disabled = true;
         }
-    }
+    };
     //Fill in the game and state number
     nextState(game, buttonUpdate, state);
 }
