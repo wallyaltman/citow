@@ -246,57 +246,85 @@ function drawToken(x, y, ctx){
     var token = this;
     var board, names, pos, number;
     var icon, sz19, sz21x17;
-    //Set the image association if
+    //Set the icon association if
     //it is not yet set
     if (!this.icon){
         board = document.getElementById("board");
+        //If this is the very first token to
+        //be drawn, retrieve the sprite sheet
+        //and set up an icon array
         if (!board.sprites){
             board.sprites = document.createElement('img');
             board.sprites.src = "../chaos/icons/sprites.png";
-            board.tokenList = {};
+            board.iconList = {};
         }
-        if (!board.tokenList.hasOwnProperty(this.name)){
+        //If this is the first instance of this
+        //specific token to be drawn, set up the
+        //drawing information and load the icon
+        //into the array
+        if (!board.iconList.hasOwnProperty(this.name)){
+            //All token names
             names = ["cards", "cultist", "daemon", "pp1", "pp2", "provender", "warrior", 
                      "event", "hero", "noble", "peasant", "skaven", "warpstone",
                      "dac", "select", "unselect", "smallcomet", "darkcomet", "magic"];
+            //Starting (upper-left) coordinate positions for
+            //the tokens, in the same order
             pos = [{x:1,y:1}, {x:23,y:1}, {x:45,y:1}, {x:67,y:1}, {x:1,y:19}, {x:23,y:19}, {x:45,y:19},
                    {x:1,y:37}, {x:21,y:37}, {x:41,y:37}, {x:1,y:57}, {x:21,y:57}, {x:41,y:57},
                    {x:67,y:19}, {x:61,y:39}, {x:77,y:39}, {x:61,y:55}, {x:73,y:55}, {x:61,y:67}];
+            //Get the index of the current icon with respect
+            //to the above "names" list
             number = names.indexOf(this.name);
             icon = {
-                img : board.sprites,
-                srcX : pos[number].x,
-                srcY : pos[number].y
+                img : board.sprites,        //The token sheet
+                srcX : pos[number].x,       //X-coord on the sheet
+                srcY : pos[number].y        //Y-coord on the sheet
             };
+            //Group tokens by dimensions and assign height
+            //and width
             sz19 = ["dac", "event", "hero", "noble", "peasant", "skaven", "warpstone"];
             sz21x17 = ["cards", "cultist", "daemon", "pp1", "pp2", "provender"];
+            //Old World tokens & DAC
             if (sz19.indexOf(this.name) >= 0){
                 icon.width = 19;
                 icon.height = 19;
             }
+            //Upgrade tokens
             else if (sz21x17.indexOf(this.name) >= 0){
                 icon.width = 21;
                 icon.height = 17;
             }
+            //Toggle switch
             else if (this.name == "select" || this.name == "unselect"){
                 icon.width = 15;
                 icon.height = 15;
             }
+            //Old World Card event indicators
             else if (this.name == "smallcomet" || this.name == "darkcomet"){
                 icon.width = 11;
                 icon.height = 11;
             }
+            //Chaos Card magic symbol
             else if (this.name == "magic"){
                 icon.width = 9;
                 icon.height = 9;
             }
-            board.tokenList[this.name] = icon;
+            //Insert the icon in the list
+            board.iconList[this.name] = icon;
         }
-        this.icon = board.tokenList[this.name];
+        //Create a reference on the token
+        //to its icon
+        this.icon = board.iconList[this.name];
     }
+    //This method draws the token, and will
+    //replace the drawToken function in
+    //subsequent calls to the draw() method
+    //on the current token
     var drawMethod = function(x, y, ctx){
         var dimX = this.icon.width;
         var dimY = this.icon.height;
+        //Draw the image by pulling the target
+        //rectangle off the sprite sheet
         ctx.drawImage(this.icon.img, this.icon.srcX, this.icon.srcY, dimX, dimY, x, y, dimX, dimY);
         //Store the token's bounding box
         this.x0 = x;
@@ -304,14 +332,16 @@ function drawToken(x, y, ctx){
         this.x1 = x + dimX;
         this.y1 = y + dimY;
     }
-    //If the image is loaded already, draw
-    //the token
+    //If the sprite sheet is loaded already,
+    //go ahead and reassign the method and
+    //draw the token
     if (this.icon.img.complete){
         this.draw = drawMethod;
         this.draw(x, y, ctx);
     }
     //Otherwise, set an interval that will
-    //draw the token once it is loaded
+    //complete those tasks once the sheet
+    //has been loaded
     else {
         var loadTimer = setInterval(function(){
             if (token.icon.img.complete){
