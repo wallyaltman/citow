@@ -243,35 +243,81 @@ function drawFigure(x0, y0, ctx){
 /* Draw a token at the specified coordinates.
  */
 function drawToken(x, y, ctx){
+    var token = this;
+    var board, names, pos, number;
+    var icon, sz19, sz21x17;
     //Set the image association if
     //it is not yet set
     if (!this.icon){
-        this.icon = document.createElement('img');
-        this.icon.src = "../chaos/icons/" + this.name + ".png";
+        board = document.getElementById("board");
+        if (!board.sprites){
+            board.sprites = document.createElement('img');
+            board.sprites.src = "../chaos/icons/sprites.png";
+            board.tokenList = {};
+        }
+        if (!board.tokenList.hasOwnProperty(this.name)){
+            names = ["cards", "cultist", "daemon", "pp1", "pp2", "provender", "warrior", 
+                     "event", "hero", "noble", "peasant", "skaven", "warpstone",
+                     "dac", "select", "unselect", "smallcomet", "darkcomet", "magic"];
+            pos = [{x:1,y:1}, {x:23,y:1}, {x:45,y:1}, {x:67,y:1}, {x:1,y:19}, {x:23,y:19}, {x:45,y:19},
+                   {x:1,y:37}, {x:21,y:37}, {x:41,y:37}, {x:1,y:57}, {x:21,y:57}, {x:41,y:57},
+                   {x:67,y:19}, {x:61,y:39}, {x:77,y:39}, {x:61,y:55}, {x:73,y:55}, {x:61,y:67}];
+            number = names.indexOf(this.name);
+            icon = {
+                img : board.sprites,
+                srcX : pos[number].x,
+                srcY : pos[number].y
+            };
+            sz19 = ["dac", "event", "hero", "noble", "peasant", "skaven", "warpstone"];
+            sz21x17 = ["cards", "cultist", "daemon", "pp1", "pp2", "provender"];
+            if (sz19.indexOf(this.name) >= 0){
+                icon.width = 19;
+                icon.height = 19;
+            }
+            else if (sz21x17.indexOf(this.name) >= 0){
+                icon.width = 21;
+                icon.height = 17;
+            }
+            else if (this.name == "select" || this.name == "unselect"){
+                icon.width = 15;
+                icon.height = 15;
+            }
+            else if (this.name == "smallcomet" || this.name == "darkcomet"){
+                icon.width = 11;
+                icon.height = 11;
+            }
+            else if (this.name == "magic"){
+                icon.width = 9;
+                icon.height = 9;
+            }
+            board.tokenList[this.name] = icon;
+        }
+        this.icon = board.tokenList[this.name];
     }
-    var token = this;
-    //If the image is loaded already, draw
-    //the token
-    if (this.icon.complete){
-        ctx.drawImage(this.icon, x, y);
+    var drawMethod = function(x, y, ctx){
+        var dimX = this.icon.width;
+        var dimY = this.icon.height;
+        ctx.drawImage(this.icon.img, this.icon.srcX, this.icon.srcY, dimX, dimY, x, y, dimX, dimY);
         //Store the token's bounding box
         this.x0 = x;
         this.y0 = y;
-        this.x1 = x + this.icon.width;
-        this.y1 = y + this.icon.height;
+        this.x1 = x + dimX;
+        this.y1 = y + dimY;
+    }
+    //If the image is loaded already, draw
+    //the token
+    if (this.icon.img.complete){
+        this.draw = drawMethod;
+        this.draw(x, y, ctx);
     }
     //Otherwise, set an interval that will
     //draw the token once it is loaded
     else {
         var loadTimer = setInterval(function(){
-            if (token.icon.complete){
+            if (token.icon.img.complete){
                 clearInterval(loadTimer);
-                ctx.drawImage(token.icon, x, y);
-                //Store the token's bounding box
-                token.x0 = x;
-                token.y0 = y;
-                token.x1 = x + token.icon.width;
-                token.y1 = y + token.icon.height;
+                token.draw = drawMethod;
+                token.draw(x, y, ctx);
             }
         }, 100);
     }
