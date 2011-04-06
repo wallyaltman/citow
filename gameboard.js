@@ -9,62 +9,74 @@
  * gamestates exist, and fill the
  * select dropdown accordingly.
  */
-function getGames(){
+function getGames(game){
     var xmlhttp = xmlRequest();
+    var board = document.getElementById("board");
     //File location
     var loc = "../chaos/saves/";
     var file = "save_manifest.json";
+    //Set the function to do the dirty work
+    //once the data (local or served) is in
+    var responseFunction = function(jsonResponse){
+        var gamesObject;
+        //Read the game list
+        gamesObject = JSON.parse(jsonResponse);
+        board.json = gamesObject;
+        var gamePick = document.getElementById("gamepick");
+        var statePick = document.getElementById("statepick");
+        //Reset the select elements
+        while(gamePick.hasChildNodes()){
+            gamePick.removeChild(gamePick.lastChild);
+        }
+        while(statePick.hasChildNodes()){
+            statePick.removeChild(statePick.lastChild);
+        }
+        var opt, key, maxKey = 0, selectedOpt, selectedStates;
+        //Iterate over the games and make
+        //select options for them
+        for (key in gamesObject){
+            if (gamesObject.hasOwnProperty(key)){
+                opt = document.createElement('option');
+                opt.text = "Game " + key
+                opt.id = "game" + key
+                opt.value = key;
+                //Select the option with maximum
+                //key < 1000
+                if (key > maxKey && key < 1000){
+                    maxKey = key;
+                }
+                gamePick.appendChild(opt);
+            }
+        }
+        //Set the designated game to be selected, or
+        //the game with highest game number < 1000 if
+        //none was indicated
+        game = game ? game : maxKey;
+        selectedOpt = document.getElementById("game" + game);
+        selectedOpt.selected = true;
+        //Retrieve states for the selected game
+        var state;
+        selectedStates = gamesObject["maxKey"];
+        for (var i = 0; i < selectedStates.length; i++){
+            opt = document.createElement('option');
+            state = String(selectedStates[i]);
+            while (state.length < 2){
+                state = "0" + state;
+            }
+            opt.text = "State " + +state;
+            opt.id = "state" + state;
+            opt.value = state;
+            //Select the last option
+            if (i == selectedStates.length){
+                opt.selected = true;
+            }
+            statePick.appendChild(opt);
+        }
+    };
     if (xmlhttp) {
         xmlhttp.onreadystatechange = function(){
             if (this.readyState == 4 && this.status == 200){
-                //Read the game list
-                var gamesObject = JSON.parse(this.responseText);
-                var gamePick = document.getElementById("gamepick");
-                var statePick = document.getElementById("statepick");
-                //Reset the select elements
-                while(gamePick.hasChildNodes()){
-                    gamePick.removeChild(gamePick.lastChild);
-                }
-                while(statePick.hasChildNodes()){
-                    statePick.removeChild(statePick.lastChild);
-                }
-                var opt, key, maxKey = 0, selectedOpt, selectedStates;
-                //Iterate over the games and make
-                //select options for them
-                for (key in gamesObject){
-                    if (gamesObject.hasOwnProperty(key)){
-                        opt = document.createElement('option');
-                        opt.text = "Game " + key
-                        opt.id = "game" + key
-                        opt.value = key;
-                        //Select the option with maximum
-                        //key < 1000
-                        if (key > maxKey && key < 1000){
-                            maxKey = key;
-                        }
-                        gamePick.appendChild(opt);
-                    }
-                }
-                selectedOpt = document.getElementById("game" + maxKey);
-                selectedOpt.selected = true;
-                //Retrieve states for the selected game
-                var state;
-                selectedStates = gamesObject["maxKey"];
-                for (var i = 0; i < selectedStates.length; i++){
-                    opt = document.createElement('option');
-                    state = String(selectedStates[i]);
-                    while (state.length < 2){
-                        state = "0" + state;
-                    }
-                    opt.text = "State " + +state;
-                    opt.id = "state" + state;
-                    opt.value = state;
-                    //Select the last option
-                    if (i == selectedStates.length){
-                        opt.selected = true;
-                    }
-                    statePick.appendChild(opt);
-                }
+                responseFunction(this.responseText);
                 return true;
             }
             else {
@@ -87,49 +99,61 @@ function getStates(evt, game, state){
     //File location
     var loc = "../chaos/saves/";
     var file = "save_manifest.json";
-    if (xmlhttp) {
+    var board = document.getElementById("board");
+    var localObj = board.json;
+    //Set the function to do the dirty work
+    //once the data (local or served) is in
+    var responseFunction = function(jsonResponse, obj){
+        var gamesObject;
+        //Read the game list
+        gamesObject = obj || JSON.parse(jsonResponse);
+        board.json = gamesObject;
+        var statePick = document.getElementById("statepick");
+        //Identify the desired game
+        var selectedStates = gamesObject[+game];
+        //Reset the select options
+        while(statePick.hasChildNodes()){
+            statePick.removeChild(statePick.lastChild);
+        }
+        var opt, currState;
+        //If no state was specified, then set
+        //the last state to be selected
+        optState = state ? state : selectedStates[selectedStates.length - 1];
+        //Create a select option for each state
+        for (var i = 0; i < selectedStates.length; i++){
+            opt = document.createElement('option');
+            currState = String(selectedStates[i]);
+            while (currState.length < 2){
+                currState = "0" + currState;
+            }
+            opt.text = "State " + +currState;
+            opt.id = "state" + currState;
+            opt.value = currState;
+            if (+currState == optState){
+                opt.selected = true;
+            }
+            statePick.appendChild(opt);
+        }
+    };
+    //If no game was specified, read the gamePick
+    //select element to get one
+    if (!game){
+        var gamePick = document.getElementById("gamepick");
+        game = gamePick[gamePick.selectedIndex].value;
+    }
+    if (localObj){
+        responseFunction(null, localObj);
+    }
+    else if (xmlhttp) {
         xmlhttp.onreadystatechange = function(){
             if (this.readyState == 4 && this.status == 200){
-                //Read the game lsit
-                var gamesObject = JSON.parse(this.responseText);
-                var statePick = document.getElementById("statepick");
-                //Identify the desired game
-                var selectedStates = gamesObject[+game];
-                //Reset the select options
-                while(statePick.hasChildNodes()){
-                    statePick.removeChild(statePick.lastChild);
-                }
-                var opt, currState;
-                //If no state was specified, then set
-                //the last state to be selected
-                optState = state ? state : selectedStates[selectedStates.length - 1];
-                //Create a select option for each state
-                for (var i = 0; i < selectedStates.length; i++){
-                    opt = document.createElement('option');
-                    currState = String(selectedStates[i]);
-                    while (currState.length < 2){
-                        currState = "0" + currState;
-                    }
-                    opt.text = "State " + +currState;
-                    opt.id = "state" + currState;
-                    opt.value = currState;
-                    if (+currState == optState){
-                        opt.selected = true;
-                    }
-                    statePick.appendChild(opt);
-                }
+                responseFunction(this.responseText, null);
                 return true;
             }
             else {
                 return false;
             }
         };
-        //If no game was specified, read the gamePick
-        //select element to get one
-        if (!game){
-            var gamePick = document.getElementById("gamepick");
-            game = gamePick[gamePick.selectedIndex].value;
-        }
         xmlhttp.open("GET", loc + file, true);
         xmlhttp.send();
     }
@@ -146,37 +170,53 @@ function nextState(game, callBackFunc, passAlong){
     //File location
     var loc = "../chaos/saves/";
     var file = "save_manifest.json";
-    if (xmlhttp && game) {
-        xmlhttp.onreadystatechange = function(){
-            if (this.readyState == 4 && this.status == 200){
-                var gamesObject = JSON.parse(this.responseText);
-                //Identify the desired game
-                var selectedStates = gamesObject[+game];
-                //Sort the result in reverse order
-                selectedStates.sort(function(a, b){ return (b - a); });
-                //Return the next state, if states exist
-                if (selectedStates.length > 0){
-                    var returnValue = String(+selectedStates[0] + 1);
-                    while (returnValue.length < 2){
-                        returnValue = "0" + returnValue;
-                    }
-                    if (callBackFunc){
-                        return callBackFunc(game, returnValue, passAlong);
-                    }
-                    else {
-                        return returnValue;
-                    }
+    var board = document.getElementById("board");
+    var localObj = board.json;
+    //Set the function to do the dirty work
+    //once the data (local or served) is in
+    var responseFunction = function(jsonResponse, obj){
+        var gamesObject;
+        //Read the game list
+        gamesObject = obj || JSON.parse(jsonResponse);
+        board.json = gamesObject;
+        //Identify the desired game
+        var selectedStates = gamesObject[+game];
+        //Sort the result in reverse order
+        selectedStates.sort(function(a, b){ return (b - a); });
+        //Return the next state, if states exist
+        if (selectedStates.length > 0){
+            var returnValue = String(+selectedStates[0] + 1);
+            while (returnValue.length < 2){
+                returnValue = "0" + returnValue;
+            }
+            if (callBackFunc){
+                return callBackFunc(game, returnValue, passAlong);
+            }
+            else {
+                return returnValue;
+            }
+        }
+    };
+    if (game){
+        if (localObj){
+            responseFunction(null, localObj);
+        }
+        else if (xmlhttp) {
+            xmlhttp.onreadystatechange = function(){
+                if (this.readyState == 4 && this.status == 200){
+                    responseFunction(this.responseText, null);
+                    return true;
                 }
                 else {
                     return false;
                 }
-            }
-            else {
-                return false;
-            }
-        };
-        xmlhttp.open("GET", loc + file, true);
-        xmlhttp.send();
+            };
+            xmlhttp.open("GET", loc + file, true);
+            xmlhttp.send();
+        }
+        else {
+            return false;
+        }
     }
     else {
         return false;
@@ -187,54 +227,65 @@ function nextState(game, callBackFunc, passAlong){
  */
 function updateGameStateList(game, state){
     var xmlhttp = xmlRequest();
+    var board = document.getElementById("board");
+    //Set the function to do the dirty work,
+    //including replacing the saves list
+    var responseFunction = function(jsonResponse){
+        var gamesObject;
+        //Read the game list
+        gamesObject = JSON.parse(jsonResponse);
+        board.json = gamesObject;
+        var statePick = document.getElementById("statepick");
+        //Identify the desired game
+        var selectedStates = gamesObject[game];
+        //Reset the select options
+        while(statePick.hasChildNodes()){
+            statePick.removeChild(statePick.lastChild);
+        }
+        var opt;
+        //If no state was specified, then set
+        //the last state to be selected
+        optState = state ? state : selectedStates[selectedStates.length - 1];
+        //Create a select option for each state
+        for (var i = 0; i < selectedStates.length; i++){
+            opt = document.createElement('option');
+            currState = String(selectedStates[i]);
+            while (currState.length < 2){
+                currState = "0" + currState;
+            }
+            opt.text = "State " + +currState;
+            opt.id = "state" + currState;
+            opt.value = currState;
+            if (+currState == optState){
+                opt.selected = true;
+            }
+            statePick.appendChild(opt);
+        }
+        //Update the save buttons
+        updateSaveButtons();
+        return true;
+    };
+    //If no game was specified, read the gamePick
+    //select element to get one
+    if (!game){
+        var gamePick = document.getElementById("gamepick");
+        game = gamePick[gamePick.selectedIndex].value;
+    }
     if (xmlhttp) {
         xmlhttp.onreadystatechange = function(){
             if (this.readyState == 4 && this.status == 200){
-                //Read the game list
-                var gamesObject = JSON.parse(this.responseText);
-                var statePick = document.getElementById("statepick");
-                //Identify the desired game
-                var selectedStates = gamesObject[game];
-                //Reset the select options
-                while(statePick.hasChildNodes()){
-                    statePick.removeChild(statePick.lastChild);
-                }
-                var opt;
-                //If no state was specified, then set
-                //the last state to be selected
-                optState = state ? state : selectedStates[selectedStates.length - 1];
-                //Create a select option for each state
-                for (var i = 0; i < selectedStates.length; i++){
-                    opt = document.createElement('option');
-                    currState = String(selectedStates[i]);
-                    while (currState.length < 2){
-                        currState = "0" + currState;
-                    }
-                    opt.text = "State " + +currState;
-                    opt.id = "state" + currState;
-                    opt.value = currState;
-                    if (+currState == optState){
-                        opt.selected = true;
-                    }
-                    statePick.appendChild(opt);
-                }
-                //Update the save buttons
-                updateSaveButtons();
-                return true;
+                responseFunction(this.responseText);
             }
             else {
                 return false;
             }
         };
-        //If no game was specified, read the gamePick
-        //select element to get one
-        if (!game){
-            var gamePick = document.getElementById("gamepick");
-            game = gamePick[gamePick.selectedIndex].value;
-        }
         xmlhttp.open("GET", "gamelist.php", true);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
         xmlhttp.send();
+    }
+    else {
+        return false;
     }
 }
 
@@ -2294,7 +2345,7 @@ function saveBoardXML(saveType){
     //Create the XML save data (regardless of
     //whether there was an error that will
     //prevent saving on the server)
-    var makeXML = function(gameNumber, gameState){
+    var makeXML = function(gameNumber, gameState, newGame){
         var board = document.getElementById("board");
         var i, j, node, node2, node3, textNode, value;
         //Create the board and find the root element
@@ -2470,14 +2521,16 @@ function saveBoardXML(saveType){
                             }
                         }
                         else {
-                            //Update the HTML controls
-                            var gameOption = document.getElementById("game" + gameNumber);
-                            gameOption.selected = true;
                             //Update the object game and save numbers
                             //for the current game
                             var board = document.getElementById("board");
                             board.game = gameNumber;
                             board.state = gameState;
+                            //If the save represents a new game, update
+                            //the game list
+                            if (newGame){
+                                getGames(gameNumber);
+                            }
                             updateGameStateList(gameNumber, gameState);
                             //Show the "Success!" message
                             showMessage(this.responseText, "okay");
@@ -2540,7 +2593,7 @@ function saveBoardXML(saveType){
                 }
             }
             //Call the function to make the XML data
-            makeXML();
+            makeXML(gameNumber, gameState, true);
         }
         //Overwrite an existing gamestate
         else if (saveType == "overwrite"){
@@ -2565,6 +2618,8 @@ function saveBoardXML(saveType){
                         showMessage("ERROR: User name mismatch", "error");
                     }
                 }
+                //Call the function to make the XML data
+                makeXML(gameNumber, gameState);
             }
             else {
                 fail = true;
