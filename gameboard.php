@@ -20,7 +20,7 @@ include $headerurl;
   <meta charset="utf-8" />
   <title>Chaos in the Old World - Game Board</title>
 <?php
-$t = 3;
+$t = 4;
 echo '  <link rel="shortcut icon" href="favicon.ico" />'."\n";
 echo '  <link rel="stylesheet" href="'.$rooturl.'/style.css" />'."\n";
 echo '  <link rel="stylesheet" href="chaos.css?t='.$t.'" />'."\n";
