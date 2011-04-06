@@ -2635,21 +2635,20 @@ function saveBoardXML(saveType){
             //Verify that a user trying to save a
             //new state for an existing game is 
             //the creator or an admin
-            if (userLevel < 3){
-                var creatorName = board.creator;
-                if (creatorName.toLowerCase() != userName.toLowerCase()){
-                    fail = true;
-                    showMessage("ERROR: User name mismatch", "error");
-                }
-                else {
-                    //Get the state number and pass it to the
-                    //makeXML function
-                    nextState(gameNumber, makeXML);
-                }
+            var creatorName = board.creator;
+            if (userLevel >= 3){
+                //Get the state number and pass it to the
+                //makeXML function
+                nextState(gameNumber, makeXML);
+            }
+            else if (creatorName.toLowerCase() = userName.toLowerCase()){
+                //Get the state number and pass it to the
+                //makeXML function
+                nextState(gameNumber, makeXML);
             }
             else {
                 fail = true;
-                showMessage("ERROR: No states for that game exist", "error");
+                showMessage("ERROR: User name mismatch", "error");
             }
         }
     }
