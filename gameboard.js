@@ -2342,11 +2342,11 @@ function clickClosed(){
  */
 function saveBoardXML(saveType){
     var fail, i, gameNumber, gameState;
+    var board = document.getElementById("board");
     //Create the XML save data (regardless of
     //whether there was an error that will
     //prevent saving on the server)
     var makeXML = function(gameNumber, gameState, newGame){
-        var board = document.getElementById("board");
         var i, j, node, node2, node3, textNode, value;
         //Create the board and find the root element
         var xmlDoc = newXMLDocument("boardstate");
@@ -2641,7 +2641,7 @@ function saveBoardXML(saveType){
                 //makeXML function
                 nextState(gameNumber, makeXML);
             }
-            else if (creatorName.toLowerCase() = userName.toLowerCase()){
+            else if (creatorName.toLowerCase() == userName.toLowerCase()){
                 //Get the state number and pass it to the
                 //makeXML function
                 nextState(gameNumber, makeXML);
