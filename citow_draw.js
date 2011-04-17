@@ -283,7 +283,7 @@ function drawToken(x, y, ctx){
             //Group tokens by dimensions and assign height
             //and width
             sz19 = ["dac", "event", "hero", "noble", "peasant", "skaven", "warpstone"];
-            sz21x17 = ["cards", "cultist", "daemon", "pp1", "pp2", "provender"];
+            sz21x17 = ["cards", "cultist", "daemon", "pp1", "pp2", "provender", "warrior"];
             //Old World tokens & DAC
             if (sz19.indexOf(this.name) >= 0){
                 icon.width = 19;
