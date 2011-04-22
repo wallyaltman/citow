@@ -20,13 +20,13 @@ include $headerurl;
   <meta charset="utf-8" />
   <title>Chaos in the Old World - Game Board</title>
 <?php
-$t = 4;
+$v = 5;
 echo '  <link rel="shortcut icon" href="favicon.ico" />'."\n";
 echo '  <link rel="stylesheet" href="'.$rooturl.'/style.css" />'."\n";
-echo '  <link rel="stylesheet" href="chaos.css?t='.$t.'" />'."\n";
+echo '  <link rel="stylesheet" href="chaos.css?v='.$v.'" />'."\n";
 echo '  <script src="utility.js" type="text/javascript"></script>'."\n";
 echo '  <script src="citow_draw.js" type="text/javascript"></script>'."\n";
-echo '  <script src="gameboard.js?t='.$t.'" type="text/javascript"></script>'."\n";
+echo '  <script src="gameboard.js?v='.$v.'" type="text/javascript"></script>'."\n";
 echo '</head>'."\n";
 echo '<body id="body">'."\n";
 //Header bar is from header.php, included at the top
