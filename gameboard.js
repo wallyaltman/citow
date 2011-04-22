@@ -2346,7 +2346,7 @@ function saveBoardXML(saveType){
     //Create the XML save data (regardless of
     //whether there was an error that will
     //prevent saving on the server)
-    var makeXML = function(gameNumber, gameState, newGame){
+    var makeXML = function(gameNumber, gameState, newGame, local){
         var i, j, node, node2, node3, textNode, value;
         //Create the board and find the root element
         var xmlDoc = newXMLDocument("boardstate");
@@ -2506,8 +2506,8 @@ function saveBoardXML(saveType){
         var xmlString = encodeURIComponent(serializer.serializeToString(boardState));
         //Send the serialized XML document
         //to the server with an AJAX request,
-        //if there are no show-stopping problems
-        if (!fail) {
+        //unless the request is to save locally
+        if (!local) {
             var xmlhttp = xmlRequest();
             if (xmlhttp) {
                 xmlhttp.onreadystatechange = function(){
@@ -2651,6 +2651,14 @@ function saveBoardXML(saveType){
                 showMessage("ERROR: User name mismatch", "error");
             }
         }
+    }
+    //Save the board state to local storage
+    if (fail){
+        gameNumber = gameNumber ? gameNumber : board.game;
+        gameState = gameState ? gameState : board.state;
+        //Take a best guess at whether to save as a new game
+        var newGame = (!gameState || gameState <= 1 || !board.creator) ? true : false;
+        makeXML(gameNumber, gameState, newGame, true);
     }
 }
 
