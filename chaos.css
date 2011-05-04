@@ -182,7 +182,7 @@ div.messagebox {
   margin:4px;
   width:700px;
   height:610px;
-  z-index:6;
+  z-index:10;
 }
 div.error {
   background-color:#E8C2C2;
@@ -362,8 +362,8 @@ div.underbox {
   margin:4px;
   z-index:3;
 }
-div.z5 {
-  z-index:5;
+div.z7 {
+  z-index:7;
 }
 div.scoresubbox {
   position:absolute;
@@ -398,11 +398,10 @@ div#workbox {
 }
 div#ppbox.framebox {
   position:absolute;
-  top:557px;
-  left:380px;
+  top:319px;
+  left:35px;
   margin-top:4px;
   margin-left:14px;
-  width:98px;
   height:29px;
   z-index:5;
 }

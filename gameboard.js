@@ -375,12 +375,13 @@ function getBoardState(blank){
 }
 
 /* Read in the XML game setup file.
+ * TODO: choice between standard and HR
  */
 function getGameSetup(){
     var xmlhttp = xmlRequest();
     //Get the board setup document
-    var loc = "../chaos/gamedata/";
-    var url = loc + "board.xml";
+    var loc = "gamedata/";
+    var url = loc + "board_hr.xml";
     xmlhttp.open("POST", url, false);
     xmlhttp.send();
     var xmlDoc = xmlhttp.responseXML;
@@ -1164,7 +1165,7 @@ function buildScoreBoardControls(){
         //Close the other panels
         this.closePanels();
         //Open the score panel
-        toggleClass("z5", box);
+        toggleClass("z7", box);
         var parent = this.parentNode;
         toggleClass("stuck", parent);
         //Set an event on the document to
@@ -1325,7 +1326,7 @@ function buildWorkshop(){
         //Close the other panels
         this.closePanels();
         //Open the workshop panel
-        toggleClass("z5", box);
+        toggleClass("z7", box);
         var parent = this.parentNode;
         toggleClass("stuck", parent);
         //Stop event propagation
@@ -1480,7 +1481,7 @@ function buildCorruption(){
         //Close the other panels
         this.closePanels();
         //Open the corruption panel
-        toggleClass("z5", box);
+        toggleClass("z7", box);
         var parent = this.parentNode;
         toggleClass("stuck", parent);
         //Set an event on the document to
@@ -1531,7 +1532,7 @@ function closePanels(evt){
     var panel, panelParent;
     for (var i = 0; i < panelList.length; i++){
         panel = document.getElementById(panelList[i] + "box");
-        toggleClass("z5", panel, "off");
+        toggleClass("z7", panel, "off");
         panelParent = document.getElementById(panelList[i] + "handle");
         toggleClass("stuck", panelParent, "off");
     }
