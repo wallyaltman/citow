@@ -73,8 +73,8 @@ div.corruptinner {
 }
 div.shiftbox {
   position:absolute;
-  left:20px;
-  top:270px;
+  left:148px;
+  top:322px;
   background-color:#111111;
   border:4px ridge #56CC08;
   padding:3px;
@@ -376,7 +376,7 @@ div#corruptbox.shift div.corrupt{
   margin-top:55px;
 }
 div#scorebox {
-  height:388px;
+  height:428px;
   width:462px;
 }
 div#upgradecontrolbox {

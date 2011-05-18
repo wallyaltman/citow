@@ -1015,7 +1015,7 @@ function buildScoreBoardControls(){
         upgradeRow.style.color = players[i].highlight;
         upgradeRow.style.backgroundColor = players[i].shadow;
         //Name (in both tables)
-        playerName = players[i].name;
+        playerName = players[i].displayName;
         name = document.createTextNode(playerName);
         nameCell = document.createElement("td");
         nameCell.appendChild(name);
@@ -1675,8 +1675,11 @@ function drawBoard(blank, local){
             type : "player",
             cultists : [],
             warriors : [],
-            daemons : []
+            daemons : [],
+            noCorruption : (playerSetupXML[i].getAttribute("nocorruption") == "true")
         };
+        //Create a display name, with underscores swapped out for spaces
+        newPlayer.displayName = newPlayer.name.replace(/_/, " ");
         //Total figure counts
         newPlayer.figures = {
             cultists : playerSetupXML[i].getElementsByTagName("cultists")[0].firstChild.data,
@@ -1712,7 +1715,7 @@ function drawBoard(blank, local){
     var newRegion, playerName;
     var idString;
     var borderXML, tempLinkList;
-    var corruptionXML, ruinTemp;
+    var corruptionXML, corruptingPlayers, ruinTemp;
     var tempFigureList, tempEffects, figure, figureXML, tempPlayers;
     var tempCardList, tempOwner, cards, newCard, magicIcon;
     var tempTokenList, tokenXML;
@@ -1750,19 +1753,24 @@ function drawBoard(blank, local){
         //Set up the region's corruption
         corruptionXML = newRegion.xmlData.getElementsByTagName("corruption");
         newRegion.corruption = [];
+        corruptPlayerCount = 0;
         for (j = 0; j < playerCount; j++){
+            if (players[j].noCorruption){
+                break;
+            }
+            corruptPlayerCount += 1;
             newRegion.corruption.push({});
-            newRegion.corruption[j].owner = players[j];
-            newRegion.corruption[j].value = 0;
-            newRegion.corruption[j].min = 0;
-            newRegion.corruption[j].max = 20;
-            newRegion.corruption[j].region = newRegion;
-            newRegion.corruption[j].draw = function(){
+            newRegion.corruption[corruptPlayerCount - 1].owner = players[j];
+            newRegion.corruption[corruptPlayerCount - 1].value = 0;
+            newRegion.corruption[corruptPlayerCount - 1].min = 0;
+            newRegion.corruption[corruptPlayerCount - 1].max = 20;
+            newRegion.corruption[corruptPlayerCount - 1].region = newRegion;
+            newRegion.corruption[corruptPlayerCount - 1].draw = function(){
                 this.region.draw();
             };
             for (k = 0; k < corruptionXML.length; k++){
-                if (newRegion.corruption[j].owner.name == corruptionXML[k].getAttribute("owner")){
-                    newRegion.corruption[j].value = Number(corruptionXML[k].firstChild.data);
+                if (newRegion.corruption[corruptPlayerCount - 1].owner.name == corruptionXML[k].getAttribute("owner")){
+                    newRegion.corruption[corruptPlayerCount - 1].value = Number(corruptionXML[k].firstChild.data);
                     break;
                 }
             }

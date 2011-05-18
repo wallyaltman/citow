@@ -570,14 +570,20 @@ function drawRegion(){
     ctx.fillText(legend, x + 90, y + 73);
     //Fill the corruption counters, set the
     //click areas, and insert the values
-    var playerName, corruption, highlight, shadow, j;
+    var playerName, corruption, highlight, shadow, j, corruptPlayers;
+    corruptPlayers = [];
     for (i = 0; i < players.length; i++){
-        highlight = players[i].highlight;
-        shadow = players[i].shadow;
+        if (!players[i].noCorruption){
+            corruptPlayers.push(players[i]);
+        }
+    }
+    for (i = 0; i < corruptPlayers.length; i++){
+        highlight = corruptPlayers[i].highlight;
+        shadow = corruptPlayers[i].shadow;
         x1 = x + 155 + (i * 16);
         y1 = y + 60;
         for (j = 0; j < this.corruption.length; j++){
-            if (this.corruption[j].owner.name == players[i].name){
+            if (this.corruption[j].owner.name == corruptPlayers[i].name){
                 corruption = this.corruption[j].value;
                 corruption.x0 = x1;
                 corruption.y0 = y1;
@@ -624,7 +630,7 @@ function drawRegion(){
             space -= 16;
         }
     }
-    space = Math.floor(space / 3);
+    space = Math.floor(space / (players.length - 1));
     //Draw the figures in the region
     x1 = x + 5;
     var figure;
@@ -781,7 +787,7 @@ function drawScoreBoard(){
     //Draw and fill the rows and cell dividers
     ctx.lineWidth = 1;
     ctx.font = "17px Tahoma, Helvetica, sans-serif";
-    var obj, count;
+    var obj, count, printName;
     for (i = 0; i < players.length; i++){
         y1 = y + (22 * i);
         currentPlayer = players[i];
@@ -798,7 +804,7 @@ function drawScoreBoard(){
         ctx.closePath();
         ctx.fill();
         ctx.fillStyle = highlight;
-        ctx.fillText(currentPlayer.name, x1 - 2, y1 + 21);
+        ctx.fillText(currentPlayer.displayName, x1 - 2, y1 + 21);
         //Peasant tokens
         peasants = currentPlayer.peasants;
         x1 = x2;
@@ -1034,7 +1040,7 @@ function drawReserves(){
     var bordercolor = "#BB7711";
     var shadow = this.shadow;
     var ctx = this.ctx;
-    var i, j, figure, x1, y1, x2, y2;
+    var i, j, figure, x1, y1, x2, y2, x3, y3;
     //Clear the area
     ctx.clearRect(x0, y0, width, height);
     //Draw the fill
@@ -1061,35 +1067,82 @@ function drawReserves(){
     var cultists = this.cultists;
     var warriors = this.warriors;
     var daemons = this.daemons;
-    //Draw cultists in the top row
-    x1 = x0 + 4;
-    y1 = y0 + 16;
-    for (i = 0; i < cultists.length; i++){
-        x1 = cultists[i].draw(x1, y1, ctx);
-    }
-    //Draw daemon(s) in the bottom row
-    x2 = x0 + 5;
-    y2 = y0 + height - 2;
-    for (i = 0; i < daemons.length; i++){
-        x2 = daemons[i].draw(x2, y2, ctx);
-    }
-    //Draw warriors from right to left in the bottom
-    //row, then the top row (if necessary)
-    var x3;
-    for (i = 0; i < warriors.length; i++){
-        x3 = x0 + width - 13 * (i + 1);
-        if (x3 - 1 < x2){
-            break;
+    //Use the standard stacking method if there
+    //are eight or fewer cultists
+    if (cultists.length <= 8){
+        //Draw cultists in the top row
+        x1 = x0 + 4;
+        y1 = y0 + 16;
+        for (i = 0; i < cultists.length; i++){
+            x1 = cultists[i].draw(x1, y1, ctx);
         }
-        warriors[i].draw(x3, y2, ctx);
-    }
-    if (i < warriors.length){
-        var diff = warriors.length - i;
-        y1 = y0 + 23; //Height of a warrior + 1 (or so)
-        for (j = 0; j < diff; j++){
-            x3 = x0 + width - 13 * (j + 1);
-            warriors[i].draw(x3, y1, ctx);
+        //Draw daemon(s) in the bottom row
+        x2 = x0 + 5;
+        y2 = y0 + height - 2;
+        for (i = 0; i < daemons.length; i++){
+            x2 = daemons[i].draw(x2, y2, ctx);
         }
+        //Draw warriors from right to left in the bottom
+        //row, then the top row (if necessary)
+        for (i = 0; i < warriors.length; i++){
+            x3 = x0 + width - 13 * (i + 1);
+            if (x3 - 1 < x2){
+                break;
+            }
+            warriors[i].draw(x3, y2, ctx);
+        }
+        if (i < warriors.length){
+            var diff = warriors.length - i;
+            y1 = y0 + 23; //Height of a warrior + 1 (or so)
+            for (j = 0; j < diff; j++){
+                x3 = x0 + width - 13 * (j + 1);
+                warriors[i].draw(x3, y1, ctx);
+            }
+        }
+    }
+    //Triple-stack cultists if there are
+    //more than eight
+    else {
+        //Draw the daemon(s) in the bottom row
+        x2 = x0 + 5;
+        y2 = y0 + height - 2;
+        for (i = 0; i < daemons.length; i++){
+            x2 = daemons[i].draw(x2, y2, ctx);
+        }
+        //Fill the space above the daemon(s) with cultists,
+        //then draw them in three even rows from the left.
+        y1 = y0 + 16;
+        y3 = y2;
+        y2 = y0 + 32;
+        var drawCount = 0;
+        var xPos = [x0 + 4, x0 + 4, x0 + 4];  //Each value increases over the loop
+        var yPos = [y1, y2, y3]; //These values are fixed
+        for (i = 0; i < 6; i++){
+            if (drawCount >= cultists.length){
+                break;
+            }
+            for (j = 0; j < 3; j++){
+                if (j == 0 || xPos[j] >= x2){
+                    xPos[j] = cultists[drawCount].draw(xPos[j], yPos[j], ctx);
+                    drawCount++;
+                    if (drawCount >= cultists.length){
+                        break;
+                    }
+                }
+                else {
+                    xPos[j] = xPos[0];
+                }
+            }
+        }
+        //Draw warriors on the right side, alternating bottom and top
+        var x1 = x0 + width - 13;
+        var x2 = x0 + width - 26;
+        var y1 = y0 + 23;
+        xPos = [x1, x1, x2, x2];  //These arrays are fixed, ordered
+        yPos = [y3, y1, y3, y1];  //pairs of coordinates
+        for (i = 0; i < warriors.length; i++){
+            warriors[i].draw(xPos[i], yPos[i], ctx);
+        }        
     }
     //Set the reserve area's bounding box
     this.x0 = x0;
