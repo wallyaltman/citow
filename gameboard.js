@@ -1022,8 +1022,8 @@ function buildScoreBoardControls(){
         upgradeRow.style.color = players[i].highlight;
         upgradeRow.style.backgroundColor = players[i].shadow;
         //Name (in both tables)
-        playerName = players[i].displayName;
-        name = document.createTextNode(playerName);
+        playerName = players[i].name;
+        name = document.createTextNode(players[i].displayName);
         nameCell = document.createElement("td");
         nameCell.appendChild(name);
         row.appendChild(nameCell);
