@@ -339,7 +339,7 @@ function updateSaveButtons(game, state){
 
 /* Read in a saved XML board state file.
  */
-function getBoardState(blank){
+function getBoardState(blank, expansion){
     var xmlhttp = xmlRequest();
     var gamePick = document.getElementById("gamepick");
     var game = gamePick.options[gamePick.selectedIndex].value;
@@ -348,7 +348,14 @@ function getBoardState(blank){
     var board = document.getElementById("board");
     //Get the board state document
     var loc = "../chaos/saves/";
-    var url = loc + (blank ? "blankboard.xml" : "game" + game + "state" + state + ".xml");
+    //If getting a clean board, check whether an
+    //expansion board was requested
+    if (blank){
+        var url = loc + (expansion == "morrslieb" ? "blankboard_hr.xml" : "blankboard.xml");
+    }
+    else {
+        var url = loc + "game" + game + "state" + state + ".xml";
+    }
     xmlhttp.open("POST", url, false);
     xmlhttp.send();
     var xmlDoc = xmlhttp.responseXML;
@@ -377,11 +384,11 @@ function getBoardState(blank){
 /* Read in the XML game setup file.
  * TODO: choice between standard and HR
  */
-function getGameSetup(){
+function getGameSetup(expansion){
     var xmlhttp = xmlRequest();
     //Get the board setup document
     var loc = "gamedata/";
-    var url = loc + "board_hr.xml";
+    var url = expansion == "morrslieb" ? loc + "board_hr.xml" : loc + "board.xml";
     xmlhttp.open("POST", url, false);
     xmlhttp.send();
     var xmlDoc = xmlhttp.responseXML;
@@ -1551,7 +1558,7 @@ function closePanels(evt){
 /* Build and draw a new board.  A value of true for
  * the "blank" parameter draws a blank board.
  */
-function drawBoard(blank, local){
+function drawBoard(blank, local, expansion){
     var board = document.getElementById("board");
     var ctx = board.getContext('2d');
     //Clear the canvas
@@ -1574,12 +1581,25 @@ function drawBoard(blank, local){
         //Flag the board as saved, if loading
         //from a save file
         unsavedBoard(true);
-        state = getBoardState(blank);
+        state = getBoardState(blank, expansion);
     }
     ctx.fillStyle = "#332211";
     ctx.fillRect(0, 0, width, height);
-    var info = board.info;
     var i, j, k;
+    //Create references to the XML gamestate data
+    var mapXML = state.getElementsByTagName("map")[0];
+    board.map = {};
+    var map = board.map;
+    map.xmlData = mapXML;
+    var regionsXML = mapXML.getElementsByTagName("region");
+    var scoreXML = state.getElementsByTagName("scoreboard")[0];
+    var playersXML = scoreXML.getElementsByTagName("player");
+    var oldWorldXML = state.getElementsByTagName("oldworld")[0];
+    //Check for the game type
+    board.expansion = state.documentElement.getAttribute("expansion");
+    //Get the board setup
+    var info = getGameSetup(board.expansion);
+    board.info = info;
     //Create references to the XML setup data
     var playerSetupXML = info.getElementsByTagName("player");
     var playerCount = playerSetupXML.length;
@@ -1592,16 +1612,6 @@ function drawBoard(blank, local){
             tokenSetupXML.push(tokensTemp[i]);
         }
     }
-    var regionCount = regionSetupXML.length;
-    //Create references to the XML gamestate data
-    var mapXML = state.getElementsByTagName("map")[0];
-    board.map = {};
-    var map = board.map;
-    map.xmlData = mapXML;
-    var regionsXML = mapXML.getElementsByTagName("region");
-    var scoreXML = state.getElementsByTagName("scoreboard")[0];
-    var playersXML = scoreXML.getElementsByTagName("player");
-    var oldWorldXML = state.getElementsByTagName("oldworld")[0];
     //Set up the old world tokens pool
     map.tokenPool = {};
     var tokenName, token, supply, tempArray;
@@ -2852,8 +2862,6 @@ function initialize(){
         //Assign the board parser (for
         //a board in local storage)
         board.parser = xmlParser();
-        //Get the standard board setup
-        board.info = getGameSetup();
         //Set handlers for the dropdown lists
         var gamePick = document.getElementById("gamepick");
         gamePick.onchange = getStates;

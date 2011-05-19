@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<gameboard>
+<gameboard expansion="morrslieb">
   <tokens>
     <event>6</event>
     <hero>4</hero>
