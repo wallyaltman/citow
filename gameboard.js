@@ -1172,7 +1172,7 @@ function buildScoreBoardControls(){
         //Close the other panels
         this.closePanels();
         //Open the score panel
-        toggleClass("z7", box);
+        toggleClass("z5", box);
         var parent = this.parentNode;
         toggleClass("stuck", parent);
         //Set an event on the document to
@@ -1333,7 +1333,7 @@ function buildWorkshop(){
         //Close the other panels
         this.closePanels();
         //Open the workshop panel
-        toggleClass("z7", box);
+        toggleClass("z5", box);
         var parent = this.parentNode;
         toggleClass("stuck", parent);
         //Stop event propagation
@@ -1488,7 +1488,7 @@ function buildCorruption(){
         //Close the other panels
         this.closePanels();
         //Open the corruption panel
-        toggleClass("z7", box);
+        toggleClass("z5", box);
         var parent = this.parentNode;
         toggleClass("stuck", parent);
         //Set an event on the document to
@@ -1539,7 +1539,7 @@ function closePanels(evt){
     var panel, panelParent;
     for (var i = 0; i < panelList.length; i++){
         panel = document.getElementById(panelList[i] + "box");
-        toggleClass("z7", panel, "off");
+        toggleClass("z5", panel, "off");
         panelParent = document.getElementById(panelList[i] + "handle");
         toggleClass("stuck", panelParent, "off");
     }
@@ -2761,7 +2761,7 @@ function showMessage(content, type){
     var topMargin = Math.floor(height / 2) + border + margin + padding;
     frame.style.marginTop = "-" + topMargin + "px";
     //Move the message div to the front
-    toggleClass("underbox", message, "off");
+    toggleClass("z5", message, "on");
     //Set a handler to clear the message
     if (document.addEventListener){
         //Decent browsers
@@ -2824,7 +2824,7 @@ function showPrompt(content, options, responder){
     var topMargin = Math.floor(height / 2) + border + margin + padding;
     frame.style.marginTop = "-" + topMargin + "px";
     //Move the message div to the front
-    toggleClass("underbox", message, "off");
+    toggleClass("z5", message, "on");
 }
 
 /* Hide the message box.
@@ -2839,7 +2839,7 @@ function hideMessage(){
         messageContent.removeChild(messageContent.firstChild);
     }
     frame.style.marginTop = "0px";
-    toggleClass("underbox", message, "on");
+    toggleClass("z5", message, "off");
     //Remove the handler
     if (document.removeEventListener){
         //Decent browsers

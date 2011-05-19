@@ -20,7 +20,7 @@ include $headerurl;
   <meta charset="utf-8" />
   <title>Chaos in the Old World - Game Board</title>
 <?php
-$v = 5;
+$v = 6;
 echo '  <link rel="shortcut icon" href="favicon.ico" />'."\n";
 echo '  <link rel="stylesheet" href="'.$rooturl.'/style.css" />'."\n";
 echo '  <link rel="stylesheet" href="chaos.css?v='.$v.'" />'."\n";
@@ -32,31 +32,33 @@ echo '<body id="body">'."\n";
 //Header bar is from header.php, included at the top
 echo $headerbar;
 ?>
-  <div id="main" class="floatbox">
-    <div class="lefthandle" id="activehandle">
-      <div id="activate"></div>
+  <div id="handlebox">
+    <div id="activehandle" class="lefthandle">
+      <div id="activate" class="handlecontents"></div>
     </div>
-    <div class="lefthandle" id="corrupthandle">
-      <div class="framebox textbox" id="corruptswitch">
+    <div id="corrupthandle" class="lefthandle">
+      <div id="corruptswitch" class="handlecontents">
 <?php
-echo '        <img src="'.$rooturl.'/chaos/icons/corruption_txt2.png" id="corrupttext" height="81" width="19" title="Corruption" />'."\n";
+echo '          <img src="'.$rooturl.'/chaos/icons/corruption_txt2.png" id="corrupttext" height="81" width="19" title="Corruption" />'."\n";
 ?>
       </div>
     </div>
-    <div class="lefthandle" id="scorehandle">
-      <div class="framebox textbox" id="scoreswitch">
+    <div id="scorehandle" class="lefthandle">
+      <div id="scoreswitch" class="handlecontents">
 <?php      
-echo '        <img src="'.$rooturl.'/chaos/icons/scoreboard_txt2.png" id="scoretext" height="86" width="19" title="Scoreboard" />'."\n";
+echo '          <img src="'.$rooturl.'/chaos/icons/scoreboard_txt2.png" id="scoretext" height="86" width="19" title="Scoreboard" />'."\n";
 ?>
       </div>
     </div>
-    <div class="lefthandle" id="workhandle">
-      <div class="framebox textbox" id="workswitch">
+    <div id="workhandle" class="lefthandle">
+      <div id="workswitch" class="handlecontents">
 <?php       
 echo '        <img src="'.$rooturl.'/chaos/icons/figure_effects_txt2.png" id="worktext" height="102" width="19" title="Figure Effects" />'."\n";
 ?>
       </div>
-    </div>
+    </div>  
+  </div>
+  <div id="main">
     <div id="corruptbox" class="underbox"></div>
     <div id="scorebox" class="underbox">
       <div id="upgradecontrolbox" class="scoresubbox">
@@ -80,18 +82,6 @@ echo '        <img src="'.$rooturl.'/chaos/icons/figure_effects_txt2.png" id="wo
         <div class="effect"></div><div class="effecttext"></div>
       </div>
     </div>
-    <div id="resetbox" class="framebox">
-      <span class="emphasis">Reset PP:</span>
-      <div id="resetpp" class="reset"></div>
-      <div class="clear"></div>
-      <span class="emphasis">Reset DACs:</span>
-      <div id="resetdacs" class="reset"></div>
-    </div>
-    <div id="ppbox" class="framebox">
-      <div id="inputbox" class="arrows">
-        <span id="ppspan" class="emphasis">PP:</span>
-      </div>
-    </div>
     <div id="message" class="messagebox underbox">
       <div>
         <div class="messageframe">
@@ -101,31 +91,42 @@ echo '        <img src="'.$rooturl.'/chaos/icons/figure_effects_txt2.png" id="wo
         </div>
       </div>
     </div>
-    <div class="spacer tall"></div>
     <canvas id="board" width="700" height="610">
-      <p>Sorry, no canvas support.</p>
+          <span class="styleme" id="Andika">This page requires support for the HTML5
+           canvas element.  Get a better browser!</span>
     </canvas>
-  </div>
-  <div class="floatbox">
-    <div class="framebox">
-      <h2 id="cchead">Chaos Cards</h2>
-      <h2 id="owchead">Old World Cards</h2>
-      <h2 id="owthead">Old World Tokens</h2>
+    <div id="resetbox">
+      <span class="emphasis">Reset PP:</span>
+      <div id="resetpp"></div>
+      <span class="emphasis">Reset DACs:</span>
+      <div id="resetdacs"></div>
     </div>
-    <div class="framebox slidetop">
+    <div id="ppbox">
+      <div id="inputbox" class="arrows">
+        <span id="ppspan" class="emphasis">PP:</span>
+      </div>
+    </div>
+  </div>
+  <div id="piecesbox">
+    <div>
+      <p id="cchead">Chaos Cards</p>
+      <p id="owchead">Old World Cards</p>
+      <p id="owthead">Old World Tokens</p>
+    </div>
+    <div>
       <div id="cc" class="slidedown"></div>
     </div>
-    <div class="framebox slidetop">
+    <div>
       <div id="owc" class="slidedown"></div>
     </div>
-    <div class="framebox slidetop">
+    <div>
       <div id="owt" class="slidedown">
-        <canvas id="pool" width="175" height="225"></canvas>
+        <canvas id="pool" width="175" height="225">
+        </canvas>
       </div>
     </div>
   </div>
   <div class="floatbox buttons clear">
-    <div class="spacer"></div>
 <?php
 $dir = $docroot.$slash.'chaos'.$slash.'saves';
 
@@ -224,14 +225,16 @@ echo '    <input type="button" id="drawnow" value="Go!" />'."\n";
 echo '    <input type="text" id="savegamenum" class="right" size="4" maxlength="4" />'."\n";
 echo '    <input type="button" id="savexmlgame" class="right warn" value="Save as New Game..." '.$disabled.' />'."\n";
 echo '    <input type="button" id="savexmlstate" class="right warn" value="Save as" '.$disabled.' />'."\n";
-echo '  </div>'."\n";
-echo '  <div class="floatbox buttons clear">'."\n";
-echo '    <div class="spacer"></div>'."\n";
-echo '    <input type="button" id="newboard" value="New Board" />'."\n";
-echo '    <input type="button" id="savepng" class="right" value="Export as .PNG" />'."\n";
-echo '    <input type="button" id="overwritestate" class="right warn" value="Overwrite" '.$disabled.' />'."\n";
-echo '  </div>'."\n";
 ?>
+  </div>
+  <div class="floatbox buttons clear">
+    <div class="spacer"></div>
+    <input type="button" id="newboard" value="New Board" />
+    <input type="button" id="savepng" class="right" value="Export as .PNG" />
+<?php
+echo '    <input type="button" id="overwritestate" class="right warn" value="Overwrite" '.$disabled.' />'."\n";
+?>
+  </div>
   <script>initialize();</script>
 </body>
 </html>
