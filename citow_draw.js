@@ -1122,7 +1122,7 @@ function drawReserves(){
                 break;
             }
             for (j = 0; j < 3; j++){
-                if (j == 0 || xPos[j] >= x2){
+                if (j == 0 || xPos[j] >= x2 || x2 == x0 + 5){
                     xPos[j] = cultists[drawCount].draw(xPos[j], yPos[j], ctx);
                     drawCount++;
                     if (drawCount >= cultists.length){

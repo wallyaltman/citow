@@ -47,6 +47,7 @@ div.updown {
   background-color:#111111;
   color:#E0E0E0;
   border:4px ridge #EF2308;
+  padding:3px;
   font-weight:bold;
   z-index:24;
 }
@@ -62,6 +63,7 @@ div.updown {
 /* Per-region controls */
 div.corrupt {
   background-color:#111111;
+  color:#E0E0E0;
   border:4px ridge #56CC08;
   margin-top:0px;
   padding:3px 2px 2px 3px;
@@ -73,11 +75,14 @@ div.corrupt {
 div.corrupt > div {
   height:23px;
 }
+div.corrupt > div > div {
+  float:right;
+}
 /* toggle for positioning of per-region boxes */
 div.shiftbox {
   position:absolute;
-  left:148px;
-  top:322px;
+  left:155px;
+  top:317px;
   background-color:#111111;
   border:4px ridge #56CC08;
   padding:3px;
@@ -85,6 +90,22 @@ div.shiftbox {
 }
 div.shiftbox img {
   vertical-align:bottom;
+}
+div.shiftbox img:nth-of-type(2n - 1){
+  background-color:#FFFFFF;
+}
+div.shiftbox img.white{
+  background-color:#FFFFFF;
+  -o-transition:background-color .15s linear;
+  -moz-transition:background-color .15s linear;
+  -webkit-transition:background-color .15s linear;
+  transition:background-color .15s linear;
+}
+div.shiftbox img.black{
+  -o-transition:background-color .15s linear;
+  -moz-transition:background-color .15s linear;
+  -webkit-transition:background-color .15s linear;
+  transition:background-color .15s linear;
 }
 /** Scoreboard controls **/
 /* Container */
@@ -124,11 +145,14 @@ div.shiftbox img {
   background-color:inherit;
   border-width:1px 0 0 1px;
   padding:0 2px;
-  font-weight:600;
+  font-weight:bold;
   font-size:12px;
   vertical-align:middle;
 }
 #upgradecontrolbox tr td {
+  padding:3px 2px 1px 2px;
+}
+#upgradecontrolbox tr td:first-child {
   padding:2px;
 }
 #scorebox tr td:first-child {
@@ -173,34 +197,54 @@ div.shiftbox img {
   height:75px;
   width:180px;
 }
+#workbox > canvas {
+  background-color:#303030;
+}
+#workbox > div {
+  display:inline-block;
+}
+#workbox > div > div:nth-of-type(2n-1){
+  clear:both;
+}
+#workbox > div > div {
+  float:left;
+  padding:4px 4px 3px 4px;
+  color:#E0E0E0;
+  font-weight:bold;
+}
 /** PP controls **/
 #ppbox {
   top:319px;
-  left:35px;
-  /*width:98px;*/
-  height:29px;
+  left:30px;
 }
 #ppbox span {
   margin:4px 0 0 2px;
   float:left;
 }
+#ppbox input {
+  float:right;
+}
 /** Controls for resetting PP / DACs **/
-#resetbox {
+#main #resetbox {
   top:490px;
   left:45px;
+  padding-bottom:6px;
   width:143px;
   height:44px;
 }
 #resetbox > span {
   margin:4px 0 0 2px;
   float:left;
-}
-#resetbox > div {
-  float:right;
   clear:both;
+}
+#resetbox div.togglebox {
+  float:right;
+  margin:0 3px;
+  vertical-align:text-top;
 }
 #resetbox input[type="button"]{
   margin:2px 2px 0 0;
+  float:right;
 }
 #resetbox img.toggle{
   margin:4px 4px 0 3px;

@@ -3,7 +3,7 @@
  * These scripts draw map components for Chaos in the Old World.
  */
 
-/*** need to rewrite getGames, getStates, nextState ***/ 
+/*** need to rewrite getGames, getStates, nextState ***/
 
 /* Read in the list of games for which
  * gamestates exist, and fill the
@@ -371,7 +371,7 @@ function getBoardState(blank, expansion){
     else {
         var saveXMLButton = document.getElementById("savexmlstate");
         var overwriteXMLstate = document.getElementById("overwritestate");
-        //Disable the "Save as Game..." 
+        //Disable the "Save as Game..."
         //and "Overwrite" buttons
         saveXMLButton.value = "Save as";
         overwriteXMLstate.value = "Overwrite";
@@ -478,7 +478,7 @@ function createUpDownButtons(target){
     up.srcData = {
         base : "../chaos/icons/up.png",
         hover : "../chaos/icons/up_hover.png",
-        press : "../chaos/icons/up_press.png"    
+        press : "../chaos/icons/up_press.png"
     };
     up.src = up.srcData.base;
     up.target = target;
@@ -488,7 +488,7 @@ function createUpDownButtons(target){
     down.srcData = {
         base : "../chaos/icons/down.png",
         hover : "../chaos/icons/down_hover.png",
-        press : "../chaos/chaos/icons/down_press.png"    
+        press : "../chaos/chaos/icons/down_press.png"
     };
     down.src = down.srcData.base;
     down.target = target;
@@ -508,7 +508,7 @@ function createUpDownButtons(target){
         if (this.target.max != this.target.value){
             this.target.value = Number(this.target.value) + 1;
             //Flag the board as unsaved
-            unsavedBoard();            
+            unsavedBoard();
         }
         this.target.draw();
         //Repeat the increment on a
@@ -544,7 +544,7 @@ function createUpDownButtons(target){
         if (this.target.min != this.target.value){
             this.target.value = Number(this.target.value) - 1;
             //Flag the board as unsaved
-            unsavedBoard();            
+            unsavedBoard();
         }
         this.target.draw();
         //Repeat the decrement on a
@@ -594,7 +594,7 @@ function createUpDownButtons(target){
 function getOldWorldCards(){
     var xmlhttp = xmlRequest();
     if (xmlhttp){
-        //Get the document 
+        //Get the document
         var loc = "gamedata/";
         var url = loc + "oldworld.xml";
         xmlhttp.onreadystatechange = function(){
@@ -900,7 +900,7 @@ function buildScoreBoardControls(){
     var row, cell, nameCell, peasantCell, upgradeRow, upgradeCell, ppCell, vpCell, dialCell, dacCell;
     var upgrades, nameCell2, upgradeName, upgradeCheck, upgradeSwitch, upgradeSwitchText;
     var i, j, text, name, peasants, pp, vp, dial, dacs;
-    //Check for support of the "number" 
+    //Check for support of the "number"
     //input type
     var numType = (compat.inputNumber) ? "number" : "text";
     //Create a value-incrementing method for
@@ -977,9 +977,9 @@ function buildScoreBoardControls(){
     buttonPP.className = "right";
     buttonPP.disabled = "disabled";
     buttonPP.value = "Go!";
-    resetPP.appendChild(buttonPP);
     var togglePP = createToggleSwitch(buttonPP, null, null, "disabled", true);
     togglePP.className += " right";
+    resetPP.appendChild(buttonPP);
     resetPP.appendChild(togglePP);
     buttonPP.onclick = function(){
         var i, j, maxPP, inputPP;
@@ -999,9 +999,9 @@ function buildScoreBoardControls(){
     buttonDACs.className = "right";
     buttonDACs.disabled = "disabled";
     buttonDACs.value = "Go!";
-    resetDACs.appendChild(buttonDACs);
     var toggleDACs = createToggleSwitch(buttonDACs, null, null, "disabled", true);
     toggleDACs.className += " right";
+    resetDACs.appendChild(buttonDACs);
     resetDACs.appendChild(toggleDACs);
     buttonDACs.onclick = function(){
         var i, j, inputDACs;
@@ -1010,7 +1010,7 @@ function buildScoreBoardControls(){
             inputDACs.value = 0;
             inputDACs.update();
         }
-        toggleDACs.flip();    
+        toggleDACs.flip();
     };
     /*** Player Rows ***/
     var playerName, inputUpDown;
@@ -1053,15 +1053,16 @@ function buildScoreBoardControls(){
         for (j = 0; j < upgrades.length; j++){
             upgradeCheck = createToggleSwitch(upgrades[j], score);
             upgradeCheck.id = playerName + "_upgrade" + j;
-            upgradeSwitch = document.createElement("div");
+            /* upgradeSwitch = document.createElement("div");
             upgradeSwitch.className = "switch";
-            upgradeSwitch.appendChild(upgradeCheck);
+            upgradeSwitch.appendChild(upgradeCheck); */
             upgradeName = document.createTextNode(upgrades[j].name);
-            upgradeSwitchText = document.createElement("div");
+            upgradeSwitchText = document.createElement("span");
             upgradeSwitchText.className = "switchtext";
             upgradeSwitchText.appendChild(upgradeName);
             upgradeCell = document.createElement("td");
-            upgradeCell.appendChild(upgradeSwitch);
+            /* upgradeCell.appendChild(upgradeSwitch); */
+            upgradeCell.appendChild(upgradeCheck);
             upgradeCell.appendChild(upgradeSwitchText);
             upgradeRow.appendChild(upgradeCell);
         }
@@ -1184,11 +1185,11 @@ function buildScoreBoardControls(){
         else if (document.attachEvent){
             //Internet Explorer
             document.attachEvent("onmousedown", closePanels);
-        }        
+        }
         //Stop event propagation
         if (e.stopPropagation) {
             e.stopPropagation();
-        } 
+        }
         else {
             e.cancelBubble = true;
         }
@@ -1201,7 +1202,7 @@ function buildScoreBoardControls(){
             var e = evt || window.event;
             if (e.stopPropagation) {
                 e.stopPropagation();
-            } 
+            }
             else {
                 e.cancelBubble = true;
             }
@@ -1270,7 +1271,7 @@ function buildWorkshop(){
     //Set the drag and drop methods
     workshop.drag = dragObject;
     workshop.drop = dropObject;
-    //Set the mouseup handler, for 
+    //Set the mouseup handler, for
     //dropping figures in the shop
     workshop.cursorPos = getCursorPosition;
     workshop.release = function(evt){
@@ -1339,7 +1340,7 @@ function buildWorkshop(){
         //Stop event propagation
         if (e.stopPropagation) {
             e.stopPropagation();
-        } 
+        }
         else {
             e.cancelBubble = true;
         }
@@ -1419,9 +1420,9 @@ function buildCorruption(){
             }
         };
         //Insert the content
+        div.appendChild(inputBox);
         div.appendChild(ruinSpan);
         div.appendChild(ruinInput);
-        div.appendChild(inputBox);
         subBox.appendChild(div);
         box.appendChild(subBox);
     }
@@ -1463,7 +1464,7 @@ function buildCorruption(){
         var e = evt || window.event;
         if (e.stopPropagation) {
             e.stopPropagation();
-        } 
+        }
         else {
             e.cancelBubble = true;
         }
@@ -1500,11 +1501,11 @@ function buildCorruption(){
         else if (document.attachEvent){
             //Internet Explorer
             document.attachEvent("onmousedown", closePanels);
-        }        
+        }
         //Stop event propagation
         if (e.stopPropagation) {
             e.stopPropagation();
-        } 
+        }
         else {
             e.cancelBubble = true;
         }
@@ -1517,7 +1518,7 @@ function buildCorruption(){
             var e = evt || window.event;
             if (e.stopPropagation) {
                 e.stopPropagation();
-            } 
+            }
             else {
                 e.cancelBubble = true;
             }
@@ -1552,7 +1553,7 @@ function closePanels(evt){
     else if (document.detachEvent){
         //Internet Explorer
         document.detachEvent("onmousedown", closePanels);
-    }    
+    }
 }
 
 /* Build and draw a new board.  A value of true for
@@ -1861,7 +1862,7 @@ function drawBoard(blank, local, expansion){
         /***Set up the region's figures***/
         tempFigureList = newRegion.xmlData.getElementsByTagName("figures")[0].childNodes;
         newRegion.figures = [];
-        //Set up name-keyed references 
+        //Set up name-keyed references
         //to the players
         tempPlayers = {};
         for (j = 0; j < playerCount; j++){
@@ -2099,7 +2100,7 @@ function drawBoard(blank, local, expansion){
                     if (pen.source != null){
                         pen.source = null;
                         unsavedBoard();
-                    }                    
+                    }
                 }
             }
         }
@@ -2121,7 +2122,7 @@ function drawBoard(blank, local, expansion){
             if (players[i].playerRow.x0 <= x && x < players[i].playerRow.x1 && players[i].playerRow.y0 <= y && y < players[i].playerRow.y1){
                 //Look for the matching player name
                 //in the scoreboard controls table
-                var playerName = players[i].name;
+                var playerName = players[i].displayName;
                 for (var j = 0; j < rows.length; j++){
                     if (rows[j].firstChild.innerText == playerName){
                         //Call the add value method on
@@ -2554,7 +2555,7 @@ function saveBoardXML(saveType){
                             //Show the "Success!" message
                             showMessage(this.responseText, "okay");
                             //Turn off the "unsaved" flags
-                            unsavedBoard(true); 
+                            unsavedBoard(true);
                         }
                     }
                 };
@@ -2628,7 +2629,7 @@ function saveBoardXML(saveType){
                     gameNumber = "0" + gameNumber;
                 }
                 //Verify that a user trying to save a
-                //new state for an existing game is 
+                //new state for an existing game is
                 //the creator or an admin
                 if (userLevel < 3){
                     var creatorName = board.creator;
@@ -2652,7 +2653,7 @@ function saveBoardXML(saveType){
                 gameNumber = "0" + gameNumber;
             }
             //Verify that a user trying to save a
-            //new state for an existing game is 
+            //new state for an existing game is
             //the creator or an admin
             var creatorName = board.creator;
             if (userLevel >= 3){
@@ -2773,7 +2774,7 @@ function showMessage(content, type){
     }
 }
 
-/* Prompt the user for a yes/no or 
+/* Prompt the user for a yes/no or
  * multiple-choice response. The possible
  * responses should be in an array.  The
  * function "responder" is called when a
@@ -2902,7 +2903,7 @@ function initialize(){
         }
         //Draw the starting board (either the locally
         //stored board, or the selected saved one)
-        drawBoard(false, localBoard);        
+        drawBoard(false, localBoard);
         //Set up the list of Chaos cards
         getChaosCards();
         var cchead = document.getElementById("cchead");
@@ -2954,3 +2955,4 @@ function initialize(){
         };
     }
 }
+
