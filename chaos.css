@@ -83,7 +83,7 @@ div.shiftbox {
   position:absolute;
   left:155px;
   top:317px;
-  background-color:#111111;
+  background-color:#000000;
   border:4px ridge #56CC08;
   padding:3px;
   width:61px;
@@ -92,25 +92,25 @@ div.shiftbox img {
   vertical-align:bottom;
 }
 div.shiftbox img:nth-of-type(2n - 1){
-  background-color:#FFFFFF;
+  background-color:#606060;
 }
 div.shiftbox img.white{
   background-color:#FFFFFF;
-  -o-transition:background-color .15s linear;
-  -moz-transition:background-color .15s linear;
-  -webkit-transition:background-color .15s linear;
-  transition:background-color .15s linear;
+  -o-transition:background-color .1s linear;
+  -moz-transition:background-color .1s linear;
+  -webkit-transition:background-color .1s linear;
+  transition:background-color .1s linear;
 }
 div.shiftbox img.black{
-  -o-transition:background-color .15s linear;
-  -moz-transition:background-color .15s linear;
-  -webkit-transition:background-color .15s linear;
-  transition:background-color .15s linear;
+  -o-transition:background-color .1s linear;
+  -moz-transition:background-color .1s linear;
+  -webkit-transition:background-color .1s linear;
+  transition:background-color .1s linear;
 }
 /** Scoreboard controls **/
 /* Container */
 #scorebox {
-  height:428px;
+  height:449px;
   width:462px;
 }
 #upgradecontrolbox {
@@ -121,7 +121,7 @@ div.shiftbox img.black{
 }
 #scorecontrolbox {
   position:absolute;
-  top:5px;
+  top:0;
   right:30px;
   border:4px ridge #0840CE;
 }
@@ -383,6 +383,10 @@ div.handlecontents > img{
   background-color:#111111;
   height:112px;
   padding:3px 4px 2px 2px;
+}
+/* Individual toggle switches */
+#activehandle > div div {
+  height:17px;
 }
 /** Corruption, scoreboard, and workshop panel switches **/
 div#corruptswitch {

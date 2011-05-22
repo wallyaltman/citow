@@ -760,7 +760,7 @@ function buildTokenPool(){
     var ctx = canvas.getContext('2d');
     var pools = [pool.event, pool.hero, pool.noble, pool.peasant, pool.warpstone, pool.skaven];
     canvas.pools = pools;
-    var endY = [25, 50, 75, 150, 200, 225];
+    var endY = [25, 50, 75, 150, 200, 275];
     var x0 = 3;
     var i, j, y0, y1;
     for (i = 0; i < pools.length; i++){
@@ -1357,7 +1357,7 @@ function buildCorruption(){
     var regions = board.map.regions;
     var players = board.map.players;
     var box = document.getElementById("corruptbox");
-    var width = 220;
+    var width = 260;
     var height = 110;
     var yOffset = 21;
     var i, j, x, y, subBox, div, inputBox, input, inputUpDown;

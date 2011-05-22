@@ -244,77 +244,114 @@ function drawFigure(x0, y0, ctx){
  */
 function drawToken(x, y, ctx){
     var token = this;
-    var board, names, pos, number;
-    var icon, sz19, sz21x17;
+    var board, allUpgrades, allIcons, pos, number;
+    var icon, sz19;
     //Set the icon association if
     //it is not yet set
     if (!this.icon){
         board = document.getElementById("board");
-        //If this is the very first token to
-        //be drawn, retrieve the sprite sheet
-        //and set up an icon array
-        if (!board.sprites){
-            board.sprites = document.createElement('img');
-            board.sprites.src = "../chaos/icons/sprites.png";
-            board.iconList = {};
+        //Create a list of upgrades, and a 
+        //list of all other icons
+        allUpgrades = ["cards", "cultist", "daemon", "pp1", "pp2", "provender", "warrior"];
+        allIcons = ["event", "hero", "noble", "peasant", "skaven", "warpstone",
+                    "dac", "select", "unselect", "smallcomet", "darkcomet", "magic"];
+        //Check whether this is an icon or upgrade,
+        //and proceed accordingly
+        if (allIcons.indexOf(this.name) >= 0){
+            //If this is the very first icon to
+            //be drawn, retrieve the sprite sheet
+            //and set up the icon array
+            if (!board.iconSprites){
+                board.iconSprites = document.createElement('img');
+                board.iconSprites.src = "../chaos/icons/icon_sprites.png";
+                board.iconList = {};
+            }
+            //If this is the first instance of this
+            //specific icon to be drawn, set up the
+            //drawing information and load the icon
+            //into the array
+            if (!board.iconList.hasOwnProperty(this.name)){
+                //Starting (upper-left) coordinate positions for
+                //the tokens, in order (from the list above)
+                pos = [{x:1,y:1}, {x:21,y:1}, {x:41,y:1}, {x:1,y:21}, {x:21,y:21}, {x:41,y:21},
+                       {x:73,y:21}, {x:61,y:3}, {x:77,y:3}, {x:61,y:19}, {x:61,y:19}, {x:61,y:31}];
+                //Get the index of the current icon with respect
+                //to the icon list
+                number = allIcons.indexOf(this.name);
+                icon = {
+                    img : board.iconSprites,   //The icon sheet
+                    srcX : pos[number].x,       //X-coord on the sheet
+                    srcY : pos[number].y        //Y-coord on the sheet
+                };
+                //Group icons by dimensions and assign height
+                //and width
+                sz19 = ["dac", "event", "hero", "noble", "peasant", "skaven", "warpstone"];
+                //Old World tokens & DAC
+                if (sz19.indexOf(this.name) >= 0){
+                    icon.width = 19;
+                    icon.height = 19;
+                }
+                //Toggle switch
+                else if (this.name == "select" || this.name == "unselect"){
+                    icon.width = 15;
+                    icon.height = 15;
+                }
+                //Old World Card event indicators
+                else if (this.name == "smallcomet" || this.name == "darkcomet"){
+                    icon.width = 11;
+                    icon.height = 11;
+                    //The "darkcomet" should be drawn semi-transparent, by
+                    //setting the global alpha value
+                    if (this.name == "darkcomet"){
+                        icon.alpha = 0.6;
+                    }
+                }
+                //Chaos Card magic symbol
+                else if (this.name == "magic"){
+                    icon.width = 9;
+                    icon.height = 9;
+                }
+                //Insert the icon in the list
+                board.iconList[this.name] = icon;
+            }
+            //Create a reference on the token
+            //to its icon
+            this.icon = board.iconList[this.name];
         }
-        //If this is the first instance of this
-        //specific token to be drawn, set up the
-        //drawing information and load the icon
-        //into the array
-        if (!board.iconList.hasOwnProperty(this.name)){
-            //All token names
-            names = ["cards", "cultist", "daemon", "pp1", "pp2", "provender", "warrior", 
-                     "event", "hero", "noble", "peasant", "skaven", "warpstone",
-                     "dac", "select", "unselect", "smallcomet", "darkcomet", "magic"];
-            //Starting (upper-left) coordinate positions for
-            //the tokens, in the same order
-            pos = [{x:1,y:1}, {x:23,y:1}, {x:45,y:1}, {x:67,y:1}, {x:1,y:19}, {x:23,y:19}, {x:45,y:19},
-                   {x:1,y:37}, {x:21,y:37}, {x:41,y:37}, {x:1,y:57}, {x:21,y:57}, {x:41,y:57},
-                   {x:67,y:19}, {x:61,y:39}, {x:77,y:39}, {x:61,y:55}, {x:73,y:55}, {x:61,y:67}];
-            //Get the index of the current icon with respect
-            //to the above "names" list
-            number = names.indexOf(this.name);
-            icon = {
-                img : board.sprites,        //The token sheet
-                srcX : pos[number].x,       //X-coord on the sheet
-                srcY : pos[number].y        //Y-coord on the sheet
-            };
-            //Group tokens by dimensions and assign height
-            //and width
-            sz19 = ["dac", "event", "hero", "noble", "peasant", "skaven", "warpstone"];
-            sz21x17 = ["cards", "cultist", "daemon", "pp1", "pp2", "provender", "warrior"];
-            //Old World tokens & DAC
-            if (sz19.indexOf(this.name) >= 0){
-                icon.width = 19;
-                icon.height = 19;
+        else if (allUpgrades.indexOf(this.name) >= 0){
+            //If this is the very first upgrade
+            //to be drawn, retrieve the sprite sheet
+            //and set up the upgrade array
+            if (!board.upgradeSprites){
+                board.upgradeSprites = document.createElement('img');
+                board.upgradeSprites.src = "../chaos/icons/upgrade_sprites.png";
+                board.upgradeList = {};
             }
-            //Upgrade tokens
-            else if (sz21x17.indexOf(this.name) >= 0){
-                icon.width = 21;
-                icon.height = 17;
+            //If this is the first instance of this
+            //specific upgrade to be drawn, set up the
+            //drawing information and load the upgrade
+            //into the array
+            if (!board.iconList.hasOwnProperty(this.name)){
+                //Starting (upper-left) coordinate positions for
+                //the upgrades, in order (from the upgrade list above)
+                pos = [{x:1,y:1}, {x:25,y:1}, {x:49,y:1}, {x:73,y:1}, {x:1,y:21}, {x:25,y:21}, {x:49,y:21}]
+                //Get the index of the current upgrade with respect
+                //to the upgrade list
+                number = allUpgrades.indexOf(this.name);
+                icon = {
+                    img : board.upgradeSprites,  //The upgrade sheet
+                    srcX : pos[number].x,        //X-coord on the sheet
+                    srcY : pos[number].y,        //Y-coord on the sheet
+                    width : 23,                  //Width (same for all upgrades)
+                    height : 19                  //Height (same for all upgrades)
+                };
+                //Insert the upgrade in the list
+                board.upgradeList[this.name] = icon;
             }
-            //Toggle switch
-            else if (this.name == "select" || this.name == "unselect"){
-                icon.width = 15;
-                icon.height = 15;
-            }
-            //Old World Card event indicators
-            else if (this.name == "smallcomet" || this.name == "darkcomet"){
-                icon.width = 11;
-                icon.height = 11;
-            }
-            //Chaos Card magic symbol
-            else if (this.name == "magic"){
-                icon.width = 9;
-                icon.height = 9;
-            }
-            //Insert the icon in the list
-            board.iconList[this.name] = icon;
+            //Create a reference on the upgrade
+            //to its icon
+            this.icon = board.upgradeList[this.name];
         }
-        //Create a reference on the token
-        //to its icon
-        this.icon = board.iconList[this.name];
     }
     //This method draws the token, and will
     //replace the drawToken function in
@@ -332,24 +369,62 @@ function drawToken(x, y, ctx){
         this.x1 = x + dimX;
         this.y1 = y + dimY;
     }
+    //This is a special method, used only
+    //for icons drawn with an alpha value
+    var drawMethodAlpha = function(x, y, ctx){
+        var dimX = this.icon.width;
+        var dimY = this.icon.height;
+        //Set the alpha value
+        ctx.globalAlpha = this.icon.alpha;
+        //Draw the image by pulling the target
+        //rectangle off the sprite sheet
+        ctx.drawImage(this.icon.img, this.icon.srcX, this.icon.srcY, dimX, dimY, x, y, dimX, dimY);
+        //Store the token's bounding box
+        this.x0 = x;
+        this.y0 = y;
+        this.x1 = x + dimX;
+        this.y1 = y + dimY;
+        //Reset the alpha value
+        ctx.globalAlpha = 1;
+    }
     //If the sprite sheet is loaded already,
     //go ahead and reassign the method and
     //draw the token
     if (this.icon.img.complete){
-        this.draw = drawMethod;
+        //Set the "alpha" method if needed
+        if (this.icon.alpha && this.icon.alpha != 1){
+            this.draw = drawMethodAlpha;
+        }
+        else {
+            this.draw = drawMethod;
+        }
         this.draw(x, y, ctx);
     }
     //Otherwise, set an interval that will
     //complete those tasks once the sheet
     //has been loaded
     else {
-        var loadTimer = setInterval(function(){
-            if (token.icon.img.complete){
-                clearInterval(loadTimer);
-                token.draw = drawMethod;
-                token.draw(x, y, ctx);
-            }
-        }, 100);
+        //Set the "alpha" method if needed. The 
+        //check is run now, rather than running
+        //it repeatedly in the timer.
+        if (this.icon.alpha && this.icon.alpha != 1){
+            var loadTimer = setInterval(function(){
+                if (token.icon.img.complete){
+                    clearInterval(loadTimer);
+                    token.draw = drawMethodAlpha;
+                    token.draw(x, y, ctx);
+                }
+            }, 100);
+        }
+        else {
+            var loadTimer = setInterval(function(){
+                if (token.icon.img.complete){
+                    clearInterval(loadTimer);
+                    token.draw = drawMethod;
+                    token.draw(x, y, ctx);
+                }
+            }, 100);
+        }
     }
 }
 
@@ -401,10 +476,11 @@ function drawRegion(){
     ctx.strokeStyle = "rgba(172, 49, 16, 1)";
     ctx.lineWidth = 1;
     ctx.lineJoin = 'miter';
-    var width = 220;
+    var width = 260;
     var height = 110;
     var x = 10 + (this.border.col * (width + 10));
     var y = 10 + (this.border.row * (height + 10));
+    var xWidth = x + width;
     //Clear the area
     ctx.fillStyle = "#332211";
     ctx.fillRect(x, y, width, height);
@@ -416,13 +492,13 @@ function drawRegion(){
     for (i = 0; i < this.links.length; i++){
         pos = this.links[i];
         if (pos == "E"){
-            ctx.fillRect(x + width + 1, y + Math.floor(height / 2) - 4, 10, 10);
+            ctx.fillRect(xWidth + 1, y + Math.floor(height / 2) - 4, 10, 10);
         }
         else if (pos == "NE"){
-            ctx.fillRect(x + width, y + 19, 10, 10);
+            ctx.fillRect(xWidth, y + 19, 10, 10);
         }
         else if (pos == "SE"){
-            ctx.fillRect(x + width + 1, y + height - 31, 10, 10);
+            ctx.fillRect(xWidth + 1, y + height - 31, 10, 10);
         }
         else if (pos == "S"){
             ctx.fillRect(x + Math.floor(width / 2) - 4, y + height + 1, 10, 10);
@@ -450,7 +526,7 @@ function drawRegion(){
     //Draw the header box borders
     ctx.beginPath();
     ctx.moveTo(x + 1, y + 19.5);
-    ctx.lineTo(x + width, y + 19.5);
+    ctx.lineTo(xWidth, y + 19.5);
     ctx.closePath();
     ctx.stroke();
     ctx.beginPath();
@@ -465,17 +541,17 @@ function drawRegion(){
     //Draw the "populated" indicator
     if (this.populated){
         ctx.fillStyle = bgcolor2;
-        ctx.fillRect(x + 192, y + 2, 27, 13);
+        ctx.fillRect(xWidth - 28, y + 2, 27, 13);
         ctx.beginPath();
-        ctx.moveTo(x + width - 26.5, y + 1);
-        ctx.lineTo(x + width - 26.5, y + 13.5);
-        ctx.lineTo(x + width + .5, y + 13.5);
+        ctx.moveTo(xWidth - 26.5, y + 1);
+        ctx.lineTo(xWidth - 26.5, y + 13.5);
+        ctx.lineTo(xWidth + .5, y + 13.5);
         ctx.stroke();
         ctx.fillStyle = bgPop;
-        ctx.fillRect(x + width - 25, y + 2, 24, 10);
+        ctx.fillRect(xWidth - 25, y + 2, 24, 10);
         ctx.fillStyle = textPop;
         ctx.font = "bold 10px Tahoma, Helvetica, sans-serif";
-        ctx.fillText("POP", x + width - 24, y + 13);
+        ctx.fillText("POP", xWidth - 24, y + 13);
     }
     //Write the resistance value and region name
     ctx.fillStyle = textcolor;
@@ -499,7 +575,7 @@ function drawRegion(){
     for (i = 0; i < 2; i++){
         cards[i].bgcolor = bgcolor;
         cards[i].bgcolor2 = bgcolor2;
-        cards[i].draw(x + 41, y + 22 + (18 * i), ctx);
+        cards[i].draw(xWidth - 179, y + 22 + (18 * i), ctx);
     }
     //Dispose of the placeholder cards
     while (cards.length > 0 && cards[cards.length - 1].placeholder == true){
@@ -510,40 +586,40 @@ function drawRegion(){
     ctx.lineWidth = 1;
     //Draw the straight-line borders
     ctx.beginPath();
-    ctx.moveTo(x + 90, y + 58.5);
-    ctx.lineTo(x + 218, y + 58.5);
-    ctx.moveTo(x + 90, y + 74.5);
-    ctx.lineTo(x + 218, y + 74.5);
-    ctx.moveTo(x + 217.5, y + 58);
-    ctx.lineTo(x + 217.5, y + 75);
+    ctx.moveTo(xWidth - 130, y + 58.5);
+    ctx.lineTo(xWidth - 2, y + 58.5);
+    ctx.moveTo(xWidth - 130, y + 74.5);
+    ctx.lineTo(xWidth - 2, y + 74.5);
+    ctx.moveTo(xWidth - 2.5, y + 58);
+    ctx.lineTo(xWidth - 2.5, y + 75);
     if (!this.ruined){
-        ctx.moveTo(x + 201.5, y + 58);
-        ctx.lineTo(x + 201.5, y + 75);
-        ctx.moveTo(x + 185.5, y + 58);
-        ctx.lineTo(x + 185.5, y + 75);
-        ctx.moveTo(x + 169.5, y + 58);
-        ctx.lineTo(x + 169.5, y + 75);
-        ctx.moveTo(x + 153.5, y + 58);
-        ctx.lineTo(x + 153.5, y + 75);
+        ctx.moveTo(xWidth - 18.5, y + 58);
+        ctx.lineTo(xWidth - 18.5, y + 75);
+        ctx.moveTo(xWidth - 34.5, y + 58);
+        ctx.lineTo(xWidth - 34.5, y + 75);
+        ctx.moveTo(xWidth - 50.5, y + 58);
+        ctx.lineTo(xWidth - 50.5, y + 75);
+        ctx.moveTo(xWidth - 66.5, y + 58);
+        ctx.lineTo(xWidth - 66.5, y + 75);
     }
     ctx.stroke();
     //Draw the curved endcap
     ctx.lineWidth = 1.3;
     ctx.beginPath();
-    ctx.moveTo(x + 90.5, y + 58.65);
-    ctx.bezierCurveTo(x + 84, y + 58.65, x + 84, y + 74.35, x + 90.5, y + 74.35);
+    ctx.moveTo(xWidth - 129.5, y + 58.65);
+    ctx.bezierCurveTo(xWidth - 136, y + 58.65, xWidth - 136, y + 74.35, xWidth - 129.5, y + 74.35);
     ctx.stroke();
     //Fill and write the corruption legend
     ctx.fillStyle = bgcolor;
     if (this.ruined){
-        ctx.fillRect(x + 92, y + 60, 125, 13);
+        ctx.fillRect(xWidth - 128, y + 60, 125, 13);
     }
     else {
-        ctx.fillRect(x + 92, y + 60, 60, 13);
+        ctx.fillRect(xWidth - 128, y + 60, 60, 13);
     }
     ctx.beginPath();
-    ctx.moveTo(x + 92, y + 60);
-    ctx.bezierCurveTo(x + 86, y + 62, x + 86, y + 71, x + 92, y + 73);
+    ctx.moveTo(xWidth - 128, y + 60);
+    ctx.bezierCurveTo(xWidth - 134, y + 62, xWidth - 134, y + 71, xWidth - 128, y + 73);
     ctx.closePath();
     ctx.fill();
     ctx.fillStyle = textcolor;
@@ -567,7 +643,7 @@ function drawRegion(){
     else {
         legend = "Corruption";
     }
-    ctx.fillText(legend, x + 90, y + 73);
+    ctx.fillText(legend, xWidth - 130, y + 73);
     //Fill the corruption counters, set the
     //click areas, and insert the values
     var playerName, corruption, highlight, shadow, j, corruptPlayers;
@@ -580,7 +656,7 @@ function drawRegion(){
     for (i = 0; i < corruptPlayers.length; i++){
         highlight = corruptPlayers[i].highlight;
         shadow = corruptPlayers[i].shadow;
-        x1 = x + 155 + (i * 16);
+        x1 = xWidth - 65 + (i * 16);
         y1 = y + 60;
         for (j = 0; j < this.corruption.length; j++){
             if (this.corruption[j].owner.name == corruptPlayers[i].name){
@@ -606,10 +682,10 @@ function drawRegion(){
     }
     //Insert the old world tokens, if any
     var x1, y1;
-    var xArray = [2, 22, 2, 22, 2, 22, 42, 62, 82, 102, 122];
-    var yArray = [21, 21, 41, 41, 61, 61, 61, 61, 61, 61, 61];
+    var xArray = [2, 22, 42, 62, 2, 22, 42, 62, 2, 22, 42, 62, 82, 102, 122, 142, 162];
+    var yArray = [21, 21, 21, 21, 41, 41, 41, 41, 61, 61, 61, 61, 61, 61, 61, 61, 61];
     for (i = 0; i < this.tokens.length; i++){
-        if (i > 10){
+        if (i >= xArray.length){
             break;
         }
         x1 = x + xArray[i];
@@ -647,7 +723,7 @@ function drawRegion(){
     //Store the region's bounding box
     this.x0 = x;
     this.y0 = y;
-    this.x1 = x + width + 1;
+    this.x1 = xWidth + 1;
     this.y1 = y + height + 1;
 }
 
@@ -748,12 +824,12 @@ function drawScoreBoard(){
     var players = this.players;
     var ctx = this.ctx;
     var x = 18;
-    var y = 172;
-    var width = 461 - x;  //not counting left caps
-    var height = 22 * players.length + 1;  //not counting headers
+    var y = 170;
+    var width = 541 - x;  //not counting left caps
+    var height = 26 * players.length + 1;  //not counting headers
     //Clear the drawing area;
     ctx.fillStyle = "#332211";
-    ctx.fillRect(x - 10, y - 20, width + 19, height + 20);
+    ctx.fillRect(x - 10, y - 24, width + 19, height + 20);
     var bgcolor = "#553311";
     var textcolor = "#CC7711";
     var bordercolor = "#BB7711";
@@ -763,18 +839,18 @@ function drawScoreBoard(){
     //Draw the row borders
     ctx.beginPath();
     for (i = 0; i <= players.length; i++){
-        ctx.moveTo(x, y + (22 * i) + .5);
-        ctx.lineTo(461, y + (22 * i) + .5);
+        ctx.moveTo(x, y + (26 * i) + .5);
+        ctx.lineTo(x + width, y + (26 * i) + .5);
     }
-    ctx.moveTo(460.5, y);
-    ctx.lineTo(460.5, y + (22 * players.length) + 1);
+    ctx.moveTo(x + width - .5, y);
+    ctx.lineTo(x + width - .5, y + (26 * players.length) + 1);
     ctx.stroke();
     //Draw the endcaps
     ctx.lineWidth = 1.3;
     ctx.beginPath();
     for (i = 0; i < players.length; i++){
-        ctx.moveTo(x, y + (22 * i) + .65);
-        ctx.bezierCurveTo(x - 10, y + (22 * i) + .65, x - 10, y + (22 * (i + 1)) + .35, x, y + (22 * (i + 1)) + .35);
+        ctx.moveTo(x, y + (26 * i) + .65);
+        ctx.bezierCurveTo(x - 10, y + (26 * i) + .65, x - 10, y + (26 * (i + 1)) + .35, x, y + (26 * (i + 1)) + .35);
     }
     ctx.stroke();
     var currentPlayer, currentObj, pp, vp, dial, dialCap, dialValue, threat;
@@ -783,13 +859,13 @@ function drawScoreBoard(){
     var x1, y1, x2, y2;
     //This array determines the cell widths:
     //Name, Peasants, Upgrades, PP, VP, Dial
-    var startX = [71, 65, 69, 22, 23, 211 - x];
+    var startX = [113, 65, 81, 24, 25, 233 - x];
     //Draw and fill the rows and cell dividers
     ctx.lineWidth = 1;
     ctx.font = "17px Tahoma, Helvetica, sans-serif";
     var obj, count, printName;
     for (i = 0; i < players.length; i++){
-        y1 = y + (22 * i);
+        y1 = y + (26 * i);
         currentPlayer = players[i];
         highlight = currentPlayer.highlight;
         shadow = currentPlayer.shadow;
@@ -797,54 +873,54 @@ function drawScoreBoard(){
         x1 = x;
         x2 = x + startX[0];
         ctx.fillStyle = shadow;
-        ctx.fillRect(x1 + 1, y1 + 2, (x2 - x1 - 4), 19);
+        ctx.fillRect(x1 + 1, y1 + 2, (x2 - x1 - 4), 23);
         ctx.beginPath();
         ctx.moveTo(x1 + 1, y1 + 2);
-        ctx.bezierCurveTo(x1 - 7.4, y1 + 3, x1 - 7.4, y1 + 20, x1 + 1, y1 + 21);
+        ctx.bezierCurveTo(x1 - 7.4, y1 + 3, x1 - 7.4, y1 + 24, x1 + 1, y1 + 25);
         ctx.closePath();
         ctx.fill();
         ctx.fillStyle = highlight;
-        ctx.fillText(currentPlayer.displayName, x1 - 2, y1 + 21);
+        ctx.fillText(currentPlayer.displayName, x1 - 2, y1 + 25);
         //Peasant tokens
         peasants = currentPlayer.peasants;
         x1 = x2;
         x2 = x2 + startX[1];
         ctx.beginPath();
         ctx.moveTo(x1 - 1.5, y1);
-        ctx.lineTo(x1 - 1.5, y1 + 22);
+        ctx.lineTo(x1 - 1.5, y1 + 26);
         ctx.stroke();
         ctx.fillStyle = shadow;
-        ctx.fillRect(x1, y1 + 2, (x2 - x1 - 3), 19);
+        ctx.fillRect(x1, y1 + 2, (x2 - x1 - 3), 23);
         if (peasants.length < 7){
             for (j = 0; j < peasants.length; j++){
-                peasants[j].draw(x1 + (8 * j), y1 + 2, ctx);
+                peasants[j].draw(x1 + (8 * j) + 2, y1 + 4, ctx);
             }
         }
         else {
-            peasants[0].draw(x1, y1 + 2, ctx);
+            peasants[0].draw(x1 + 2, y1 + 4, ctx);
             ctx.fillStyle = highlight;
-            ctx.fillText("\u00D7 " + peasants.length, x1 + 22, y1 + 21);
+            ctx.fillText("\u00D7 " + peasants.length, x1 + 24, y1 + 25);
         }
         //Upgrades
         x1 = x2;
         x2 = x2 + startX[2];
         ctx.beginPath();
         ctx.moveTo(x1 - 1.5, y1);
-        ctx.lineTo(x1 - 1.5, y1 + 22);
+        ctx.lineTo(x1 - 1.5, y1 + 26);
         ctx.stroke();
         ctx.fillStyle = shadow;
-        ctx.fillRect(x1, y1 + 2, (x2 - x1 - 3), 19);
+        ctx.fillRect(x1, y1 + 2, (x2 - x1 - 3), 23);
         upgrades = currentPlayer.upgrades;
-        offset = 0;
+        offset = 1;
         ctx.fillStyle = highlight;
         count = 0;
         for (j = 0; j < upgrades.length; j++){
             //Draw the appropriate upgrade icon, if
             //the upgrade is active
             if (upgrades[j].active){
-                ctx.fillRect(x1 + offset + 1, y1 + 3, 21, 17);
-                upgrades[j].draw(x1 + offset + 1, y1 + 3, ctx);
-                offset += 22;
+                ctx.fillRect(x1 + offset, y1 + 4, 23, 19);
+                upgrades[j].draw(x1 + offset, y1 + 4, ctx);
+                offset += 26;
                 count++;
             }
             //Stop drawing upgrades after three
@@ -857,94 +933,94 @@ function drawScoreBoard(){
         x2 = x2 + startX[3];
         ctx.beginPath();
         ctx.moveTo(x1 - 1.5, y1);
-        ctx.lineTo(x1 - 1.5, y1 + 22);
+        ctx.lineTo(x1 - 1.5, y1 + 26);
         ctx.stroke();
         ctx.fillStyle = shadow;
-        ctx.fillRect(x1, y1 + 2, (x2 - x1 - 3), 19);
+        ctx.fillRect(x1, y1 + 2, (x2 - x1 - 3), 23);
         ctx.fillStyle = highlight;
         pp = currentPlayer.pp;
         len = ctx.measureText(pp).width;
         space = Math.max((x2 - x1 - len) / 2, 2) - 2;
-        ctx.fillText(pp, x1 + space, y1 + 21);
+        ctx.fillText(pp, x1 + space, y1 + 25);
         //VP
         x1 = x2;
         x2 = x2 + startX[4];
         ctx.beginPath();
         ctx.moveTo(x1 - 1.5, y1);
-        ctx.lineTo(x1 - 1.5, y1 + 22);
+        ctx.lineTo(x1 - 1.5, y1 + 26);
         ctx.stroke();
         ctx.fillStyle = shadow;
-        ctx.fillRect(x1, y1 + 2, (x2 - x1 - 3), 19);
+        ctx.fillRect(x1, y1 + 2, (x2 - x1 - 3), 23);
         ctx.fillStyle = highlight;
         vp = currentPlayer.vp;
         len = ctx.measureText(vp).width;
         space = Math.max((x2 - x1 - len) / 2, 2) - 2;
-        ctx.fillText(vp, x1 + space, y1 + 21);
+        ctx.fillText(vp, x1 + space, y1 + 25);
         //Threat Dial - threat value
         x1 = x2;
-        x2 = x2 + 22;
+        x2 = x2 + 24;
         ctx.beginPath();
         ctx.moveTo(x1 - 1.5, y1);
-        ctx.lineTo(x1 - 1.5, y1 + 22);
+        ctx.lineTo(x1 - 1.5, y1 + 26);
         ctx.stroke();
         ctx.fillStyle = shadow;
-        ctx.fillRect(x1, y1 + 2, 19, 19);
+        ctx.fillRect(x1, y1 + 2, 21, 23);
         dialCap = currentPlayer.dialCap;
         dialValue = Number(currentPlayer.dialValue);
         threat = (dialValue < dialCap) ? currentPlayer.threat[dialValue] : "\u221E";
         ctx.fillStyle = highlight;
         len = ctx.measureText(threat).width;
-        space = Math.max((22 - len) / 2, 2) - 2;
-        ctx.fillText(threat, x1 + space, y1 + 21);
+        space = Math.max((24 - len) / 2, 2) - 2;
+        ctx.fillText(threat, x1 + space, y1 + 25);
         //Threat Dial - dial advancement
         x1 = x2;
         ctx.beginPath();
         ctx.moveTo(x1 - 1.5, y1);
-        ctx.lineTo(x1 - 1.5, y1 + 22);
+        ctx.lineTo(x1 - 1.5, y1 + 26);
         ctx.stroke();
         for (j = 0; j < 10; j++){
             //Check to see if the dial cap is hit yet
             if (j < dialCap){
                 ctx.fillStyle = shadow;
-                ctx.fillRect(x2, y1 + 2, 9, 19);
+                ctx.fillRect(x2, y1 + 2, 10, 23);
                 //Draw a dial indicator if needed
                 if (j < dialValue){
                     ctx.save();
                     ctx.translate(x2, y1);
-                    ctx.scale(0.91, 1.4);
+                    ctx.scale(1.08, 1.75);
                     radGrad = ctx.createRadialGradient(4, 6, 2, 5, 8, 6);
                     radGrad.addColorStop(0.05, highlight);
                     radGrad.addColorStop(0.95, shadow);
                     radGrad.addColorStop(0.97, "rgba(0, 0, 0, 0)");
                     ctx.fillStyle = radGrad;
-                    ctx.fillRect(0, 1, 10, 13);
+                    ctx.fillRect(0, 2, 11, 15);
                     ctx.restore();
                 }
                 //Draw the right cell border
-                x2 += 12;
+                x2 += 13;
                 ctx.beginPath();
                 ctx.moveTo(x2 - 1.5, y1);
-                ctx.lineTo(x2 - 1.5, y1 + 22);
+                ctx.lineTo(x2 - 1.5, y1 + 26);
                 ctx.stroke();
             }
             else if (j == 9){
                 //Fill the remaining area
-                len = 12 * (10 - dialCap) - 1;
+                len = 13 * (10 - dialCap) - 1;
                 ctx.fillStyle = "#000000";
-                ctx.fillRect(x2 - 1, y1 + 1, len, 21);
+                ctx.fillRect(x2 - 1, y1 + 1, len, 25);
                 ctx.fillStyle = "#111111";
-                ctx.fillRect(x2, y1 + 2, len - 2, 19);
+                ctx.fillRect(x2, y1 + 2, len - 2, 23);
                 //Draw the right border
                 ctx.beginPath();
                 ctx.moveTo(x2 + len - .5, y1);
-                ctx.lineTo(x2 + len - .5, y1 + 22);
+                ctx.lineTo(x2 + len - .5, y1 + 26);
                 ctx.stroke();
             }
         }
-        x1 += 120;
+        x1 += 130;
         //Dial Advancement Counters
         ctx.fillStyle = shadow;
-        ctx.fillRect(x1, y1 + 2, 459 - x1, 19);
+        ctx.fillRect(x1, y1 + 2, 539 - x1, 23);
         dacs = currentPlayer.dacs;
         if (dacs < 6){
             for (j = 0; j < dacs; j++){
@@ -952,7 +1028,7 @@ function drawScoreBoard(){
                     name : "dac",
                     draw : drawToken
                 };
-                obj.draw(x1 + (7 * j), y1 + 2, ctx);
+                obj.draw(x1 + (7 * j) + 2, y1 + 2, ctx);
             }
         }
         else {
@@ -960,9 +1036,9 @@ function drawScoreBoard(){
                 name : "dac",
                 draw : drawToken
             };
-            obj.draw(x1, y1 + 2, ctx);
+            obj.draw(x1 + 2, y1 + 4, ctx);
             ctx.fillStyle = highlight;
-            ctx.fillText("\u00D7 " + dacs, x1 + 21, y1 + 21);
+            ctx.fillText("\u00D7 " + dacs, x1 + 23, y1 + 25);
         }
         //Create a drop zone for peasant tokens
         var score = this;
@@ -976,11 +1052,11 @@ function drawScoreBoard(){
             drop : dropObject,
             x0 : x,
             y0 : y1,
-            x1 : 461,
-            y1 : y1 + 22
+            x1 : 541,
+            y1 : y1 + 26
         };
     }
-    //Draw the header row
+    //Draw the header row  //HERE
     ctx.font = "15px Tahoma, Helvetica, sans-serif";
     y1 = y;
     y2 = y - 13.5;
@@ -994,7 +1070,7 @@ function drawScoreBoard(){
     for (i = 0; i < 5; i++){
         //Set the current boundaries
         x1 = x2;
-        x2 = (i == 4) ? 460.5 : x2 + startX[i + 1];
+        x2 = (i == 4) ? 540.5 : x2 + startX[i + 1];
         //Draw the border
         ctx.lineWidth = 1.3;
         ctx.beginPath();
