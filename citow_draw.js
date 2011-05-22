@@ -303,7 +303,7 @@ function drawToken(x, y, ctx){
                     //The "darkcomet" should be drawn semi-transparent, by
                     //setting the global alpha value
                     if (this.name == "darkcomet"){
-                        icon.alpha = 0.6;
+                        icon.alpha = 0.4;
                     }
                 }
                 //Chaos Card magic symbol
@@ -449,9 +449,9 @@ function drawOldWorldTokens(){
 }
 
 /* Draw the slide-out Old World card
- * activation selector.
+ * activation selector
  */
-function drawOldWorldActive(){
+function drawOldWorldActive(noRedraw){
     var slider = this;
     var i, toggle;
     //Clear the previous controls
@@ -463,7 +463,11 @@ function drawOldWorldActive(){
         toggle = createToggleSwitch(this.cards[i], this.oldWorld, true);
         slider.appendChild(toggle);
     }
-    this.oldWorld.draw(true);
+    //Redraw the Old World track, unless that
+    //function called this one
+    if (!noRedraw){
+        this.oldWorld.draw(true);
+    }
 }
 
 /* Draw a region, with the upper-left corner at the
@@ -739,6 +743,9 @@ function drawOldWorld(noslider){
     var color2 = "#595959";
     var bgcolor1 = "#111111";
     var bgcolor2 = "#000000";
+    //Clear the drawing area
+    ctx.fillStyle = "#332211";
+    ctx.fillRect(x - 10, y - 24, x2, y + 112);
     //Draw the outside border and fill
     //for the title box
     ctx.lineWidth = 1;
@@ -809,7 +816,7 @@ function drawOldWorld(noslider){
     //Draw the slide-out selector, unless the
     //slider itself called the function
     if (!noslider){
-        this.slider.draw();
+        this.slider.draw(true);
     }
     //Set the Old World track's bounding box
     this.x0 = x - 16;
