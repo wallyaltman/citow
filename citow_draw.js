@@ -263,7 +263,7 @@ function drawToken(x, y, ctx){
             //and set up the icon array
             if (!board.iconSprites){
                 board.iconSprites = document.createElement('img');
-                board.iconSprites.src = "../chaos/icons/icon_sprites.png";
+                board.iconSprites.src = "icons/icon_sprites.png";
                 board.iconList = {};
             }
             //If this is the first instance of this
@@ -324,7 +324,7 @@ function drawToken(x, y, ctx){
             //and set up the upgrade array
             if (!board.upgradeSprites){
                 board.upgradeSprites = document.createElement('img');
-                board.upgradeSprites.src = "../chaos/icons/upgrade_sprites.png";
+                board.upgradeSprites.src = "icons/upgrade_sprites.png";
                 board.upgradeList = {};
             }
             //If this is the first instance of this
