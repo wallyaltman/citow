@@ -19,10 +19,11 @@ if ($handle = opendir($dir)){
 }
 //Identify game saves
 $gamefiles = preg_grep('/game[0-9]+state[0-9]+\.xml/', $files);
-//Put games and saves into a
-//two-dimensional array
+//Put games and saves into a two-dimensional array.
+//Also create an array of "last modified" times.
 $games = array();
 $matches = array();
+$modtimes = array();
 foreach ($gamefiles as $filename){
     if (preg_match('/game([0-9]+)state([0-9]+)/', $filename, $matches)){
         $gnum = (int) $matches[1];
@@ -31,6 +32,10 @@ foreach ($gamefiles as $filename){
             $games[$gnum] = array();
         }
         $games[$gnum][] = $snum;
+        $currentmodtime = filemtime($dir.$filename);
+        if ($currentmodtime > $modtimes[$gnum] || !isset($modtimes[$gnum])){
+            $modtimes[$gnum] = $currentmodtime;
+        }
     }
 }
 //Sort the states in each game
@@ -43,6 +48,34 @@ ksort($games);
 $file = 'save_manifest.json';
 $output = json_encode($games);
 file_put_contents($dir.$file, $output, LOCK_EX);
+
+//Create a list of games and their owners
+$gamestarts = array();
+$xmlgame = new XMLReader();
+//Identify first saves
+$gamestartfiles = preg_grep('/game[0-9]+state0*1\.xml/', $files);
+foreach ($gamestartfiles as $filename){
+    if (preg_match('/game([0-9]+)/', $filename, $matches)){
+        $gnum = (int) $matches[1];
+        $xmlgame->open($dir.$filename);
+        if ($xmlgame->read() && $xmlgame->moveToAttribute('creator')){
+            $gamestarts[$gnum] = array();
+            $gamestarts[$gnum]['creator'] = $xmlgame->value;
+            if ($xmlgame->moveToAttribute('expansion')){
+                $gamestarts[$gnum]['expansion'] = $xmlgame->value;
+            }
+            $gamestarts[$gnum]['modified'] = $modtimes[$gnum];
+        }
+        $xmlgame->close();
+    }
+}
+ksort($gamestarts);
+//Write out the game/owner list
+$ownerfile = 'owned_games.json';
+$owneroutput = json_encode($gamestarts);
+file_put_contents($dir.$ownerfile, $owneroutput, LOCK_EX);
+
+//Return the game/state list
 if (file_exists($dir.$file)){
     $returnmsg = $output;
 }
