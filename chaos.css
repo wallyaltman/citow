@@ -226,10 +226,10 @@ div.shiftbox img.black{
 }
 /** Controls for resetting PP / DACs **/
 #main #resetbox {
-  top:490px;
+  top:489px;
   left:45px;
   padding-bottom:6px;
-  width:143px;
+  width:150px;
   height:44px;
 }
 #resetbox > span {

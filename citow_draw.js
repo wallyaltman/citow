@@ -331,7 +331,7 @@ function drawToken(x, y, ctx){
             //specific upgrade to be drawn, set up the
             //drawing information and load the upgrade
             //into the array
-            if (!board.iconList.hasOwnProperty(this.name)){
+            if (!board.upgradeList.hasOwnProperty(this.name)){
                 //Starting (upper-left) coordinate positions for
                 //the upgrades, in order (from the upgrade list above)
                 pos = [{x:1,y:1}, {x:25,y:1}, {x:49,y:1}, {x:73,y:1}, {x:1,y:21}, {x:25,y:21}, {x:49,y:21}]
