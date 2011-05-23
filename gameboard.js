@@ -347,13 +347,14 @@ function getBoardState(blank, expansion){
     var state = statePick.options[statePick.selectedIndex].value;
     var board = document.getElementById("board");
     //Get the board state document
-    var loc = "../chaos/saves/";
     //If getting a clean board, check whether an
     //expansion board was requested
     if (blank){
+        var loc = "gamedata/";
         var url = loc + (expansion == "morrslieb" ? "blankboard_hr.xml" : "blankboard.xml");
     }
     else {
+        var loc = "../chaos/saves/";
         var url = loc + "game" + game + "state" + state + ".xml";
     }
     xmlhttp.open("POST", url, false);
@@ -2381,6 +2382,8 @@ function saveBoardXML(saveType){
         //Set the game and state numbers
         boardState.setAttribute("game", gameNumber || board.game);
         boardState.setAttribute("state", gameState || board.state);
+        //Set the game expansion
+        boardState.setAttribute("expansion", board.expansion);
         //Old World cards
         var oldWorld = xmlDoc.createElement("oldworld");
         var cards = board.map.oldWorld.cards;
