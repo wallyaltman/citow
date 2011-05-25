@@ -26,6 +26,7 @@ $dir = realpath($docroot.'/chaos/saves/').'/';
 echo '  <link rel="shortcut icon" href="favicon.ico" />', "\n";
 echo '  <link rel="stylesheet" href="', $rooturl, '/style.css" />', "\n";
 echo '  <link rel="stylesheet" href="chaos.css" />', "\n";
+echo '  <script src="', $rooturl, '/library/jquery-1.6.1.min.js" type="text/javascript"></script>', "\n";
 echo '</head>'."\n";
 echo '<body id="body">'."\n";
 //Header bar is from header.php, included at the top
@@ -76,7 +77,7 @@ echo '  <time datetime="', date(DATE_ATOM), '">Current server time: ',
           <input type="radio" id="cardsetbase" name="cardset" />
           <label for="cardsetbase">Base Game</label>
           <input type="radio" id="cardsetmorrslieb" name="cardset" checked="checked" value="morrslieb" />
-          <label for="cardsetmorrslieb">Morrslieb</label>          
+          <label for="cardsetmorrslieb">Morrslieb</label>
         </fieldset>
         <fieldset>
           <legend>Game Number</legend>
@@ -87,7 +88,7 @@ echo '          <input type="radio" id="officialgame" name="gamerank" ', $disabl
 ?>
           <label for="cardsetbase">Official CF Game</label>
           <input type="radio" id="othergame" name="gamerank" checked="checked" />
-          <label for="cardsetmorrslieb">Unofficial Game</label>  
+          <label for="cardsetmorrslieb">Unofficial Game</label>
         </fieldset>
         <fieldset>
           <input type="submit" />
@@ -152,9 +153,9 @@ foreach ($moddates as $gnum => $modtime){
     }
     else {
         $modstring = $modtimeobj->format('F j, Y \a\\t g:i A');
-    }    
+    }
     $thisrow = array('game' => $gnum,
-                     'creator' => $creator, 
+                     'creator' => $creator,
                      'expansion' => $gamedata[$gnum]->expansion,
                      'modified' => $modstring);
     $allrows[] = $thisrow;
@@ -171,7 +172,7 @@ if (count($myrows) > 0){
     $hidestring = '';
     foreach ($myrows as $row){
         $expstring = $row['expansion'] == 'morrslieb' ? ' (The Horned Rat)' : '';
-        echo '        <p', $hidestring, '><a href="gameboard.php?game=', 
+        echo '        <p', $hidestring, '><a href="gameboard.php?game=',
              $row['game'], '">', 'Game ', $row['game'], '</a>', $expstring,
              ': last modified ', $row['modified'], '</p>', "\n";
         $rowcounter += 1;
@@ -254,3 +255,4 @@ echo '    </section>', "\n";
   </div>
 </body>
 </html>
+
