@@ -21,5 +21,4 @@ capture/*
 php.ini
 
 ### save files (tracked separately) ###
-saves/game*
-saves/.gitignore
+saves
