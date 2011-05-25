@@ -15,92 +15,60 @@ section {
   overflow:auto;
   float:left;
 }
+/*** New Game ***/
 #contentbox > section:nth-of-type(1){
   width:1025px;
   padding-right:7px;
 }
-section a {
-  text-decoration:none;
-  font-weight:bold;
-}
-section a:link {
-  color:#690000;
-  text-shadow: #110000 1px 1px 0;
-}
-
-section a:visited { 
-  color:#D02020;
-  text-shadow: #300000 1px 1px 0;
-} 
-
-section a:active {
-  color:#000000;
-  text-shadow: #E00000 1px 1px 0, #E00000 1px -1px 0, #E00000 -1px -1px 0, #E00000 -1px 1px 0;
-}
-
-section a.more {
-  text-decoration:underline;
-  margin-bottom:10px;
-  float:right;
-  clear:right;
-}
-section a.more + a.more {
-  margin-top:-7px;
-}
-section a.more:link, section a.more:visited {
-  color:#9922CC;
-  text-shadow: #110000 1px 1px 0;
-}
-section a.more:active {
-  color:#000000;
-  text-shadow: #B300FF 1px 1px 0, #B300FF 1px -1px 0, #B300FF -1px -1px 0, #B300FF -1px 1px 0;
-}
-
 fieldset {
   margin-bottom:13px;
   width:456px;
   float:left;
 }
-fieldset:nth-of-type(1){
-  margin-right:58px;
-  clear:left;
+/* Vertical field list */
+ol > li {
+  list-style-type:none;
 }
-
+/* Label styling (with colors for unchecked items) */
 label {
   font-weight:bold;
   color:#454545;
   text-shadow: #F0F0F0 1px 1px 0; 
   padding:6px 4px 0 0;
 }
+/* Labels for checked items */
 input:checked + label {
   color:#FFFFFF;
   text-shadow: #0C0C0C 1px 1px 0;
 }
+/** Power selection **/
+fieldset:nth-of-type(1){
+  margin-right:58px;
+  clear:left;
+}
+/* Power names */
 input[type="checkbox"] + label {
   width:100px;
   float:left;
   text-align:right;
 }
+/* Deselected power styling */
 label[for="khorne"]{
-  color:#3A0A0A;
-  text-shadow: #DD1111 1px 1px 0;
+  color:#801111;
 }
 label[for="nurgle"]{
-  color:#112C08;
-  text-shadow: #339911 1px 1px 0;
+  color:#1D520C;
 }
 label[for="tzeentch"]{
-  color:#0D1A3D;
-  text-shadow: #2255DD 1px 1px 0;
+  color:#122966;
 }
 label[for="slaanesh"]{
-  color:#2D0D3B;
-  text-shadow: #9922CC 1px 1px 0;
+  color:#571573;
 }
 label[for="hornedrat"]{
-  color:#282828;
-  text-shadow: #D0D0D0 1px 1px 0;
+  color:#616161;
 }
+/* Selected power styling */
 input:checked + label[for="khorne"]{
   color:#DD1111;
   text-shadow: #3A0A0A 1px 1px 0;
@@ -121,14 +89,49 @@ input:checked + label[for="hornedrat"]{
   color:#E9E9E9;
   text-shadow: #282828 1px 1px 0;
 }
-
+/** Game number, official vs. other game **/
+/* Game number input */
 #gamenumber {
   width:80px;
 }
-
-ol > li {
-  list-style-type:none;
+/*** My Games / Recent Games***/
+/** Game links **/
+section a {
+  text-decoration:none;
+  font-weight:bold;
 }
+section a:link {
+  color:#690000;
+  text-shadow: #110000 1px 1px 0;
+}
+section a:visited { 
+  color:#D02020;
+  text-shadow: #300000 1px 1px 0;
+} 
+section a:active {
+  color:#000000;
+  text-shadow: #E00000 1px 1px 0, #E00000 1px -1px 0, #E00000 -1px -1px 0, #E00000 -1px 1px 0;
+}
+/** "More" links**/
+section a.more {
+  text-decoration:underline;
+  margin-bottom:10px;
+  float:right;
+  clear:right;
+}
+section a.more + a.more {
+  margin-top:-7px;
+}
+section a.more:link, section a.more:visited {
+  color:#9922CC;
+  text-shadow: #110000 1px 1px 0;
+}
+section a.more:active {
+  color:#000000;
+  text-shadow: #B300FF 1px 1px 0, #B300FF 1px -1px 0, #B300FF -1px -1px 0, #B300FF -1px 1px 0;
+}
+/*** Other ***/
+/* Server time */ 
 time {
   position:relative;
   top:-20px;
