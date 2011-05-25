@@ -1,9 +1,145 @@
-/**** Global ****/
+/***** Global *****/
 body {
   font-family:Tahoma,'Trebuchet MS',Helvetica,sans-serif;
   line-height:1.2;
 }
 
+h1 {
+  color:#BB1111;
+  text-shadow: #200000 0px 0px 3px;
+  padding:4px;
+}
+
+/**** index.php ****/
+section {
+  overflow:auto;
+  float:left;
+}
+#contentbox > section:nth-of-type(1){
+  width:1025px;
+  padding-right:7px;
+}
+section a {
+  text-decoration:none;
+  font-weight:bold;
+}
+section a:link {
+  color:#690000;
+  text-shadow: #110000 1px 1px 0;
+}
+
+section a:visited { 
+  color:#D02020;
+  text-shadow: #300000 1px 1px 0;
+} 
+
+section a:active {
+  color:#000000;
+  text-shadow: #E00000 1px 1px 0, #E00000 1px -1px 0, #E00000 -1px -1px 0, #E00000 -1px 1px 0;
+}
+
+section a.more {
+  text-decoration:underline;
+  margin-bottom:10px;
+  float:right;
+  clear:right;
+}
+section a.more + a.more {
+  margin-top:-7px;
+}
+section a.more:link, section a.more:visited {
+  color:#9922CC;
+  text-shadow: #110000 1px 1px 0;
+}
+section a.more:active {
+  color:#000000;
+  text-shadow: #B300FF 1px 1px 0, #B300FF 1px -1px 0, #B300FF -1px -1px 0, #B300FF -1px 1px 0;
+}
+
+fieldset {
+  margin-bottom:13px;
+  width:456px;
+  float:left;
+}
+fieldset:nth-of-type(1){
+  margin-right:58px;
+  clear:left;
+}
+
+label {
+  font-weight:bold;
+  color:#454545;
+  text-shadow: #F0F0F0 1px 1px 0; 
+  padding:6px 4px 0 0;
+}
+input:checked + label {
+  color:#FFFFFF;
+  text-shadow: #0C0C0C 1px 1px 0;
+}
+input[type="checkbox"] + label {
+  width:100px;
+  float:left;
+  text-align:right;
+}
+label[for="khorne"]{
+  color:#3A0A0A;
+  text-shadow: #DD1111 1px 1px 0;
+}
+label[for="nurgle"]{
+  color:#112C08;
+  text-shadow: #339911 1px 1px 0;
+}
+label[for="tzeentch"]{
+  color:#0D1A3D;
+  text-shadow: #2255DD 1px 1px 0;
+}
+label[for="slaanesh"]{
+  color:#2D0D3B;
+  text-shadow: #9922CC 1px 1px 0;
+}
+label[for="hornedrat"]{
+  color:#282828;
+  text-shadow: #D0D0D0 1px 1px 0;
+}
+input:checked + label[for="khorne"]{
+  color:#DD1111;
+  text-shadow: #3A0A0A 1px 1px 0;
+}
+input:checked + label[for="nurgle"]{
+  color:#339911;
+  text-shadow: #112C08 1px 1px 0;
+}
+input:checked + label[for="tzeentch"]{
+  color:#2255DD;
+  text-shadow: #0D1A3D 1px 1px 0;
+}
+input:checked + label[for="slaanesh"]{
+  color:#9922CC;
+  text-shadow: #2D0D3B 1px 1px 0;
+}
+input:checked + label[for="hornedrat"]{
+  color:#E9E9E9;
+  text-shadow: #282828 1px 1px 0;
+}
+
+#gamenumber {
+  width:80px;
+}
+
+ol > li {
+  list-style-type:none;
+}
+time {
+  position:relative;
+  top:-20px;
+  font-size:1em;
+  float:right;
+  padding:8px;
+}
+.hideme {
+  display:none;
+}
+/**** gameboard.php ****/
 /*** Main content area (including canvas, and items appearing over it) ***/
 #main {
   float:left;
