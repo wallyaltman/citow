@@ -27,6 +27,7 @@ echo '  <link rel="shortcut icon" href="favicon.ico" />', "\n";
 echo '  <link rel="stylesheet" href="', $rooturl, '/style.css" />', "\n";
 echo '  <link rel="stylesheet" href="chaos.css" />', "\n";
 echo '  <script src="', $rooturl, '/library/jquery-1.6.1.min.js" type="text/javascript"></script>', "\n";
+echo '  <script src="index.js" type="text/javascript"></script>', "\n";
 echo '</head>'."\n";
 echo '<body id="body">'."\n";
 //Header bar is from header.php, included at the top
@@ -86,9 +87,13 @@ echo '  <time datetime="', date(DATE_ATOM), '">Current server time: ',
 $disabled = $userlevel > 1 ? '' : 'disabled="disabled" ';
 echo '          <input type="radio" id="officialgame" name="gamerank" ', $disabled, '/>', "\n";
 ?>
-          <label for="cardsetbase">Official CF Game</label>
+          <label for="officialgame">Official CF Game</label>
           <input type="radio" id="othergame" name="gamerank" checked="checked" />
-          <label for="cardsetmorrslieb">Unofficial Game</label>
+          <label for="othergame">Unofficial Game</label>
+<?php
+echo '          <img src="', $rooturl, '/graphics/check.png" id="check" height="31" width="31" alt="Game number is OK" class="hideme" />', "\n";
+echo '          <img src="', $rooturl, '/graphics/error.png" id="error" height="31" width="31" alt="Game number is too low or already taken" class="hideme" />', "\n";
+?>
         </fieldset>
         <fieldset>
           <input type="submit" />
