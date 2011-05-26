@@ -346,16 +346,18 @@ function getBoardState(blank, expansion){
     var statePick = document.getElementById("statepick");
     var state = statePick.options[statePick.selectedIndex].value;
     var board = document.getElementById("board");
+    var loc, file, url;
     //Get the board state document
     //If getting a clean board, check whether an
     //expansion board was requested
     if (blank){
-        var loc = "gamedata/";
-        var url = loc + (expansion == "morrslieb" ? "blankboard_hr.xml" : "blankboard.xml");
+        loc = "gamedata/";
+        file = (expansion == "morrslieb") ? "chaos_hr.xml" : "chaos.xml";
+        url = loc + file;
     }
     else {
-        var loc = "../chaos/saves/";
-        var url = loc + "game" + game + "state" + state + ".xml";
+        loc = "../chaos/saves/";
+        url = loc + "game" + game + "state" + state + ".xml";
     }
     xmlhttp.open("POST", url, false);
     xmlhttp.send();
@@ -592,17 +594,23 @@ function createUpDownButtons(target){
 
 /* Generate the list of Old World cards.
  */
-function getOldWorldCards(){
+function getOldWorldCards(cardSet){
     var xmlhttp = xmlRequest();
     if (xmlhttp){
         //Get the document
         var loc = "gamedata/";
-        var url = loc + "oldworld.xml";
+        var file = (cardSet == "all")
+                        ? "oldworld_all.xml"
+                        : ((cardSet == "hardmode")
+                                ? "oldworld_hard.xml"
+                                : "oldworld.xml");
+        var url = loc + file;
         xmlhttp.onreadystatechange = function(){
             if (this.readyState == 4 && this.status == 200){
                 var xmlDoc = this.responseXML;
                 var oldWorldCards = xmlDoc.getElementsByTagName("card");
-                var owc = document.getElementById("owc");
+                var owc = $("#owc");
+                owc.children().remove();
                 var card;
                 for (var i = 0; i < oldWorldCards.length; i++){
                     card = {
@@ -625,7 +633,7 @@ function getOldWorldCards(){
                     card.canvas.height = 17;
                     card.canvas.card = card;
                     var ctx = card.canvas.getContext('2d');
-                    owc.appendChild(card.canvas);
+                    owc.append(card.canvas); //jQuery syntax
                     card.draw(1, 0, ctx);
                     card.canvas.cursorPos = getCursorPosition;
                     card.canvas.onmousedown = function(evt){
@@ -664,13 +672,13 @@ function getOldWorldCards(){
 
 /* Generate the list of Chaos cards.
  */
-function getChaosCards(){
+function getChaosCards(expansion){
     var xmlhttp = xmlRequest();
     if (xmlhttp){
-        //Get the document (full URL is required due
-        //to a bug in Google Chrome)
+        //Get the document
         var loc = "gamedata/";
-        var url = loc + "chaos.xml";
+        var file = (expansion == "morrslieb") ? "chaos_hr.xml" : "chaos.xml";
+        var url = loc + file;
         xmlhttp.onreadystatechange = function(){
             if (this.readyState == 4 && this.status == 200){
                 var i, j;
@@ -688,7 +696,8 @@ function getChaosCards(){
                     players[i].highlight = xmlData.getAttribute("highlight");
                     players[i].shadow = xmlData.getAttribute("shadow");
                 }
-                var cc = document.getElementById("cc");
+                var cc = $("#cc");
+                cc.children().remove();
                 var card;
                 for (i = 0; i < chaosCards.length; i++){
                     card = {
@@ -715,7 +724,7 @@ function getChaosCards(){
                     card.canvas.height = 17;
                     card.canvas.card = card;
                     var ctx = card.canvas.getContext('2d');
-                    cc.appendChild(card.canvas);
+                    cc.append(card.canvas); //jQuery syntax
                     card.draw(1, 0, ctx);
                     card.canvas.cursorPos = getCursorPosition;
                     card.canvas.onmousedown = function(evt){
@@ -1560,13 +1569,13 @@ function closePanels(evt){
 /* Build and draw a new board.  A value of true for
  * the "blank" parameter draws a blank board.
  */
-function drawBoard(blank, local, expansion){
+function drawBoard(blank, local){
     var board = document.getElementById("board");
     var ctx = board.getContext('2d');
     //Clear the canvas
     var width = board.width;
     var height = board.height;
-    var state;
+    var state, expansion;
     if (local){
         //Flag the board as unsaved if
         //from local storage
@@ -1597,11 +1606,17 @@ function drawBoard(blank, local, expansion){
     var scoreXML = state.getElementsByTagName("scoreboard")[0];
     var playersXML = scoreXML.getElementsByTagName("player");
     var oldWorldXML = state.getElementsByTagName("oldworld")[0];
-    //Check for the game type
+    //Check for the game type (for Chaos cards)
     board.expansion = state.documentElement.getAttribute("expansion");
     //Get the board setup
     var info = getGameSetup(board.expansion);
     board.info = info;
+    //Check for the Old World card set
+    board.owcset = oldWorldXML.getAttribute("set");
+    //Load the Old World cards
+    getOldWorldCards(board.owcset);
+    //Load the Chaos Cards
+    getChaosCards(expansion);
     //Create references to the XML setup data
     var playerSetupXML = info.getElementsByTagName("player");
     var playerCount = playerSetupXML.length;
@@ -2386,6 +2401,7 @@ function saveBoardXML(saveType){
         boardState.setAttribute("expansion", board.expansion);
         //Old World cards
         var oldWorld = xmlDoc.createElement("oldworld");
+        oldWorld.setAttribute("set", board.owcset);
         var cards = board.map.oldWorld.cards;
         for (i = 0; i < cards.length; i++){
             node = xmlDoc.createElement("card");
@@ -2908,14 +2924,12 @@ function initialize(){
         //stored board, or the selected saved one)
         drawBoard(false, localBoard);
         //Set up the list of Chaos cards
-        getChaosCards();
         var cchead = document.getElementById("cchead");
         cchead.items =  document.getElementById("cc");
         cchead.open = clickOpen;
         cchead.close = clickClosed;
         cchead.onmousedown = cchead.open;
         //Set up the list of Old World cards
-        getOldWorldCards();
         var owchead = document.getElementById("owchead");
         owchead.items =  document.getElementById("owc");
         owchead.open = clickOpen;

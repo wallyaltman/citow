@@ -24,6 +24,7 @@ $v = 7;
 echo '  <link rel="shortcut icon" href="favicon.ico" />'."\n";
 echo '  <link rel="stylesheet" href="'.$rooturl.'/style.css" />'."\n";
 echo '  <link rel="stylesheet" href="chaos.css?v='.$v.'" />'."\n";
+echo '  <script src="'.$rooturl.'/library/jquery-1.6.1.min.js" type="text/javascript"></script>'."\n";
 echo '  <script src="utility.js" type="text/javascript"></script>'."\n";
 echo '  <script src="citow_draw.js" type="text/javascript"></script>'."\n";
 echo '  <script src="gameboard.js?v='.$v.'" type="text/javascript"></script>'."\n";

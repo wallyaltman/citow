@@ -596,7 +596,7 @@ div.slidedown {
   position:relative;
   overflow:hidden;
   padding-top:4px;
-  margin-top:-700px;
+  margin-top:-800px;
   width:180px;
   -o-transition:margin-top .2s linear;
   -moz-transition:margin-top .2s linear;

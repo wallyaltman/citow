@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<oldworldcards>
+  <card>Bretonnian Knights</card>
+  <card>Call to Arms!</card>
+  <card>Closing the Portal</card>
+  <card>The Crusade is Come</card>
+  <card event="true">Dark Elf Corsairs</card>
+  <card>Divine Inspiration</card>
+  <card>Dwarf Trollslayers</card>
+  <card>Electors Arise</card>
+  <card event="true">Electors Sue for Peace</card>
+  <card>Franz's Decree</card>
+  <card event="true">Greenskins Invade</card>
+  <card event="true">High Elf Protection</card>
+  <card event="true">The Horned One's Due</card>
+  <card event="true">The Light of Day</card>
+  <card>Mass Exodus</card>
+  <card>Meteor Showers</card>
+  <card>Morrslieb Eclipsed</card>
+  <card event="true">Norse Reavers</card>
+  <card>Peasant Uprising</card>
+  <card>Plunged Into Chaos</card>
+  <card>Road Wardens</card>
+  <card>Rousing the Rabble</card>
+  <card>Skavengers</card>
+  <card event="true">Teclis Aids the Empire</card>
+  <card event="true">The Grail is Found</card>
+  <card>Up From Skavenblight</card>
+  <card>Warpstone Discovery</card>
+  <card>The Warrens Erupt!</card>
+  <card>Witch Hunters</card>
+  <card>Vermin Outbreak</card>
+</oldworldcards>
