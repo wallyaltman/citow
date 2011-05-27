@@ -117,7 +117,7 @@ function drawCard(x, y, ctx){
 /* Draw a cultist, warrior, or daemon figure, and return
  * the x-coordinate for drawing the next figure.
  */
-function drawFigure(x0, y0, ctx){
+function drawFigure(x0, y0, ctx, transform){
     var highlight = this.owner.highlight;
     var shadow = this.owner.shadow;
     var x1, y1, x2, x3, y3, r1, r2, r3, x4, y4;
@@ -230,11 +230,20 @@ function drawFigure(x0, y0, ctx){
         ctx.beginPath();
         ctx.arc(x4, y4, 0.5, 0, 2 * Math.PI, true);
     }
-    //Store the figure's bounding box
-    this.x0 = x0;
-    this.y0 = Math.floor(y0 - (4 * r1));
-    this.x1 = Math.floor(x2 + 1);
-    this.y1 = y0 + 1;
+    //Store the figure's bounding box, accounting for
+    //any transformations
+    if (!transform){
+        this.x0 = x0;
+        this.y0 = Math.floor(y0 - (4 * r1));
+        this.x1 = Math.floor(x2 + 1);
+        this.y1 = y0 + 1;
+    }
+    else {
+        this.x0 = x0 + transform.x;
+        this.y0 = y0 + transform.y - Math.floor((4 * r1) / transform.factor);
+        this.x1 = x0 + transform.x + Math.floor((x2 - x0 + 1) / transform.factor);
+        this.y1 = y0 + transform.y + 1;
+    }
     //Return the horizontal position to start
     //drawing the next figure
     return x2 + 2;
@@ -480,7 +489,7 @@ function drawRegion(){
     ctx.strokeStyle = "rgba(172, 49, 16, 1)";
     ctx.lineWidth = 1;
     ctx.lineJoin = 'miter';
-    var width = 260;
+    var width = 240;
     var height = 110;
     var x = 10 + (this.border.col * (width + 10));
     var y = 10 + (this.border.row * (height + 10));
@@ -686,8 +695,10 @@ function drawRegion(){
     }
     //Insert the old world tokens, if any
     var x1, y1;
-    var xArray = [2, 22, 42, 62, 2, 22, 42, 62, 2, 22, 42, 62, 82, 102, 122, 142, 162];
-    var yArray = [21, 21, 21, 21, 41, 41, 41, 41, 61, 61, 61, 61, 61, 61, 61, 61, 61];
+    //var xArray = [2, 22, 42, 62, 2, 22, 42, 62, 2, 22, 42, 62, 82, 102, 122, 142, 162];
+    //var yArray = [21, 21, 21, 21, 41, 41, 41, 41, 61, 61, 61, 61, 61, 61, 61, 61, 61];
+    var xArray = [2, 22, 42, 2, 22, 42, 2, 22, 42, 62, 82, 102, 122, 142];
+    var yArray = [21, 21, 21, 41, 41, 41, 61, 61, 61, 61, 61, 61, 61, 61];
     for (i = 0; i < this.tokens.length; i++){
         if (i >= xArray.length){
             break;
@@ -710,20 +721,45 @@ function drawRegion(){
             space -= 16;
         }
     }
-    space = Math.floor(space / (players.length - 1));
-    //Draw the figures in the region
+    //If there's not enough space, shrink the figures
     x1 = x + 5;
+    y1 = y + height - 1;
+    ctx.save();
+    var eachSpace, factor, transform;
+    if (space < 0){
+        ctx.translate(x1, y1);
+        factor = (width - 8) / (width - 8 - space);
+        //Keep two decimal places
+        factor = Math.floor(factor * 100) / 100;
+        ctx.scale(factor, factor);
+        //Save the transformation, to be applied to the
+        //figure's bounding box
+        transform = {
+            x : x1,
+            y : y1,
+            factor : factor
+        };
+        x1 = 0;
+        y1 = 0;
+        eachSpace = 0;
+    }
+    else {
+        transform = false;
+        eachSpace = Math.floor(space / (players.length - 1));
+    }
+    //Draw the figures in the region
     var figure;
     for (i = 0; i < players.length; i++){
         playerName = players[i].name;
         for (j = 0; j < this.figures.length; j++){
             figure = this.figures[j];
             if (playerName == figure.owner.name){
-                x1 = figure.draw(x1, y + height - 1, ctx);
+                x1 = figure.draw(x1, y1, ctx, transform);
             }
         }
-        x1 += space;
+        x1 += eachSpace;
     }
+    ctx.restore();
     //Store the region's bounding box
     this.x0 = x;
     this.y0 = y;
@@ -832,7 +868,7 @@ function drawScoreBoard(){
     var ctx = this.ctx;
     var x = 18;
     var y = 170;
-    var width = 541 - x;  //not counting left caps
+    var width = 501 - x;  //not counting left caps
     var height = 26 * players.length + 1;  //not counting headers
     //Clear the drawing area;
     ctx.fillStyle = "#332211";
@@ -865,12 +901,20 @@ function drawScoreBoard(){
     var offset, radGrad;
     var x1, y1, x2, y2;
     //This array determines the cell widths:
-    //Name, Peasants, Upgrades, PP, VP, Dial
-    var startX = [113, 65, 81, 24, 25, 233 - x];
+    //Peasants, Upgrades, PP, VP, Threat Dial
+    var startX = [65, 81, 24, 25, 207];
+    //Subtract the other columns to get the width
+    //of the first one (Name)
+    var firstCol = width;
+    for (i = 0; i < startX.length; i++){
+        firstCol -= startX[i];
+    }
+    startX.unshift(firstCol);
     //Draw and fill the rows and cell dividers
     ctx.lineWidth = 1;
     ctx.font = "17px Tahoma, Helvetica, sans-serif";
     var obj, count, printName;
+    var widthAdj = width + x - 2;
     for (i = 0; i < players.length; i++){
         y1 = y + (26 * i);
         currentPlayer = players[i];
@@ -1027,7 +1071,7 @@ function drawScoreBoard(){
         x1 += 130;
         //Dial Advancement Counters
         ctx.fillStyle = shadow;
-        ctx.fillRect(x1, y1 + 2, 539 - x1, 23);
+        ctx.fillRect(x1, y1 + 2, widthAdj - x1, 23);
         dacs = currentPlayer.dacs;
         if (dacs < 6){
             for (j = 0; j < dacs; j++){
@@ -1035,7 +1079,7 @@ function drawScoreBoard(){
                     name : "dac",
                     draw : drawToken
                 };
-                obj.draw(x1 + (7 * j) + 2, y1 + 2, ctx);
+                obj.draw(x1 + (7 * j) + 2, y1 + 4, ctx);
             }
         }
         else {
@@ -1074,10 +1118,11 @@ function drawScoreBoard(){
     ctx.lineTo(x2, y2 - .35);
     ctx.stroke();
     var headers = ["Peasants", "Upgrades", "PP", "VP", "Threat Dials and Tokens"];
+    widthAdj = width - 0.5;
     for (i = 0; i < 5; i++){
         //Set the current boundaries
         x1 = x2;
-        x2 = (i == 4) ? 540.5 : x2 + startX[i + 1];
+        x2 = (i == 4) ? widthAdj + x : x2 + startX[i + 1];
         //Draw the border
         ctx.lineWidth = 1.3;
         ctx.beginPath();

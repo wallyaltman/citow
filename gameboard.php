@@ -93,7 +93,7 @@ echo '        <img src="'.$rooturl.'/chaos/icons/figure_effects_txt2.png" id="wo
         </div>
       </div>
     </div>
-    <canvas id="board" width="820" height="610">
+    <canvas id="board" width="760" height="610">
           <span class="styleme" id="Andika">This page requires support for the HTML5
            canvas element.  Get a better browser!</span>
     </canvas>

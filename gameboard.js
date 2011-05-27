@@ -352,7 +352,7 @@ function getBoardState(blank, expansion){
     //expansion board was requested
     if (blank){
         loc = "gamedata/";
-        file = (expansion == "morrslieb") ? "chaos_hr.xml" : "chaos.xml";
+        file = (expansion == "morrslieb") ? "blankboard_hr.xml" : "blankboard.xml";
         url = loc + file;
     }
     else {
@@ -1484,7 +1484,7 @@ function buildCorruption(){
     var regions = board.map.regions;
     var players = board.map.players;
     var box = document.getElementById("corruptbox");
-    var width = 260;
+    var width = 240;
     var height = 110;
     var yOffset = 21;
     var i, j, x, y, subBox, div, inputBox, input, inputUpDown;
