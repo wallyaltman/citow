@@ -590,6 +590,12 @@ div#workswitch {
   overflow:hidden;
   z-index:11;
 }
+#cc {
+  z-index:115;
+}
+#cc2 {
+  z-index:110;
+}
 div.slidedown {
   background-color:#553311;
   line-height:16px;
@@ -603,7 +609,7 @@ div.slidedown {
   -webkit-transition:margin-top .2s linear;
   transition:margin-top .2s linear;
 }
-div.open {
+div.open, div.open + #cc2 {
   background-color:#322311;
   margin-top:3px;
   -o-transition:margin-top .2s linear, background-color .2s linear;
@@ -611,10 +617,14 @@ div.open {
   -webkit-transition:margin-top .2s linear, background-color .2s linear;
   transition:margin-top .2s linear, background-color .2s linear;
 }
-#cc > canvas {
-  margin-top:-1px;
+#cc2.open {
+  left:184px;
+  -o-transition:margin-top .2s linear, left .2s linear .2s;
+  -moz-transition:margin-top .2s linear, left .2s linear .2s;
+  -webkit-transition:margin-top .2s linear, left .2s linear .2s;
+  transition:margin-top .2s linear, left .2s linear .2s;
 }
-#owc > canvas {
+#piecesbox canvas {
   margin-top:-1px;
 }
 
