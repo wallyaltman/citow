@@ -8,8 +8,8 @@
     <skaven>16</skaven>
     <warpstone>14</warpstone>
   </tokens>
-  <powers>
-    <player id="0" highlight="#DD1111" shadow="#3A0A0A">
+  <ruinouspowers>
+    <power id="0" highlight="#DD1111" shadow="#3A0A0A">
       <name>Khorne</name>
       <dial cap="9">3,6,12,14,17,23,28,31,32</dial>
       <figures>
@@ -25,8 +25,8 @@
         <pp1 pp="1" />
         <cards />
       </upgrades>    
-    </player>
-    <player id="1" highlight="#339911" shadow="#112C08">
+    </power>
+    <power id="1" highlight="#339911" shadow="#112C08">
       <name>Nurgle</name>
       <dial cap="10">1,5,10,13,18,22,26,30,33,34</dial>
       <figures>
@@ -42,8 +42,8 @@
         <pp1 pp="1" />
         <provender />
       </upgrades>
-    </player>
-    <player id="2" highlight="#2255DD" shadow="#0D1A3D">
+    </power>
+    <power id="2" highlight="#2255DD" shadow="#0D1A3D">
       <name>Tzeentch</name>
       <dial cap="8">2,7,9,15,20,21,25,29</dial>
       <figures>
@@ -59,8 +59,8 @@
         <pp1 pp="1" />
         <cards />        
       </upgrades>
-    </player>
-    <player id="3" highlight="#9922CC" shadow="#2D0D3B">
+    </power>
+    <power id="3" highlight="#9922CC" shadow="#2D0D3B">
       <name>Slaanesh</name>    
       <dial cap="7">4,8,11,16,19,24,27</dial>
       <figures>
@@ -76,8 +76,8 @@
         <pp1 pp="1" />
         <pp2 pp="2" />
       </upgrades>
-    </player>
-    <player id="4" highlight="#999999" shadow="#282828" nocorruption="true">
+    </power>
+    <power id="4" highlight="#999999" shadow="#282828" nocorruption="true">
       <name>Horned_Rat</name>    
       <dial cap="8">0,5,9,12,16,20,24,28</dial>
       <figures>
@@ -93,8 +93,8 @@
         <pp1 pp="1" />
         <cards />
       </upgrades>
-    </player>
-  </powers>
+    </power>
+  </ruinouspowers>
   <map>
     <region id="0">
       <name>Norsca</name>
