@@ -586,14 +586,15 @@ div#workswitch {
 #piecesbox > div:nth-of-type(4) {
   position:absolute;
   top:75px;
+  background-color:#322311;
   border:4px ridge #EF2308;
   overflow:hidden;
   z-index:11;
 }
-#cc {
+#cc0 {
   z-index:115;
 }
-#cc2 {
+#cc1 {
   z-index:110;
 }
 div.slidedown {
@@ -609,20 +610,23 @@ div.slidedown {
   -webkit-transition:margin-top .2s linear;
   transition:margin-top .2s linear;
 }
-div.open, div.open + #cc2 {
+div.upper {
+  margin-top:4px;
+}
+div.open, div.open + #cc1 {
   background-color:#322311;
-  margin-top:3px;
+  margin-top:0;
   -o-transition:margin-top .2s linear, background-color .2s linear;
   -moz-transition:margin-top .2s linear, background-color .2s linear;
   -webkit-transition:margin-top .2s linear, background-color .2s linear;
   transition:margin-top .2s linear, background-color .2s linear;
 }
-#cc2.open {
-  left:184px;
-  -o-transition:margin-top .2s linear, left .2s linear .2s;
-  -moz-transition:margin-top .2s linear, left .2s linear .2s;
-  -webkit-transition:margin-top .2s linear, left .2s linear .2s;
-  transition:margin-top .2s linear, left .2s linear .2s;
+#cc1.open {
+  -o-transition:margin-top .2s linear, margin-left .2s linear .2s;
+  -moz-transition:margin-top .2s linear, margin-left .2s linear .2s;
+  -webkit-transition:margin-top .2s linear, margin-left .2s linear .2s;
+  transition:margin-top .2s linear, margin-left .2s linear .2s;
+  margin-left:181px;
 }
 #piecesbox canvas {
   margin-top:-1px;

@@ -116,8 +116,8 @@ echo '        <img src="'.$rooturl.'/chaos/icons/figure_effects_txt2.png" id="wo
       <p id="owthead">Old World Tokens</p>
     </div>
     <div>
-      <div id="cc" class="slidedown"></div>
-      <div id="cc2" class="slidedown"></div>
+      <div id="cc1" class="slidedown"></div>
+      <div id="cc0" class="slidedown"></div>
     </div>
     <div>
       <div id="owc" class="slidedown"></div>
