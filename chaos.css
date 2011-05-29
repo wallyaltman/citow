@@ -22,8 +22,19 @@ section {
 }
 fieldset {
   margin-bottom:13px;
+  vertical-align:bottom;
   width:456px;
   float:left;
+}
+legend {
+  color:#22660B;
+  font-size:1.2em;
+  font-weight:bold;
+  text-shadow: #110000 1px 1px 0;
+}
+/* Fieldset content */
+fieldset > img, fieldset > input, fieldset > label {
+  vertical-align:middle;
 }
 /* Vertical field list */
 ol > li {
@@ -41,10 +52,20 @@ input:checked + label {
   color:#FFFFFF;
   text-shadow: #0C0C0C 1px 1px 0;
 }
-/** Power selection **/
-fieldset:nth-of-type(1){
+/* First column of fieldsets */
+form > div {
   margin-right:58px;
+  float:left;
   clear:left;
+}
+form > div > fieldset {
+  clear:left;
+}
+/** Power selection **/
+/* Fieldset content */
+form > div > fieldset:first-child > img, form > div > fieldset:first-child > input,
+form > div > fieldset:first-child > label {
+  vertical-align:baseline;
 }
 /* Power names */
 input[type="checkbox"] + label {
@@ -90,6 +111,9 @@ input:checked + label[for="hornedrat"]{
   text-shadow: #282828 1px 1px 0;
 }
 /** Game number, official vs. other game **/
+form > fieldset:nth-of-type(2){
+  height:43px;
+}
 /* Game number input */
 #gamenumber {
   width:80px;

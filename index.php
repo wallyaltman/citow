@@ -42,43 +42,66 @@ echo '  <time datetime="', date(DATE_ATOM), '">Current server time: ',
   <div id="contentbox">
     <section>
       <h1>Create a New Game</h1>
+<?php
+//Display a message, if there is one
+if (isset($_SESSION['message'])){
+    $message = $_SESSION['message'];
+    //Clear the message, so it won't be displayed again
+    unset($_SESSION['message']);
+    $messageclass = (substr($message, 0, 5) == 'ERROR')
+                      ? 'errormsg msg'
+                      : 'msg';
+    echo '      <p class="', $messageclass, '">', $message, '</p>', "\n";
+}
+?>
       <form action="newgame.php" method="post">
+        <div>
+          <fieldset>
+            <legend>Powers</legend>
+            <ol>
+              <li>
+                <input type="checkbox" id="khorne" name="khorne" checked="checked" />
+                <label for="khorne">Khorne</label>
+                <input type="text" id="player_khorne" name="player_khorne" placeholder="Name of the Khorne player" size="30" />
+              </li>
+              <li>
+                <input type="checkbox" id="nurgle" name="nurgle" checked="checked" />
+                <label for="nurgle">Nurgle</label>
+                <input type="text" id="player_nurgle" name="player_nurgle" placeholder="Name of the Nurgle player" size="30" />
+              </li>
+              <li>
+                <input type="checkbox" id="tzeentch" name="tzeentch" checked="checked" />
+                <label for="tzeentch">Tzeentch</label>
+                <input type="text" id="player_tzeentch" name="player_tzeentch" placeholder="Name of the Tzeentch player" size="30" />
+              </li>
+              <li>
+                <input type="checkbox" id="slaanesh" name="slaanesh" checked="checked" />
+                <label for="slaanesh">Slaanesh</label>
+                <input type="text" id="player_slaanesh" name="player_slaanesh" placeholder="Name of the Slaanesh player" size="30" />
+              </li>
+              <li>
+                <input type="checkbox" id="hornedrat" name="hornedrat" checked="checked" />
+                <label for="hornedrat">The Horned Rat</label>
+                <input type="text" id="player_hornedrat" name="player_hornedrat" placeholder="Name of the Horned Rat player" size="30" />
+              </li>
+            </ol>
+          </fieldset>
+          <fieldset>
+            <legend>Chaos Cards &amp; Upgrades</legend>
+            <input type="radio" id="ccardsetbase" name="ccardset" />
+            <label for="ccardsetbase">CitOW</label>
+            <input type="radio" id="ccardsetmorrslieb" name="ccardset" checked="checked" value="morrslieb"/>
+            <label for="ccardsetmorrslieb">The Horned Rat</label>
+          </fieldset>
+        </div>
         <fieldset>
-          <legend>Powers</legend>
-          <ol>
-            <li>
-              <input type="checkbox" id="khorne" name="khorne" checked="checked" />
-              <label for="khorne">Khorne</label>
-              <input type="text" name="player_khorne" placeholder="Name of the Khorne player" size="30" />
-            </li>
-            <li>
-              <input type="checkbox" id="nurgle" name="nurgle" checked="checked" />
-              <label for="nurgle">Nurgle</label>
-              <input type="text" name="player_nurgle" placeholder="Name of the Nurgle player" size="30" />
-            </li>
-            <li>
-              <input type="checkbox" id="tzeentch" name="tzeentch" checked="checked" />
-              <label for="tzeentch">Tzeentch</label>
-              <input type="text" name="player_tzeentch" placeholder="Name of the Tzeentch player" size="30" />
-            </li>
-            <li>
-              <input type="checkbox" id="slaanesh" name="slaanesh" checked="checked" />
-              <label for="slaanesh">Slaanesh</label>
-              <input type="text" name="player_slaanesh" placeholder="Name of the Slaanesh player" size="30" />
-            </li>
-            <li>
-              <input type="checkbox" id="hornedrat" name="hornedrat" checked="checked" />
-              <label for="hornedrat">The Horned Rat</label>
-              <input type="text" name="player_hornedrat" placeholder="Name of the Horned Rat player" size="30" />
-            </li>
-          </ol>
-        </fieldset>
-        <fieldset>
-          <legend>Card Set</legend>
-          <input type="radio" id="cardsetbase" name="cardset" />
-          <label for="cardsetbase">Base Game</label>
-          <input type="radio" id="cardsetmorrslieb" name="cardset" checked="checked" value="morrslieb" />
-          <label for="cardsetmorrslieb">Morrslieb</label>
+          <legend>Old World Card Set</legend>
+          <input type="radio" id="owcardsetbase" name="owcardset" value='citow' />
+          <label for="owcardsetbase">CitOW Only</label>
+          <input type="radio" id="owcardsetall" name="owcardset" checked="checked" value="all" />
+          <label for="owcardsetall">CitOW + The Horned Rat</label>
+          <input type="radio" id="owcardsetmorrslieb" name="owcardset" value="morrslieb" />
+          <label for="owcardsetmorrslieb">The Horned Rat Only</label>
         </fieldset>
         <fieldset>
           <legend>Game Number</legend>
@@ -91,12 +114,21 @@ echo '          <input type="radio" id="officialgame" name="gamerank" ', $disabl
           <input type="radio" id="othergame" name="gamerank" checked="checked" />
           <label for="othergame">Unofficial Game</label>
 <?php
-echo '          <img src="', $rooturl, '/graphics/check.png" id="check" height="31" width="31" alt="Game number is OK" class="hideme" />', "\n";
-echo '          <img src="', $rooturl, '/graphics/error.png" id="error" height="31" width="31" alt="Game number is too low or already taken" class="hideme" />', "\n";
+echo '          <img src="', $rooturl, '/graphics/check23.png" id="check"',
+     ' height="23" width="23" alt="Game number is OK" class="hideme" />', "\n";
+echo '          <img src="', $rooturl, '/graphics/error23.png" id="error" height="23"',
+     ' width="23" alt="Game number is too low or already taken" class="hideme" />', "\n";
 ?>
         </fieldset>
+          <fieldset>
+            <legend>Initial Old World Token Placement</legend>
+            <input type="radio" id="owtokensyes" name="owtokens" checked="checked" value="auto" />
+            <label for="owtokensyes">Automatic</label>
+            <input type="radio" id="owtokensno" name="owtokens" value="manual" />
+            <label for="owtokensno">Manual</label>
+          </fieldset>
         <fieldset>
-          <input type="submit" />
+          <input type="submit" id="submit" />
         </fieldset>
       </form>
     </section>
