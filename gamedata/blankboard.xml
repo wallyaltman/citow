@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <boardstate>
+  <setup>
+    <noble>2</noble>
+    <peasant>4</peasant>
+    <warpstone>3</warpstone>
+  </setup>
   <oldworld>
   </oldworld>
   <scoreboard>
@@ -50,6 +55,24 @@
         <value>0</value>
         <dac>0</dac>
       </dial>
+    </player>
+    <player name="Horned_Rat">
+      <tokens>
+      </tokens>
+      <upgrades>
+      </upgrades>
+      <pp>6</pp>
+      <vp>0</vp>
+      <dial cap="8">
+        <value>0</value>
+        <dac>0</dac>
+      </dial>
+      <special>
+        <setup>
+          <peasant>-2</peasant>
+          <skaven>2</skaven>
+        </setup>
+      </special>
     </player>
   </scoreboard>
   <map>
@@ -126,51 +149,4 @@
       </figures>
     </region>
   </map>
-  <reserves>
-    <cultist owner="Khorne" />
-    <cultist owner="Khorne" />
-    <cultist owner="Khorne" />
-    <cultist owner="Khorne" />
-    <warrior owner="Khorne" />
-    <warrior owner="Khorne" />
-    <warrior owner="Khorne" />
-    <warrior owner="Khorne" />
-    <warrior owner="Khorne" />
-    <warrior owner="Khorne" />
-    <daemon owner="Khorne" />
-    <cultist owner="Nurgle" />
-    <cultist owner="Nurgle" />
-    <cultist owner="Nurgle" />
-    <cultist owner="Nurgle" />
-    <cultist owner="Nurgle" />
-    <cultist owner="Nurgle" />
-    <warrior owner="Nurgle" />
-    <warrior owner="Nurgle" />
-    <warrior owner="Nurgle" />
-    <warrior owner="Nurgle" />
-    <warrior owner="Nurgle" />
-    <daemon owner="Nurgle" />
-    <cultist owner="Tzeentch" />
-    <cultist owner="Tzeentch" />
-    <cultist owner="Tzeentch" />
-    <cultist owner="Tzeentch" />
-    <cultist owner="Tzeentch" />
-    <cultist owner="Tzeentch" />
-    <cultist owner="Tzeentch" />
-    <cultist owner="Tzeentch" />
-    <warrior owner="Tzeentch" />
-    <warrior owner="Tzeentch" />
-    <warrior owner="Tzeentch" />
-    <daemon owner="Tzeentch" />
-    <cultist owner="Slaanesh" />
-    <cultist owner="Slaanesh" />
-    <cultist owner="Slaanesh" />
-    <cultist owner="Slaanesh" />
-    <cultist owner="Slaanesh" />
-    <cultist owner="Slaanesh" />
-    <warrior owner="Slaanesh" />
-    <warrior owner="Slaanesh" />
-    <warrior owner="Slaanesh" />
-    <daemon owner="Slaanesh" />
-  </reserves>
 </boardstate>
