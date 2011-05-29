@@ -15,7 +15,7 @@ $rooturl = 'http://'.$_SERVER['HTTP_HOST'];
 $dir = realpath($docroot . '/chaos/saves/') . '/';
 
 //Set the session path
-session_save_path($docroot . '/../var/php_sessions');
+session_save_path(realpath(dirname($_SERVER['DOCUMENT_ROOT']) . '/../var/php_sessions'));
 
 //Attempt to resume a session
 session_start();
