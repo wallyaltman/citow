@@ -27,11 +27,13 @@ if (isset($_SESSION['username'])){
 //Retrieve the POST variables
 $game = $_POST['gamenumber'];
 $players = array();
-$powerlist = array('khorne', 'nurgle', 'tzeentch', 'slaanesh', 'hornedrat');
+$powerlist = array('khorne', 'nurgle', 'tzeentch', 'slaanesh', 'horned_rat');
 foreach ($powerlist as $power){
-    $checked = (bool) $_POST[$power];
+    $checked = (isset($_POST[$power]))
+                     ? ($_POST[$power] == '1')
+                     : false;
     if ($checked){
-      $players[$power] = $_POST['player_' . $power] || '';
+      $players[$power] = $_POST['player_' . $power];
     }
 }
 $ccardset = $_POST['ccardset'];
@@ -45,6 +47,7 @@ while (strlen($game) < 4){
 $state = '01';
 $file = 'game' . $game . 'state' . $state . '.xml';
 
+$fail = false;
 //User verification, etc.
 if (!isset($_SESSION['username'])){
     $fail = true;
@@ -65,8 +68,10 @@ if (isset($_SERVER['HTTP_REFERER'])){
     $domain = parse_url($_SERVER['HTTP_REFERER']);
     $hostlist = array('localhost', 'www.appliednerditry.com', 'appliednerditry.com', 'appliednerditry.wallyaltman.com');
     if (in_array(strtolower($domain['host']), $hostlist)){
-        $host = $_SERVER['HTTP_HOST'];
-        $uri = $host . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+        $uri = preg_replace('/\/\w+\.php$/', '', $_SERVER['HTTP_REFERER']);
+    }
+    else {
+        $fail = true;
     }
 }    
 
@@ -77,60 +82,57 @@ if (!$fail){
     $newgame = new DOMDocument(); //HERE
     $newgame->load('./gamedata/blankboard.xml');
     //Insert player names and get token setup modifiers
-    //for players who are in the game.  Delete entries
-    //for powers not being played.
+    //for players who are in the game.
     $playernodelist = $newgame->getElementsByTagName('player');
     $playernodecount = $playernodelist->length;
-    $setupmods = array();
+    $playerstodelete = array();
     for ($i = 0; $i < $playernodecount; $i++){
         $playernode = $playernodelist->item($i);
-        $power = $playernode->getAttribute('name');
+        $power = strtolower($playernode->getAttribute('name'));
         if (isset($players[$power])){
             //Set the player name
             $playernode->setAttribute('playername', $players[$power]);
-            //Look for setup modifiers
-            $playersetuplist = $playernode->getElementsByTagName('setup')->item(0)->childNodes;
-            $setupcount = $playersetuplist->length;
-            if ($setupcount > 0){
-                for ($j = 0; $j < $setupcount; $j++){
-                    $setupitem = $playersetuplist->item($j);
-                    $setupitemname = $setupitem->nodeName;
-                    if (!isset($setupmods[$setupitemname])){
-                        $setupmods[$setupitemname] = 0;
-                    }
-                    $setupmods[$setupitemname] += $setupitem->textContent;
-                }
-            }
         }
         else {
-            $playernodelist->removeChild($playernode);
+            $playerstodelete[] = $i;
         }
     }
+    //Delete entries for powers not being played.
+    arsort($playerstodelete);
+    $scoreboard = $newgame->getElementsByTagName('scoreboard')->item(0);
+    foreach($playerstodelete as $deletekey){
+        $scoreboard->removeChild($playernodelist->item($deletekey));
+    }
+    //Get the list of setup tokens
+    $setup = $newgame->getElementsByTagName('setup');
+    $setuplength = $setup->length;
     //If automatic Old World token placement was requested,
     //read token counts and any player-based modifiers
     if (strtolower($owtokens) == 'auto'){
-        //Get the list of setup tokens
-        $setup = $newgame->getElementsByTagName('setup')->item(0)->childNodes;
-        $setuplength = $setup->length;
-        $setuptokens = array();
+        //Make a list of token names
+        $setuptokencounts = array('event'=>0, 'hero'=>0, 'noble'=>0, 'peasant'=>0, 'skaven'=>0, 'warpstone'=>0);
+        foreach($setuptokencounts as $tokenname => $tokencount){
+            //Run through each setup element and pull tokens
+            for ($i = 0; $i < $setuplength; $i++){
+                $thistokenlist = $setup->item($i)->getElementsByTagName($tokenname);
+                if ($thistokenlist->length > 0){
+                    $setuptokencounts[$tokenname] += $thistokenlist->item(0)->textContent;
+                }
+            }
+        }
         //Turn the list of tokens w/ counts into a stack
         //of tokens
-        for ($i = 0; $i < $setuplength; $i++){
-            $tokenname = $setup->item($i)->nodeName;
-            $tokencount = $setup->item($i)->textContent;
-            if (is_numeric($tokencount) && $tokencount > 0){
-                //If there was a modifier, use it
-                if (isset($setupmods[$tokenname])){
-                    $tokencount += $setupmods[$tokenname];
-                }
+        $setuptokens = array();
+        foreach($setuptokencounts as $tokenname => $tokencount){
+            if ($tokencount > 0){
                 //Put some tokens on the stack
-                for ($j = 0; $j < $tokencount; $j++){
+                for ($i = 0; $i < $tokencount; $i++){
                     $setuptokens[] = $tokenname;
                 }
             }
         }
         //Shuffle the starting tokens
-        $shuffle($setuptokens);
+        shuffle($setuptokens);
         //Get the region list
         $regionlist = $newgame->getElementsByTagName('region');
         $regioncount = $regionlist->length;
@@ -144,12 +146,19 @@ if (!$fail){
             $tokendrop->appendChild($token);
         }
     }
+    //Remove the token setup data
+    for ($i = $setuplength - 1; $i >= 0; $i--){
+        $thissetup = $setup->item($i);
+        $thissetupparent = $thissetup->parentNode;
+        $thissetupparent->removeChild($thissetup);
+    }
     //Set the game and state number, game creator, and expansion name
-    $newgame->setAttribute('creator', $user);
-    $newgame->setAttribute('game', $game);
-    $newgame->setAttribute('state', 1);
+    $documentnode = $newgame->getElementsByTagName('boardstate')->item(0);
+    $documentnode->setAttribute('creator', $user);
+    $documentnode->setAttribute('game', $game);
+    $documentnode->setAttribute('state', 1);
     if (strtolower($ccardset) == 'morrslieb'){
-        $newgame->setAttribute('expansion', 'morrslieb');
+        $documentnode->setAttribute('expansion', 'morrslieb');
     }
     //Set the Old World card set
     $newgame->getElementsByTagName('oldworld')->item(0)->setAttribute('set', $owcardset);
@@ -179,7 +188,7 @@ if (!$fail){
     }
     $data = implode("\n", $pretty);
     //Write out the save file
-    file_put_contents($dir.$file, '<?xml version="1.0" encoding="UTF-8" ?>'."\n".$data, LOCK_EX);
+    file_put_contents($dir.$file, $data, LOCK_EX);
     if (file_exists($dir.$file) && simplexml_load_file($dir.$file)){
         //If successful, load the new game at gameboard.php
         header( 'Location: ' . $uri . '/gameboard.php?game=' . $game );

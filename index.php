@@ -60,29 +60,29 @@ if (isset($_SESSION['message'])){
             <legend>Powers</legend>
             <ol>
               <li>
-                <input type="checkbox" id="khorne" name="khorne" checked="checked" />
+                <input type="checkbox" id="khorne" name="khorne" checked="checked" value="1" />
                 <label for="khorne">Khorne</label>
                 <input type="text" id="player_khorne" name="player_khorne" placeholder="Name of the Khorne player" size="30" />
               </li>
               <li>
-                <input type="checkbox" id="nurgle" name="nurgle" checked="checked" />
+                <input type="checkbox" id="nurgle" name="nurgle" checked="checked" value="1" />
                 <label for="nurgle">Nurgle</label>
                 <input type="text" id="player_nurgle" name="player_nurgle" placeholder="Name of the Nurgle player" size="30" />
               </li>
               <li>
-                <input type="checkbox" id="tzeentch" name="tzeentch" checked="checked" />
+                <input type="checkbox" id="tzeentch" name="tzeentch" checked="checked" value="1" />
                 <label for="tzeentch">Tzeentch</label>
                 <input type="text" id="player_tzeentch" name="player_tzeentch" placeholder="Name of the Tzeentch player" size="30" />
               </li>
               <li>
-                <input type="checkbox" id="slaanesh" name="slaanesh" checked="checked" />
+                <input type="checkbox" id="slaanesh" name="slaanesh" checked="checked" value="1" />
                 <label for="slaanesh">Slaanesh</label>
                 <input type="text" id="player_slaanesh" name="player_slaanesh" placeholder="Name of the Slaanesh player" size="30" />
               </li>
               <li>
-                <input type="checkbox" id="hornedrat" name="hornedrat" checked="checked" />
-                <label for="hornedrat">The Horned Rat</label>
-                <input type="text" id="player_hornedrat" name="player_hornedrat" placeholder="Name of the Horned Rat player" size="30" />
+                <input type="checkbox" id="horned_rat" name="horned_rat" checked="checked" value="1" />
+                <label for="horned_rat">The Horned Rat</label>
+                <input type="text" id="player_horned_rat" name="player_horned_rat" placeholder="Name of the Horned Rat player" size="30" />
               </li>
             </ol>
           </fieldset>
@@ -141,13 +141,13 @@ if (!file_exists($dir.'owned_games.json')){
 $rawdata = file_get_contents($dir.'owned_games.json');
 $jsondata = json_decode($rawdata);
 //Determine whether to show "test" games (> 1000)
-$showtest = (strtolower($_GET['test']) === 'true');
+$showtest = (isset($_GET['test']) && strtolower($_GET['test'])=== 'true');
 $testget = $showtest ? '&test=true' : '';
 //See if the "my games" section should be expanded
-$expmy = (strtolower($_GET['my']) === 'true');
+$expmy = (isset($_GET['my']) && strtolower($_GET['my']) === 'true');
 $expmyget = $expmy ? '&my=true' : '';
 //See if the "recent" section should be expanded
-$expall = (strtolower($_GET['al']) === 'true');
+$expall = (isset($_GET['al']) && strtolower($_GET['al']) === 'true');
 $expallget = $expall ? '&al=true' : '';
 //Split off date modified, and sort descending
 $gamedata = array();
@@ -179,6 +179,9 @@ foreach ($moddates as $gnum => $modtime){
     $modtimeobj = new DateTime('@'.$modtime);
     $modtimeobj->setTimezone(new DateTimeZone('America/New_York'));
     $creator = $gamedata[$gnum]->creator;
+    $expansion = (isset($gamedata[$gnum]->expansion))
+                       ? $gamedata[$gnum]->expansion
+                       : '';
     if ($modtimeobj > $today){
         $modstring = $modtimeobj->format('g:i A');
     }
@@ -193,7 +196,7 @@ foreach ($moddates as $gnum => $modtime){
     }
     $thisrow = array('game' => $gnum,
                      'creator' => $creator,
-                     'expansion' => $gamedata[$gnum]->expansion,
+                     'expansion' => $expansion,
                      'modified' => $modstring);
     $allrows[] = $thisrow;
     if ($creator === $user){
