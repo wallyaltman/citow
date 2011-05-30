@@ -83,5 +83,7 @@ else {
     $x = new stdClass();
     $returnmsg = json_encode($x);
 }
-echo $returnmsg;
+if (!isset($gamelist_quiet) || !$gamelist_quiet){
+    echo $returnmsg;
+}
 ?>

@@ -190,6 +190,9 @@ if (!$fail){
     //Write out the save file
     file_put_contents($dir.$file, $data, LOCK_EX);
     if (file_exists($dir.$file) && simplexml_load_file($dir.$file)){
+        //Update the JSON game lists
+        $gamelist_quiet = true; //Don't echo anything in gamelist.php
+        include 'gamelist.php';
         //If successful, load the new game at gameboard.php
         header( 'Location: ' . $uri . '/gameboard.php?game=' . $game );
     }
