@@ -385,7 +385,6 @@ function getBoardState(blank, expansion){
 }
 
 /* Read in the XML game setup file.
- * TODO: choice between standard and HR
  */
 function getGameSetup(expansion){
     var xmlhttp = xmlRequest();
@@ -1707,18 +1706,32 @@ function drawBoard(blank, local){
     var height = board.height;
     var state, expansion;
     if (local){
-        //Flag the board as unsaved if
-        //from local storage
-        unsavedBoard();
-        state = local;
-        //Update the HTML controls
-        var gameOption = document.getElementById("game" + board.game);
-        gameOption.selected = true;
-        getStates(null, board.game, board.state);
-        //Update the save buttons
-        updateSaveButtons();
+        //Check whether the game in local storage
+        //has a matching game number
+        var gamePick = document.getElementById("gamepick");
+        var selectedGame = Number(gamePick.options[gamePick.selectedIndex].value);
+        //Read the local board's game number and
+        //state number from the XML doc
+        var root = local.getElementsByTagName("boardstate")[0];
+        var localGame = Number(root.getAttribute("game"));
+        var localState = Number(root.getAttribute("state"));
+        if (selectedGame == localGame){
+            //Flag the board as unsaved if
+            //from local storage
+            unsavedBoard();
+            state = local;
+            //Set the board game and state
+            board.game = localGame;
+            board.state = localState;
+            //Update the HTML controls
+            var gameOption = document.getElementById("game" + board.game);
+            gameOption.selected = true;
+            getStates(null, board.game, board.state);
+            //Update the save buttons
+            updateSaveButtons();
+        }
     }
-    else {
+    if (!state){
         //Flag the board as saved, if loading
         //from a save file
         unsavedBoard(true);
@@ -1742,6 +1755,7 @@ function drawBoard(blank, local){
     //Get the board setup
     var info = getGameSetup(board.expansion);
     board.info = info;
+    board.upgradeSheet = info.getElementsByTagName("upgrades")[0].getAttribute("sheet");
     //Check for the Old World card set
     board.owcset = oldWorldXML.getAttribute("set");
     //Load the Old World cards
@@ -2081,7 +2095,9 @@ function drawBoard(blank, local){
                 draw : drawToken,
                 name : this.nodeName,
                 pp : Number($(this).attr("pp")) || 0,
-                active : isActive
+                active : isActive,
+                srcX : Number($(this).attr("srcx")),
+                srcY : Number($(this).attr("srcy"))
             };
             currentPlayer.upgrades.push(obj);
         });
@@ -2847,13 +2863,9 @@ function checkLocalStorage(){
         //the locally stored board
         if (board.parser){
             xmlDoc = board.parser.readXML(unescape(localStorage["gameboard"].replace(/\+/g, " ")));
-            //Read the board's game number, state number,
-            //and creator from the XML doc
+            //Make sure the game can be read
             root = xmlDoc.getElementsByTagName("boardstate")[0];
             if (root && root.getAttribute){
-                board.game = Number(root.getAttribute("game"));
-                board.state = Number(root.getAttribute("state"));
-                board.creator = root.getAttribute("creator");
                 //Clear out the local copy
                 delete localStorage["gameboard"];
                 //Return the board

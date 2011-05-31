@@ -255,18 +255,69 @@ function drawToken(x, y, ctx){
     var token = this;
     var board, allUpgrades, allIcons, pos, number;
     var icon, sz19;
-    //Set the icon association if
-    //it is not yet set
-    if (!this.icon){
-        board = document.getElementById("board");
-        //Create a list of upgrades, and a 
-        //list of all other icons
-        allUpgrades = ["cards", "cultist", "daemon", "pp1", "pp2", "provender", "warrior"];
-        allIcons = ["event", "hero", "noble", "peasant", "skaven", "warpstone",
-                    "dac", "select", "unselect", "smallcomet", "darkcomet", "magic"];
-        //Check whether this is an icon or upgrade,
-        //and proceed accordingly
-        if (allIcons.indexOf(this.name) >= 0){
+    //This method draws the token, and will
+    //replace the drawToken function in
+    //subsequent calls to the draw() method
+    //on the current token
+    var drawIcon = function(x, y, ctx){
+        var dimX = this.icon.width;
+        var dimY = this.icon.height;
+        //Draw the image by pulling the target
+        //rectangle off the sprite sheet
+        ctx.drawImage(this.icon.img, this.icon.srcX, this.icon.srcY, dimX, dimY, x, y, dimX, dimY);
+        //Store the token's bounding box
+        this.x0 = x;
+        this.y0 = y;
+        this.x1 = x + dimX;
+        this.y1 = y + dimY;
+    }
+    
+    //This is a special method, used only
+    //for icons drawn with an alpha value
+    var drawIconAlpha = function(x, y, ctx){
+        var dimX = this.icon.width;
+        var dimY = this.icon.height;
+        //Set the alpha value
+        ctx.globalAlpha = this.icon.alpha;
+        //Draw the image by pulling the target
+        //rectangle off the sprite sheet
+        ctx.drawImage(this.icon.img, this.icon.srcX, this.icon.srcY, dimX, dimY, x, y, dimX, dimY);
+        //Store the token's bounding box
+        this.x0 = x;
+        this.y0 = y;
+        this.x1 = x + dimX;
+        this.y1 = y + dimY;
+        //Reset the alpha value
+        ctx.globalAlpha = 1;
+    }
+    
+    //This method is for drawing upgrades
+    //(which have uniform dimensions, and 
+    //carry their own coordinate data)
+    var drawUpgrade = function(x, y, ctx){
+        var img = board.upgradeSprites;
+        var dimX = 23;
+        var dimY = 19;
+        //Draw the image by pulling the target
+        //rectangle off the sprite sheet
+        ctx.drawImage(img, this.srcX, this.srcY, dimX, dimY, x, y, dimX, dimY);
+        //Store the token's bounding box
+        this.x0 = x;
+        this.y0 = y;
+        this.x1 = x + dimX;
+        this.y1 = y + dimY;
+    }
+    
+    board = document.getElementById("board");
+    //Create a list of icons other than upgrades
+    allIcons = ["event", "hero", "noble", "peasant", "skaven", "warpstone",
+                "dac", "select", "unselect", "smallcomet", "darkcomet", "magic"];
+    //Check whether this is an icon or upgrade,
+    //and proceed accordingly
+    if (allIcons.indexOf(this.name) >= 0){
+        //Set the icon association if
+        //it is not yet set
+        if (!this.icon){
             //If this is the very first icon to
             //be drawn, retrieve the sprite sheet
             //and set up the icon array
@@ -327,109 +378,68 @@ function drawToken(x, y, ctx){
             //to its icon
             this.icon = board.iconList[this.name];
         }
-        else if (allUpgrades.indexOf(this.name) >= 0){
-            //If this is the very first upgrade
-            //to be drawn, retrieve the sprite sheet
-            //and set up the upgrade array
-            if (!board.upgradeSprites){
-                board.upgradeSprites = document.createElement('img');
-                board.upgradeSprites.src = "icons/upgrade_sprites.png";
-                board.upgradeList = {};
+        //If the sprite sheet is loaded already,
+        //go ahead and reassign the method and
+        //draw the token
+        if (this.icon.img.complete){
+            //Set the "alpha" method if needed
+            if (this.icon.alpha && this.icon.alpha != 1){
+                this.draw = drawIconAlpha;
             }
-            //If this is the first instance of this
-            //specific upgrade to be drawn, set up the
-            //drawing information and load the upgrade
-            //into the array
-            if (!board.upgradeList.hasOwnProperty(this.name)){
-                //Starting (upper-left) coordinate positions for
-                //the upgrades, in order (from the upgrade list above)
-                pos = [{x:1,y:1}, {x:25,y:1}, {x:49,y:1}, {x:73,y:1}, {x:1,y:21}, {x:25,y:21}, {x:49,y:21}]
-                //Get the index of the current upgrade with respect
-                //to the upgrade list
-                number = allUpgrades.indexOf(this.name);
-                icon = {
-                    img : board.upgradeSprites,  //The upgrade sheet
-                    srcX : pos[number].x,        //X-coord on the sheet
-                    srcY : pos[number].y,        //Y-coord on the sheet
-                    width : 23,                  //Width (same for all upgrades)
-                    height : 19                  //Height (same for all upgrades)
-                };
-                //Insert the upgrade in the list
-                board.upgradeList[this.name] = icon;
+            else {
+                this.draw = drawIcon;
             }
-            //Create a reference on the upgrade
-            //to its icon
-            this.icon = board.upgradeList[this.name];
+            this.draw(x, y, ctx);
         }
-    }
-    //This method draws the token, and will
-    //replace the drawToken function in
-    //subsequent calls to the draw() method
-    //on the current token
-    var drawMethod = function(x, y, ctx){
-        var dimX = this.icon.width;
-        var dimY = this.icon.height;
-        //Draw the image by pulling the target
-        //rectangle off the sprite sheet
-        ctx.drawImage(this.icon.img, this.icon.srcX, this.icon.srcY, dimX, dimY, x, y, dimX, dimY);
-        //Store the token's bounding box
-        this.x0 = x;
-        this.y0 = y;
-        this.x1 = x + dimX;
-        this.y1 = y + dimY;
-    }
-    //This is a special method, used only
-    //for icons drawn with an alpha value
-    var drawMethodAlpha = function(x, y, ctx){
-        var dimX = this.icon.width;
-        var dimY = this.icon.height;
-        //Set the alpha value
-        ctx.globalAlpha = this.icon.alpha;
-        //Draw the image by pulling the target
-        //rectangle off the sprite sheet
-        ctx.drawImage(this.icon.img, this.icon.srcX, this.icon.srcY, dimX, dimY, x, y, dimX, dimY);
-        //Store the token's bounding box
-        this.x0 = x;
-        this.y0 = y;
-        this.x1 = x + dimX;
-        this.y1 = y + dimY;
-        //Reset the alpha value
-        ctx.globalAlpha = 1;
-    }
-    //If the sprite sheet is loaded already,
-    //go ahead and reassign the method and
-    //draw the token
-    if (this.icon.img.complete){
-        //Set the "alpha" method if needed
-        if (this.icon.alpha && this.icon.alpha != 1){
-            this.draw = drawMethodAlpha;
-        }
+        //Otherwise, set an interval that will
+        //complete those tasks once the sheet
+        //has been loaded
         else {
-            this.draw = drawMethod;
+            //Set the "alpha" method if needed. The 
+            //check is run now, rather than running
+            //it repeatedly in the timer.
+            if (this.icon.alpha && this.icon.alpha != 1){
+                var loadTimer = setInterval(function(){
+                    if (token.icon.img.complete){
+                        clearInterval(loadTimer);
+                        token.draw = drawIconAlpha;
+                        token.draw(x, y, ctx);
+                    }
+                }, 100);
+            }
+            else {
+                var loadTimer = setInterval(function(){
+                    if (token.icon.img.complete){
+                        clearInterval(loadTimer);
+                        token.draw = drawIcon;
+                        token.draw(x, y, ctx);
+                    }
+                }, 100);
+            }
         }
-        this.draw(x, y, ctx);
     }
-    //Otherwise, set an interval that will
-    //complete those tasks once the sheet
-    //has been loaded
     else {
-        //Set the "alpha" method if needed. The 
-        //check is run now, rather than running
-        //it repeatedly in the timer.
-        if (this.icon.alpha && this.icon.alpha != 1){
-            var loadTimer = setInterval(function(){
-                if (token.icon.img.complete){
-                    clearInterval(loadTimer);
-                    token.draw = drawMethodAlpha;
-                    token.draw(x, y, ctx);
-                }
-            }, 100);
+        //If this is the very first upgrade
+        //to be drawn, retrieve the sprite sheet
+        if (!board.upgradeSprites){
+            board.upgradeSprites = document.createElement('img');
+            board.upgradeSprites.src = "icons/" + board.upgradeSheet;
         }
+        //If the sprite sheet is loaded already,
+        //go ahead and reassign the method and
+        //draw the token
+        if (board.upgradeSprites.complete){
+            this.draw = drawUpgrade;
+            this.draw(x, y, ctx);
+        }
+        //Otherwise, set an interval that will
+        //complete those tasks once the sheet
+        //has been loaded
         else {
             var loadTimer = setInterval(function(){
-                if (token.icon.img.complete){
+                if (board.upgradeSprites.complete){
                     clearInterval(loadTimer);
-                    token.draw = drawMethod;
+                    token.draw = drawUpgrade;
                     token.draw(x, y, ctx);
                 }
             }, 100);
