@@ -1,33 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <oldworldcards>
-  <card>Bretonnian Knights</card>
-  <card>Call to Arms!</card>
-  <card>Closing the Portal</card>
-  <card>The Crusade is Come</card>
-  <card event="true">Dark Elf Corsairs</card>
-  <card>Divine Inspiration</card>
-  <card>Dwarf Trollslayers</card>
-  <card>Electors Arise</card>
-  <card event="true">Electors Sue for Peace</card>
-  <card>Franz's Decree</card>
-  <card event="true">Greenskins Invade</card>
-  <card event="true">High Elf Protection</card>
-  <card event="true">The Horned One's Due</card>
-  <card event="true">The Light of Day</card>
-  <card>Mass Exodus</card>
-  <card>Meteor Showers</card>
-  <card>Morrslieb Eclipsed</card>
-  <card event="true">Norse Reavers</card>
-  <card>Peasant Uprising</card>
-  <card>Plunged Into Chaos</card>
-  <card>Road Wardens</card>
-  <card>Rousing the Rabble</card>
-  <card>Skavengers</card>
-  <card event="true">Teclis Aids the Empire</card>
-  <card event="true">The Grail is Found</card>
-  <card>Up From Skavenblight</card>
-  <card>Warpstone Discovery</card>
-  <card>The Warrens Erupt!</card>
-  <card>Witch Hunters</card>
-  <card>Vermin Outbreak</card>
+  <card dataid="owc001">Bretonnian Knights</card>
+  <card dataid="owc101">Call to Arms!</card>
+  <card dataid="owc102">Closing the Portal</card>
+  <card dataid="owc002">The Crusade is Come</card>
+  <card dataid="owc003" event="true">Dark Elf Corsairs</card>
+  <card dataid="owc004">Divine Inspiration</card>
+  <card dataid="owc005">Dwarf Trollslayers</card>
+  <card dataid="owc006">Electors Arise</card>
+  <card dataid="owc007" event="true">Electors Sue for Peace</card>
+  <card dataid="owc008">Franz's Decree</card>
+  <card dataid="owc009" event="true">The Grail is Found</card>
+  <card dataid="owc010" event="true">Greenskins Invade</card>
+  <card dataid="owc103" event="true">High Elf Protection</card>
+  <card dataid="owc011">The Horned One's Due</card>
+  <card dataid="owc104" event="true">The Light of Day</card>
+  <card dataid="owc012">Mass Exodus</card>
+  <card dataid="owc013">Meteor Showers</card>
+  <card dataid="owc105">Morrslieb Eclipsed</card>
+  <card dataid="owc014" event="true">Norse Reavers</card>
+  <card dataid="owc015">Peasant Uprising</card>
+  <card dataid="owc016">Plunged Into Chaos</card>
+  <card dataid="owc017">Road Wardens</card>
+  <card dataid="owc106">Rousing the Rabble</card>
+  <card dataid="owc018">Skavengers</card>
+  <card dataid="owc019" event="true">Teclis Aids the Empire</card>
+  <card dataid="owc020">Up From Skavenblight</card>
+  <card dataid="owc107">Vermin Outbreak</card>
+  <card dataid="owc021">Warpstone Discovery</card>
+  <card dataid="owc108">The Warrens Erupt!</card>
+  <card dataid="owc022">Witch Hunters</card>
 </oldworldcards>

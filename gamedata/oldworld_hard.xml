@@ -1,12 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <oldworldcards>
-  <card>Call to Arms!</card>
-  <card>Closing the Portal</card>
-  <card event="true">High Elf Protection</card>
-  <card event="true">The Horned One's Due</card>
-  <card event="true">The Light of Day</card>
-  <card>Morrslieb Eclipsed</card>
-  <card>Rousing the Rabble</card>
-  <card>Vermin Outbreak</card>
-  <card>The Warrens Erupt!</card>
+  <card dataid="owc101">Call to Arms!</card>
+  <card dataid="owc102">Closing the Portal</card>
+  <card dataid="owc103" event="true">High Elf Protection</card>
+  <card dataid="owc104" event="true">The Light of Day</card>
+  <card dataid="owc105">Morrslieb Eclipsed</card>
+  <card dataid="owc106">Rousing the Rabble</card>
+  <card dataid="owc107">Vermin Outbreak</card>
+  <card dataid="owc108">The Warrens Erupt!</card>
 </oldworldcards>
