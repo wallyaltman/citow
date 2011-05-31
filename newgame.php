@@ -194,7 +194,7 @@ if (!$fail){
         $gamelist_quiet = true; //Don't echo anything in gamelist.php
         include 'gamelist.php';
         //If successful, load the new game at gameboard.php
-        header( 'Location: ' . $uri . '/gameboard.php?game=' . $game );
+        header('Location: ' . $uri . '/gameboard.php?game=' . $game);
     }
     else {
         $returnmsg = 'ERROR: Problem writing file';
@@ -204,5 +204,6 @@ if (!$fail){
 //the error message
 if (isset($returnmsg)){
     $_SESSION['message'] = $returnmsg;
+    header('Location: ' . $uri . '/index.php');
 }
 ?>
