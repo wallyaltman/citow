@@ -274,7 +274,7 @@ div.shiftbox img.black{
 /* Container */
 #scorebox {
   height:449px;
-  width:462px;
+  width:500px;
 }
 #upgradecontrolbox {
   position:absolute;
@@ -295,7 +295,7 @@ div.shiftbox img.black{
   font-size:1.15em;
 }
 #upgradecontrolbox > table {
-  width:445px;
+  width:475px;
 }
 #scorebox tr {
   padding:2px;
