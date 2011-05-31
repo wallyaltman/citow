@@ -601,13 +601,15 @@ function getOldWorldCards(cardSet){
         var loc = "gamedata/";
         var file = (cardSet == "all")
                         ? "oldworld_all.xml"
-                        : ((cardSet == "hardmode")
+                        : ((cardSet == "morrslieb")
                                 ? "oldworld_hard.xml"
                                 : "oldworld.xml");
         var url = loc + file;
         xmlhttp.onreadystatechange = function(){
             if (this.readyState == 4 && this.status == 200){
                 var xmlDoc = this.responseXML;
+                var board = document.getElementById("board");
+                var players = board.map.score.players;
                 var oldWorldCards = xmlDoc.getElementsByTagName("card");
                 var $owc = $("#owc");
                 $owc.children().remove();
@@ -621,12 +623,23 @@ function getOldWorldCards(cardSet){
                         draw : drawCard,
                         symbol : {},
                         symbol2 : {},
-                        type : "oldworld"
+                        type : "oldworld",
+                        dataid : oldWorldCards[i].getAttribute("dataid")
                     };
                     card.symbol.name = "smallcomet";
                     card.symbol.draw = drawToken;
                     card.symbol2.name = "darkcomet";
                     card.symbol2.draw = drawToken;
+                    //If the Horned Rat is a player, make The Horned One's Due
+                    //an event card
+                    if (card.dataid == "owc011"){
+                        for (j = 0; j < players.length; j++){
+                            if (players[j].idNum == 4){
+                                card.event = true;
+                                break;
+                            }
+                        }
+                    }
                     card.canvas = document.createElement("canvas");
                     card.canvas.className = "card";
                     card.canvas.width = 180;
