@@ -1,2 +1,2 @@
 AddType 'text/xml; charset=UTF-8' citow 
-DirectoryIndex gameboard.php
+DirectoryIndex index.php
