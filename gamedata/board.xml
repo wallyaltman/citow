@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <gameboard>
+  <upgrades sheet="upgrade_sprites.png" />
   <tokens>
     <event>6</event>
     <hero>4</hero>
@@ -19,11 +20,11 @@
       </figures>
       <pp>7</pp>
       <upgrades>
-        <cultist />
-        <warrior />
-        <daemon />
-        <pp1 pp="1" />
-        <cards />
+        <cultist srcx="25" srcy="1" />
+        <warrior srcx="49" srcy="21" />
+        <daemon srcx="49" srcy="1" />
+        <pp1 srcx="73" srcy="1" pp="1" />
+        <cards srcx="1" srcy="1" />
       </upgrades>    
     </power>
     <power id="1" highlight="#339911" shadow="#112C08">
@@ -36,11 +37,11 @@
       </figures>
       <pp>6</pp>
       <upgrades>
-        <cultist />
-        <warrior />
-        <daemon />
-        <pp1 pp="1" />
-        <provender />
+        <cultist srcx="25" srcy="1" />
+        <warrior srcx="49" srcy="21" />
+        <daemon srcx="49" srcy="1" />
+        <pp1 srcx="73" srcy="1" pp="1" />
+        <provender srcx="25" srcy="21" />
       </upgrades>
     </power>
     <power id="2" highlight="#2255DD" shadow="#0D1A3D">
@@ -53,11 +54,11 @@
       </figures>
       <pp>6</pp>
       <upgrades>
-        <cultist />
-        <warrior />
-        <daemon />
-        <pp1 pp="1" />
-        <cards />        
+        <cultist srcx="25" srcy="1" />
+        <warrior srcx="49" srcy="21" />
+        <daemon srcx="49" srcy="1" />
+        <pp1 srcx="73" srcy="1" pp="1" />
+        <cards srcx="1" srcy="1" />      
       </upgrades>
     </power>
     <power id="3" highlight="#9922CC" shadow="#2D0D3B">
@@ -70,11 +71,11 @@
       </figures>
       <pp>6</pp>
       <upgrades>
-        <cultist />
-        <warrior />
-        <daemon />
-        <pp1 pp="1" />
-        <pp2 pp="2" />
+        <cultist srcx="25" srcy="1" />
+        <warrior srcx="49" srcy="21" />
+        <daemon srcx="49" srcy="1" />
+        <pp1 srcx="73" srcy="1" pp="1" />
+        <pp2 srcx="1" srcy="21" pp="2" />
       </upgrades>
     </power>
     <power id="4" highlight="#999999" shadow="#282828" nocorruption="true">
@@ -87,11 +88,11 @@
       </figures>
       <pp>6</pp>
       <upgrades>
-        <cultist />
-        <warrior />
-        <daemon />
-        <pp1 pp="1" />
-        <cards />
+        <cultist srcx="25" srcy="1" />
+        <warrior srcx="49" srcy="21" />
+        <daemon srcx="49" srcy="1" />
+        <under srcx="97" srcy="21" />
+        <thirteen srcx="73" srcy="21" />
       </upgrades>
     </power>
   </ruinouspowers>
