@@ -51,29 +51,28 @@ $fail = false;
 //User verification, etc.
 if (!isset($_SESSION['username'])){
     $fail = true;
-    $returnmsg = 'ERROR: Not logged in';
+    $error = '01';
 }
 else if ($game < 1000 && $userlevel < 2){
     $fail = true;
-    $returnmsg = 'ERROR: Insufficient user permissions';
+    $error = '02';
 }
 //Check for an existing file with the
 //same game & state numbers
 else if (file_exists($dir.$file)){
     $fail = true;
-    $returnmsg = 'ERROR: Specified game already exists';
+    $error = '11';
 }
 //Check the HTTP_REFERER header, and fail if it's no good
 if (isset($_SERVER['HTTP_REFERER'])){
     $domain = parse_url($_SERVER['HTTP_REFERER']);
     $hostlist = array('localhost', 'www.appliednerditry.com', 'appliednerditry.com', 'appliednerditry.wallyaltman.com');
-    if (in_array(strtolower($domain['host']), $hostlist)){
-        $uri = preg_replace('/\/\w+\.php$/', '', $_SERVER['HTTP_REFERER']);
-    }
-    else {
+    if (!in_array(strtolower($domain['host']), $hostlist)){
         $fail = true;
     }
 }    
+
+$uri = preg_replace('/\/\w+\.php$/', '', $_SERVER['HTTP_REFERER']);
 
 //Read in the blank board, edit it a bit, then write
 //it out as a new file
@@ -190,20 +189,18 @@ if (!$fail){
     //Write out the save file
     file_put_contents($dir.$file, $data, LOCK_EX);
     if (file_exists($dir.$file) && simplexml_load_file($dir.$file)){
-        //Update the JSON game lists
-        $gamelist_quiet = true; //Don't echo anything in gamelist.php
-        include 'gamelist.php';
-        //If successful, load the new game at gameboard.php
-        header('Location: ' . $uri . '/gameboard.php?game=' . $game);
+        //If successful, update the JSON game lists
+        //and then load the new board.
+        include 'gamelist_q.php';
+        header( 'Location: ' . $uri . '/gameboard.php?game=' . $game );
     }
     else {
-        $returnmsg = 'ERROR: Problem writing file';
+        $error = '51';
     }
 }
 //If we failed somehow, return to the index page with
 //the error message
-if (isset($returnmsg)){
-    $_SESSION['message'] = $returnmsg;
-    header('Location: ' . $uri . '/index.php');
+if (isset($error)){
+    header('Location: ' . $uri . '/index.php?error=' . $error);
 }
 ?>

@@ -1,7 +1,8 @@
 <?php
 /* This program generates a list of games/gamestates
  * and stores it on the server in JSON format, as
- * well as returning the list.
+ * well as returning the list.  This "_q" version
+ * doesn't return any response.
  */
 
 $slash = strpos(getcwd(), '/') === false ? '\\' : '/';
@@ -76,16 +77,4 @@ ksort($gamestarts);
 $ownerfile = 'owned_games.json';
 $owneroutput = json_encode($gamestarts);
 file_put_contents($dir.$ownerfile, $owneroutput, LOCK_EX);
-
-//Return the game/state list
-if (file_exists($dir.$file)){
-    $returnmsg = $output;
-}
-else {
-    $x = new stdClass();
-    $returnmsg = json_encode($x);
-}
-if (!$quiet){
-    echo $returnmsg;
-}
 ?>

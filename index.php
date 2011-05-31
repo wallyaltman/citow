@@ -44,13 +44,15 @@ echo '  <time datetime="', date(DATE_ATOM), '">Current server time: ',
       <h1>Create a New Game</h1>
 <?php
 //Display a message, if there is one
-if (isset($_SESSION['message'])){
-    $message = $_SESSION['message'];
-    //Clear the message, so it won't be displayed again
-    unset($_SESSION['message']);
-    $messageclass = (substr($message, 0, 5) == 'ERROR')
+if (isset($_GET['error'])){
+    $errorcode = $_GET['error'];
+    //Create a table of error messages
+    $errorlist = array( '01'=>'ERROR: Not logged in', '02'=>'ERROR: Insufficient user permissions',
+                        '11'=>'ERROR: File already exists', '51'=>'ERROR: Unknown I/O error');
+    $message = $errorlist[$errorcode];
+    $messageclass = is_numeric($errorcode)
                       ? 'errormsg msg'
-                      : 'msg';
+                      : 'msg';              //Always true (so far)
     echo '      <p class="', $messageclass, '">', $message, '</p>', "\n";
 }
 ?>
