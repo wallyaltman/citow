@@ -92,7 +92,7 @@
         <warrior srcx="25" srcy="81" />
         <daemon srcx="49" srcy="81" />
         <under srcx="73" srcy="81" />
-        <thirteen srcx="97" srcy="81" />
+        <thirteen srcx="97" srcy="81" extracard="true" />
       </upgrades>
     </power>
   </ruinouspowers>

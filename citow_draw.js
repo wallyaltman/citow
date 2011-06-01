@@ -600,6 +600,30 @@ function drawRegion(){
         cards[i].bgcolor2 = bgcolor2;
         cards[i].draw(xWidth - 179, y + 22 + (18 * i), ctx);
     }
+    //Draw a third card over the region name, if
+    //upgrades permit
+    var currentUpgrades;
+    var thirdCard = false;
+    for (i = 2; i < cards.length; i++){
+        currentUpgrades = cards[i].owner 
+                                ? (cards[i].owner.upgrades
+                                        ? cards[i].owner.upgrades
+                                        : [])
+                                : [];
+        for (var j = 0; j < currentUpgrades.length; j++){
+            if (currentUpgrades[j].extraCard && currentUpgrades[j].active){
+                thirdCard = true;
+                cards[i].bgcolor = bgcolor;
+                cards[i].bgcolor2 = bgcolor2;
+                cards[i].draw(xWidth - 179, y + 2, ctx);
+                break;
+            }
+        }
+        //Stop after three
+        if (thirdCard){
+            break;
+        }
+    }
     //Dispose of the placeholder cards
     while (cards.length > 0 && cards[cards.length - 1].placeholder == true){
         cards.pop();
@@ -669,7 +693,7 @@ function drawRegion(){
     ctx.fillText(legend, xWidth - 130, y + 73);
     //Fill the corruption counters, set the
     //click areas, and insert the values
-    var playerName, corruption, highlight, shadow, j, corruptPlayers;
+    var playerName, corruption, highlight, shadow, corruptPlayers;
     corruptPlayers = [];
     for (i = 0; i < players.length; i++){
         if (!players[i].noCorruption){

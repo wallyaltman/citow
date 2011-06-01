@@ -1830,7 +1830,7 @@ function drawBoard(blank, local){
     //Set up the players array
     var players = [];
     map.players = players;
-    var currentPlayer, $currentPower, powerName, newPlayer, figCount, figTypes;
+    var currentPlayer, $currentPower, powerName, playerName, newPlayer, figCount, figTypes;
     var allPowers = {};
     var numPowers = 0;
     //Dump the XML data for the individual powers into
@@ -1845,9 +1845,11 @@ function drawBoard(blank, local){
     for (i = 0; i < playerCount; i++){
         currentPlayer = playersXML[i];
         powerName = $(currentPlayer).attr("name");
+        playerName = $(currentPlayer).attr("playername");
         $currentPower = allPowers[powerName];
         newPlayer = {
             name : powerName,
+            playerName : playerName,
             idNum : i,
             highlight : $currentPower.attr("highlight"),
             shadow : $currentPower.attr("shadow"),
@@ -1892,8 +1894,7 @@ function drawBoard(blank, local){
     }
     //Load the Chaos Cards
     getChaosCards(board.expansion);
-    //Set up the regions array,
-    //and draw the regions
+    //Set up the regions array
     var regions = [];
     map.regions = regions;
     var newRegion, playerName;
@@ -2056,10 +2057,8 @@ function drawBoard(blank, local){
                 newRegion.figures.push(figure);
             }
         }
-        //Draw the region
-        newRegion.draw();
     }
-    //Set up and draw the scoreboard
+    //Set up the scoreboard
     var score = {};
     map.score = score;
     score.draw = drawScoreBoard;
@@ -2097,8 +2096,12 @@ function drawBoard(blank, local){
                 pp : Number($(this).attr("pp")) || 0,
                 active : isActive,
                 srcX : Number($(this).attr("srcx")),
-                srcY : Number($(this).attr("srcy"))
+                srcY : Number($(this).attr("srcy")),
             };
+            //Upgrade allowing a third card to be placed in a region
+            if ($(this).attr("extracard") == "true"){
+                obj.extraCard = true;
+            }
             currentPlayer.upgrades.push(obj);
         });
         //Set up scores
@@ -2113,6 +2116,11 @@ function drawBoard(blank, local){
         currentPlayer.dialValue = dialXML.getElementsByTagName("value")[0].firstChild.data;
         currentPlayer.dacs = dialXML.getElementsByTagName("dac")[0].firstChild ? dialXML.getElementsByTagName("dac")[0].firstChild.data : 0;
     }
+    //Draw the regions
+    for (i = 0; i < regionCount; i++){
+        regions[i].draw();
+    }
+    //Draw the scoreboard
     score.draw();
     //Set up the scoreboard controls
     buildScoreBoardControls();
@@ -2573,6 +2581,7 @@ function saveBoardXML(saveType){
         for (i = 0; i < players.length; ++i){
             node = xmlDoc.createElement("player");
             node.setAttribute("name", players[i].name);
+            node.setAttribute("playername", players[i].playerName);
             //Peasants
             node2 = xmlDoc.createElement("tokens");
             for (j = 0; j < players[i].peasants.length; j++){
