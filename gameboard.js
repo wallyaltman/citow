@@ -3029,8 +3029,8 @@ function hideMessage(){
 /* Set up the board.
  */
 function initialize(){
-    var board = document.getElementById("board");
-    var body = document.getElementById("body");
+    var board = $("#board")[0];
+    var $body = $("#body");
     //Set up the various controls and
     //components, and draw the initial board
     if (board.getContext){
@@ -3038,35 +3038,31 @@ function initialize(){
         //a board in local storage)
         board.parser = xmlParser();
         //Set handlers for the dropdown lists
-        var gamePick = document.getElementById("gamepick");
-        gamePick.onchange = getStates;
-        var statePick = document.getElementById("statepick");
-        var drawNow = document.getElementById("drawnow");
-        drawNow.onclick = function(){
+        var $gamePick = $("#gamepick");
+        var $statePick = $("#statepick");
+        $gamePick.change(getStates);
+        $("#drawnow").click(function(){
             //Reload the page with the requested data
-            var game = Number(gamePick.options[gamePick.selectedIndex].value);
-            var state = Number(statePick.options[statePick.selectedIndex].value);
+            var game = Number($gamePick[0].options[$gamePick[0].selectedIndex].value);
+            var state = Number($statePick[0].options[$statePick[0].selectedIndex].value);
             window.location = "gameboard.php?game=" + game + "&state=" + state;
-        }
+        });
         //Set up the save game/state buttons
-        var saveXMLstate = document.getElementById("savexmlstate");
-        saveXMLstate.onclick = function(){
+        $("#savexmlstate").click(function(){
             saveBoardXML("newstate");
-        };
-        var saveXMLgame = document.getElementById("savexmlgame");
-        saveXMLgame.onclick = function(){
+        });
+        $("#savexmlgame").click(function(){
             saveBoardXML("newgame");
-        };
-        var overwriteXMLstate = document.getElementById("overwritestate");
-        overwriteXMLstate.onclick = function(){
+        });
+        $("#overwritestate").click(function(){
             saveBoardXML("overwrite");
-        };
+        });
         //Set up the holding pen for
         //object drag-and-drop
-        var pen = document.createElement("div");
-        pen.className = "holding";
-        pen.id = "pen";
-        body.appendChild(pen);
+        var $pen = $(document.createElement("div"));
+        $pen.addClass("holding");
+        $pen.attr("id", "pen");
+        $body.append($pen);
         //Check for a board in local storage,
         //and restore it if one is found
         if (checkCompatibility().localStorage){
@@ -3076,13 +3072,14 @@ function initialize(){
         //stored board, or the selected saved one)
         drawBoard(false, localBoard);
         //Set up the list of Chaos cards
-        var cchead = document.getElementById("cchead");
-        cchead.items =  document.getElementById("cc0");
-        cchead.items2 =  document.getElementById("cc1");
-        cchead.open = clickOpen;
-        cchead.close = clickClosed;
-        cchead.onmousedown = cchead.open;
+        var $cchead = $("#cchead");
+        $cchead[0].items = $("#cc0")[0];
+        $cchead[0].items2 =  $("#cc1")[0];
+        $cchead[0].open = clickOpen;
+        $cchead[0].close = clickClosed;
+        $cchead.mousedown($cchead[0].open);
         //Set up the list of Old World cards
+        //HERE HERE
         var owchead = document.getElementById("owchead");
         owchead.items =  document.getElementById("owc");
         owchead.open = clickOpen;
