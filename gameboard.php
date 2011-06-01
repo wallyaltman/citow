@@ -232,7 +232,6 @@ echo '    <input type="button" id="savexmlstate" class="right warn" value="Save 
   </div>
   <div class="floatbox buttons clear">
     <div class="spacer"></div>
-    <input type="button" id="newboard" value="New Board" />
     <input type="button" id="savepng" class="right" value="Export as .PNG" />
 <?php
 echo '    <input type="button" id="overwritestate" class="right warn" value="Overwrite" '.$disabled.' />'."\n";

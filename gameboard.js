@@ -3040,16 +3040,13 @@ function initialize(){
         //Set handlers for the dropdown lists
         var gamePick = document.getElementById("gamepick");
         gamePick.onchange = getStates;
+        var statePick = document.getElementById("statepick");
         var drawNow = document.getElementById("drawnow");
         drawNow.onclick = function(){
-            //Draw a saved board
-            drawBoard(false);
-        }
-        //Set up the "New Board" button
-        var newBoard = document.getElementById("newboard");
-        newBoard.onclick = function(){
-            //Draw a blank board
-            drawBoard(true);
+            //Reload the page with the requested data
+            var game = Number(gamePick.options[gamePick.selectedIndex].value);
+            var state = Number(statePick.options[statePick.selectedIndex].value);
+            window.location = "gameboard.php?game=" + game + "&state=" + state;
         }
         //Set up the save game/state buttons
         var saveXMLstate = document.getElementById("savexmlstate");
