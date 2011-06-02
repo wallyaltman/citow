@@ -236,6 +236,7 @@ function updateSaveButtons(game, state){
 }
 
 /* Read in a saved XML board state file.
+ * TODO: Make this function asynchronous
  */
 function getBoardState(blank, expansion){
     var xmlhttp = xmlRequest();
@@ -2964,7 +2965,6 @@ function initialize(){
         $cchead[0].close = clickClosed;
         $cchead.mousedown($cchead[0].open);
         //Set up the list of Old World cards
-        //HERE HERE
         var $owchead = $("#owchead");
         $owchead[0].items =  $("#owc")[0];
         $owchead[0].open = clickOpen;
