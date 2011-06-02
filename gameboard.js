@@ -5,116 +5,27 @@
 
 /*** need to rewrite getGames, getStates, nextState ***/
 
-/* Read in the list of games for which
- * gamestates exist, and fill the
- * select dropdown accordingly.
- */
-function getGames(game){
-    var xmlhttp = xmlRequest();
-    var board = document.getElementById("board");
-    //File location
-    var loc = "../chaos/saves/";
-    var file = "save_manifest.json";
-    //Set the function to do the dirty work
-    //once the data (local or served) is in
-    var responseFunction = function(jsonResponse){
-        var gamesObject;
-        //Read the game list
-        gamesObject = JSON.parse(jsonResponse);
-        board.json = gamesObject;
-        var gamePick = document.getElementById("gamepick");
-        var statePick = document.getElementById("statepick");
-        //Reset the select elements
-        while(gamePick.hasChildNodes()){
-            gamePick.removeChild(gamePick.lastChild);
-        }
-        while(statePick.hasChildNodes()){
-            statePick.removeChild(statePick.lastChild);
-        }
-        var opt, key, maxKey = 0, selectedOpt, selectedStates;
-        //Iterate over the games and make
-        //select options for them
-        for (key in gamesObject){
-            if (gamesObject.hasOwnProperty(key)){
-                opt = document.createElement('option');
-                opt.text = "Game " + key
-                opt.id = "game" + key
-                opt.value = key;
-                //Select the option with maximum
-                //key < 1000
-                if (key > maxKey && key < 1000){
-                    maxKey = key;
-                }
-                gamePick.appendChild(opt);
-            }
-        }
-        //Set the designated game to be selected, or
-        //the game with highest game number < 1000 if
-        //none was indicated
-        game = game ? game : maxKey;
-        selectedOpt = document.getElementById("game" + game);
-        selectedOpt.selected = true;
-        //Retrieve states for the selected game
-        var state;
-        selectedStates = gamesObject["maxKey"];
-        for (var i = 0; i < selectedStates.length; i++){
-            opt = document.createElement('option');
-            state = String(selectedStates[i]);
-            while (state.length < 2){
-                state = "0" + state;
-            }
-            opt.text = "State " + +state;
-            opt.id = "state" + state;
-            opt.value = state;
-            //Select the last option
-            if (i == selectedStates.length){
-                opt.selected = true;
-            }
-            statePick.appendChild(opt);
-        }
-    };
-    if (xmlhttp) {
-        xmlhttp.onreadystatechange = function(){
-            if (this.readyState == 4 && this.status == 200){
-                responseFunction(this.responseText);
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
-        xmlhttp.open("GET", loc + file, true);
-        xmlhttp.send();
-    }
-    else {
-        return false;
-    }
-}
-
 /* Read in the list of gamestates for
  * the currently selected game.
  */
 function getStates(evt, game, state){
-    var xmlhttp = xmlRequest();
     //File location
     var loc = "../chaos/saves/";
     var file = "save_manifest.json";
-    var board = document.getElementById("board");
+    var board = $("#board")[0];
     var localObj = board.json;
     //Set the function to do the dirty work
     //once the data (local or served) is in
     var responseFunction = function(jsonResponse, obj){
         var gamesObject;
         //Read the game list
-        gamesObject = obj || JSON.parse(jsonResponse);
+        gamesObject = jsonResponse || obj;
         board.json = gamesObject;
-        var statePick = document.getElementById("statepick");
+        var $statePick = $("#statepick");
         //Identify the desired game
         var selectedStates = gamesObject[+game];
         //Reset the select options
-        while(statePick.hasChildNodes()){
-            statePick.removeChild(statePick.lastChild);
-        }
+        $statePick.children().remove();
         var opt, currState;
         //If no state was specified, then set
         //the last state to be selected
@@ -132,33 +43,20 @@ function getStates(evt, game, state){
             if (+currState == optState){
                 opt.selected = true;
             }
-            statePick.appendChild(opt);
+            $statePick.append(opt);
         }
     };
     //If no game was specified, read the gamePick
     //select element to get one
     if (!game){
-        var gamePick = document.getElementById("gamepick");
+        var gamePick = $("#gamepick")[0];
         game = gamePick[gamePick.selectedIndex].value;
     }
     if (localObj){
         responseFunction(null, localObj);
     }
-    else if (xmlhttp) {
-        xmlhttp.onreadystatechange = function(){
-            if (this.readyState == 4 && this.status == 200){
-                responseFunction(this.responseText, null);
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
-        xmlhttp.open("GET", loc + file, true);
-        xmlhttp.send();
-    }
     else {
-        return false;
+        $.getJSON(loc + file, responseFunction);
     }
 }
 
@@ -2910,42 +2808,35 @@ function unsavedBoard(saved, stifle){
 /* Display error or status messages.
  */
 function showMessage(content, type){
-    var message = document.getElementById("message");
-    var frame = message.firstElementChild;
-    var messageContent = document.getElementById("messagecontent");
+    var $message = $("#message");
+    var $frame = $message.children().first();
+    var $messageContent = $("#messagecontent");
     //Set the message type
     if (type == "okay"){
-        frame.className = "okay";
+        $frame.attr("class", "okay");
     }
     else if (type == "warning"){
-        frame.className = "warning";
+        $frame.attr("class", "warning");
     }
     else if (type == "error"){
-        frame.className = "error";
+        $frame.attr("class", "error");
     }
     //Set the message content
     var text = document.createTextNode(content);
-    messageContent.appendChild(text);
+    $messageContent.append(text);
     //Set the top margin based on the
     //message height;
-    var styles = getComputedStyle(frame, null) || frame.currentStyle;
+    var styles = getComputedStyle($frame[0], null) || $frame[0].currentStyle;
     var height = Number(styles.height.replace(/[^0-9.]/g,""));
     var border = Number(styles.borderTopWidth.replace(/[^0-9.]/g,""));
     var margin = Number(styles.marginTop.replace(/[^0-9.]/g,""));
     var padding = Number(styles.paddingTop.replace(/[^0-9.]/g,""));
     var topMargin = Math.floor(height / 2) + border + margin + padding;
-    frame.style.marginTop = "-" + topMargin + "px";
+    $frame.css("margin-top", "-" + topMargin + "px");
     //Move the message div to the front
-    toggleClass("z5", message, "on");
+    $message.toggleClass("z5", true);
     //Set a handler to clear the message
-    if (document.addEventListener){
-        //Decent browsers
-        document.addEventListener("click", hideMessage, false);
-    }
-    else if (document.attachEvent){
-        //Internet Explorer
-        document.attachEvent("onclick", hideMessage);
-    }
+    $(document).click(hideMessage);
 }
 
 /* Prompt the user for a yes/no or
@@ -3005,25 +2896,16 @@ function showPrompt(content, options, responder){
 /* Hide the message box.
  */
 function hideMessage(){
-    var message = document.getElementById("message");
-    var frame = message.firstElementChild;
-    var messageContent = document.getElementById("messagecontent");
+    var $message = $("#message");
+    var $frame = $message.children().first();
+    var $messageContent = $("#messagecontent");
     //Reset everything
-    frame.className = "";
-    while (messageContent.firstChild){
-        messageContent.removeChild(messageContent.firstChild);
-    }
-    frame.style.marginTop = "0px";
-    toggleClass("z5", message, "off");
+    $frame.removeClass();
+    $messageContent.children().remove();
+    $frame.css("margin-top", "0px");
+    $message.toggleClass("z5", false);
     //Remove the handler
-    if (document.removeEventListener){
-        //Decent browsers
-        document.removeEventListener("click", hideMessage, false);
-    }
-    else if (document.detachEvent){
-        //Internet Explorer
-        document.detachEvent("onclick", hideMessage);
-    }
+    $(document).unbind('click', hideMessage);
 }
 
 /* Set up the board.
@@ -3080,46 +2962,32 @@ function initialize(){
         $cchead.mousedown($cchead[0].open);
         //Set up the list of Old World cards
         //HERE HERE
-        var owchead = document.getElementById("owchead");
-        owchead.items =  document.getElementById("owc");
-        owchead.open = clickOpen;
-        owchead.close = clickClosed;
-        owchead.onmousedown = owchead.open;
+        var $owchead = $("#owchead");
+        $owchead[0].items =  $("#owc")[0];
+        $owchead[0].open = clickOpen;
+        $owchead[0].close = clickClosed;
+        $owchead.mousedown($owchead[0].open);
         //Draw the remaining Old World tokens
-        var owthead = document.getElementById("owthead");
-        owthead.items =  document.getElementById("owt");
-        owthead.open = clickOpen;
-        owthead.close = clickClosed;
-        owthead.onmousedown = owthead.open;
+        var $owthead = $("#owthead");
+        $owthead[0].items =  $("#owt")[0];
+        $owthead[0].open = clickOpen;
+        $owthead[0].close = clickClosed;
+        $owthead.mousedown($owthead[0].open);
         //Set relations so that the reserve
         //drawers can close each other
-        cchead.next = owchead;
-        owchead.next = owthead;
-        owthead.next = cchead;
+        $cchead[0].next = owchead;
+        $owchead[0].next = owthead;
+        $owthead[0].next = cchead;
         //Set up the save PNG button
-        var savePNG = document.getElementById("savepng");
-        savePNG.onclick = function(){
-            var board = document.getElementById("board");
-            var canvasData = board.toDataURL("image/png");
+        var $savePNG = $("#savepng");
+        $savePNG.click(function(){
+            var $board = $("#board");
+            var canvasData = $board[0].toDataURL("image/png");
             var postData = "canvas=" + canvasData;
-            var xmlhttp = xmlRequest();
-            if (xmlhttp) {
-                xmlhttp.onreadystatechange = function(){
-                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
-                        var board = document.getElementById("board");
-                        window.open("getmap.php?game=" + board.game + "&state=" + board.state, "_self");
-                        return true;
-                    }
-                };
-                xmlhttp.open("POST",'savepng.php',true);
-                xmlhttp.setRequestHeader('Content-Type', 'canvas/upload');
-                xmlhttp.send(postData);
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
+            $.post('savepng.php', postData, function(){
+                var board = $("#board")[0];
+                window.open("getmap.php?game=" + board.game + "&state=" + board.state, "_self");
+            });
+        });
     }
 }
-

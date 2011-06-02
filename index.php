@@ -209,7 +209,7 @@ foreach ($moddates as $gnum => $modtime){
 //List the current user's recent games, if any
 if (count($myrows) > 0){
     echo '    <section>', "\n";
-    echo '      <h1>My Games</h2>', "\n";
+    echo '      <h1>My Games</h1>', "\n";
     $rowcounter = 0;
     $hidestring = '';
     foreach ($myrows as $row){
@@ -251,7 +251,7 @@ if (count($myrows) > 0){
 
 ?>
     <section>
-      <h1>Recent Activity</h2>
+      <h1>Recent Activity</h1>
 <?php
 //See if the "recent" section should be expanded
 $rowcounter = 0;
