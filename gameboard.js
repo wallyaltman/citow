@@ -2877,6 +2877,7 @@ function checkLocalStorage(){
             if (root && root.getAttribute){
                 //Clear out the local copy
                 delete localStorage["gameboard"];
+								board.creator = root.getAttribute("creator");
                 //Return the board
                 return xmlDoc;
             }
