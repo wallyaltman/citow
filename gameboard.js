@@ -2877,6 +2877,7 @@ function checkLocalStorage(){
             if (root && root.getAttribute){
                 //Clear out the local copy
                 delete localStorage["gameboard"];
+								board.creator = root.getAttribute("creator");
                 //Return the board
                 return xmlDoc;
             }
@@ -3042,6 +3043,7 @@ function initialize(){
         gamePick.onchange = getStates;
         var statePick = document.getElementById("statepick");
         var drawNow = document.getElementById("drawnow");
+				var prohibitLocal = $("#localreferer").val() == 'true';
         drawNow.onclick = function(){
             //Reload the page with the requested data
             var game = Number(gamePick.options[gamePick.selectedIndex].value);
@@ -3068,8 +3070,9 @@ function initialize(){
         pen.id = "pen";
         body.appendChild(pen);
         //Check for a board in local storage,
-        //and restore it if one is found
-        if (checkCompatibility().localStorage){
+        //and restore it if one is found unless
+				//we got here from another board.
+        if (checkCompatibility().localStorage && !prohibitLocal){
             var localBoard = checkLocalStorage();
         }
         //Draw the starting board (either the locally

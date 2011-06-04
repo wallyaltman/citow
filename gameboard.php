@@ -235,6 +235,8 @@ echo '    <input type="button" id="savexmlstate" class="right warn" value="Save 
     <input type="button" id="savepng" class="right" value="Export as .PNG" />
 <?php
 echo '    <input type="button" id="overwritestate" class="right warn" value="Overwrite" '.$disabled.' />'."\n";
+$localreferer = preg_match('/gameboard\.php/', $_SERVER['HTTP_REFERER']) ? 'true' : '';
+echo '    <input type="hidden" id="localreferer" value="', $localreferer, '" />', "\n"; 
 ?>
   </div>
   <script>initialize();</script>
