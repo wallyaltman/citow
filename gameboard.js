@@ -1594,6 +1594,13 @@ function closePanels(evt){
     }
 }
 
+/**
+ * Set up the gameboard objects.
+ */
+function setupBoard(local){
+
+}
+
 /* Build and draw a new board.  A value of true for
  * the "blank" parameter draws a blank board.
  */
