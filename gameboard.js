@@ -1123,7 +1123,7 @@ function buildScoreBoardControls(){
     buttonPP.onclick = function(){
         var i, j, maxPP, inputPP;
         for (i = 0; i < players.length; i++){
-            maxPP = Number(board.info.getElementsByTagName("player")[i].getElementsByTagName("pp")[0].firstChild.data);
+            maxPP = Number(board.info.getElementsByTagName("power")[i].getElementsByTagName("pp")[0].firstChild.data);
             for (j = 0; j < players[i].upgrades.length; j++){
                 maxPP += players[i].upgrades[j].active ? players[i].upgrades[j].pp : 0;
             }
