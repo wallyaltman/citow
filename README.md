@@ -7,6 +7,7 @@ This is a web application for the manipulation and display of board states for
 
 The board manager is written in PHP and Javascript, and takes advantage of a
 few HTML5 technologies, most notably the `<canvas>` element.
+
 -------
 Files
 -----
