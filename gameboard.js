@@ -2924,6 +2924,7 @@ function initialize(){
         var $gamePick = $("#gamepick");
         var $statePick = $("#statepick");
         $gamePick.change(getStates);
+				var prohibitLocal = $("#localreferer").val() == 'true';
         $("#drawnow").click(function(){
             //Reload the page with the requested data
             var game = Number($gamePick[0].options[$gamePick[0].selectedIndex].value);
