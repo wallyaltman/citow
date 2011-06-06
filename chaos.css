@@ -4,10 +4,32 @@ body {
   line-height:1.2;
 }
 
+hgroup {
+	margin:0 0 10px 45px;
+}
 h1 {
   color:#BB1111;
   text-shadow: #200000 0px 0px 3px;
   padding:4px;
+}
+hgroup > h1 {
+	margin:-5px 0 3px 0;
+}
+hgroup > h2 {
+  color:#BB1111;
+  text-shadow: #200000 0px 0px 3px;
+	font-size:1.6em;
+	display:block;
+	margin-left:15px;
+	width:auto;
+}
+/* Server time */ 
+time {
+  position:relative;
+  top:-20px;
+  font-size:1em;
+  float:right;
+  padding:8px;
 }
 
 /**** index.php ****/
@@ -155,18 +177,34 @@ section a.more:active {
   text-shadow: #B300FF 1px 1px 0, #B300FF 1px -1px 0, #B300FF -1px -1px 0, #B300FF -1px 1px 0;
 }
 /*** Other ***/
-/* Server time */ 
-time {
-  position:relative;
-  top:-20px;
-  font-size:1em;
-  float:right;
-  padding:8px;
-}
 .hideme {
   display:none;
 }
 /**** gameboard.php ****/
+/*** Navigation ***/
+nav {
+	position:relative;
+	top:-75px;
+}
+nav > ul {
+	float:right;
+	padding:0;
+}
+nav li {
+	display:inline-block;
+	padding-right:8px;
+}
+nav a {
+	font-weight:bold;
+}
+nav a:link, nav a:visited {
+  color:#9922CC;
+  text-shadow: #110000 1px 1px 0;
+}
+nav a:active {
+  color:#000000;
+  text-shadow: #B300FF 1px 1px 0, #B300FF 1px -1px 0, #B300FF -1px -1px 0, #B300FF -1px 1px 0;
+}
 /*** Main content area (including canvas, and items appearing over it) ***/
 #main {
   float:left;

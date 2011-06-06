@@ -20,6 +20,9 @@ include $headerurl;
   <meta charset="utf-8" />
   <title>Chaos in the Old World - Game Board</title>
 <?php
+$gamenum = $_GET['game'];
+$statenum = $_GET['state'];
+
 $v = 8;
 echo '  <link rel="shortcut icon" href="favicon.ico" />'."\n";
 echo '  <link rel="stylesheet" href="'.$rooturl.'/style.css" />'."\n";
@@ -31,9 +34,33 @@ echo '  <script src="citow_draw.js" type="text/javascript"></script>'."\n";
 echo '  <script src="gameboard.js?v='.$v.'" type="text/javascript"></script>'."\n";
 echo '</head>'."\n";
 echo '<body id="body">'."\n";
+
 //Header bar is from header.php, included at the top
 echo $headerbar;
+
+//Display current time
+echo '  <time datetime="', date(DATE_ATOM), '">Current server time: ',
+     date('g:i A T'), '</time>', "\n";
+
+//Read in the game metadata, generating it first
+//if necessary
+if (!file_exists($dir.'owned_games.json')){
+    include "gamelist_q.php";
+}
+$rawdata = file_get_contents($dir.'owned_games.json');
+$jsondata = json_decode($rawdata);
+$creator = $jsondata->$gamenum->creator;
+echo '  <hgroup>', "\n";
+echo '    <h1>Chaos in the Old World - Game ', $gamenum, ' </h1>', "\n";
+echo '    <h2>Hosted by ', $creator, '</h2>', "\n";
+echo '  </hgroup>', "\n";
 ?>
+  <nav>
+		<ul>
+			<li><a href="index.php">Return to Index</a></li>
+			<li><a href="http://appliednerditry.com/tracker/bug_report_page.php">Report a Bug</a></li>
+		</ul>
+	</nav>
   <div id="handlebox">
     <div id="activehandle" class="lefthandle">
       <div id="activate" class="handlecontents"></div>
@@ -132,9 +159,6 @@ echo '        <img src="'.$rooturl.'/chaos/icons/figure_effects_txt2.png" id="wo
   <div class="floatbox buttons clear">
 <?php
 $dir = $docroot.$slash.'chaos'.$slash.'saves';
-
-$gamenum = $_GET['game'];
-$statenum = $_GET['state'];
 
 $matches = array();
 $states = array();
