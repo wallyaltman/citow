@@ -68,7 +68,7 @@ function nextState(game, callBackFunc, passAlong){
     //File location
     var loc = "../chaos/saves/";
     var file = "save_manifest.json";
-    var board = document.getElementById("board");
+    var board = $("#board")[0];
     var localObj = board.json;
     //Set the function to do the dirty work
     //once the data (local or served) is in
@@ -125,7 +125,7 @@ function nextState(game, callBackFunc, passAlong){
  */
 function updateGameStateList(game, state){
     var xmlhttp = xmlRequest();
-    var board = document.getElementById("board");
+    var board = $("#board")[0];
     //Set the function to do the dirty work,
     //including replacing the saves list
     var responseFunction = function(jsonResponse){
@@ -133,13 +133,11 @@ function updateGameStateList(game, state){
         //Read the game list
         gamesObject = JSON.parse(jsonResponse);
         board.json = gamesObject;
-        var statePick = document.getElementById("statepick");
+        var $statePick = $("#statepick");
         //Identify the desired game
         var selectedStates = gamesObject[game];
         //Reset the select options
-        while(statePick.hasChildNodes()){
-            statePick.removeChild(statePick.lastChild);
-        }
+				$statePick.children().remove();
         var opt;
         //If no state was specified, then set
         //the last state to be selected
@@ -157,7 +155,7 @@ function updateGameStateList(game, state){
             if (+currState == optState){
                 opt.selected = true;
             }
-            statePick.appendChild(opt);
+            $statePick.append(opt);
         }
         //Update the save buttons
         updateSaveButtons();
@@ -166,7 +164,7 @@ function updateGameStateList(game, state){
     //If no game was specified, read the gamePick
     //select element to get one
     if (!game){
-        var gamePick = document.getElementById("gamepick");
+        var gamePick = $("#gamepick")[0];
         game = gamePick[gamePick.selectedIndex].value;
     }
     if (xmlhttp) {
@@ -190,7 +188,7 @@ function updateGameStateList(game, state){
 /* Update the "Save as Game" and "Overwrite Game" buttons.
  */
 function updateSaveButtons(game, state){
-    var board = document.getElementById("board");
+    var board = $("#board")[0];
     if (!game){
         game = board.game;
     }
@@ -199,15 +197,15 @@ function updateSaveButtons(game, state){
     }
     //Make a callback function to do the work
     var buttonUpdate = function(game, stateNumNext, stateNum){
-        var board = document.getElementById("board");
-        var saveXMLButton = document.getElementById("savexmlstate");
-        var overwriteXMLstate = document.getElementById("overwritestate");
-        saveXMLButton.value = "Save as Game " + +game + ", State " + +stateNumNext;
-        overwriteXMLstate.value = "Overwrite Game " + +game + ", State " + +state;
+        var board = $("#board")[0];
+        var $saveXMLButton = $("#savexmlstate");
+        var $overwriteXMLstate = $("#overwritestate");
+        $saveXMLButton.val("Save as Game " + +game + ", State " + +stateNumNext);
+        $overwriteXMLstate.val("Overwrite Game " + +game + ", State " + +state);
         //Check for username matching the board's
         //creator, or a user with top-level permissions
-        var userLevel = document.getElementById("userlevel").value;
-        var userElement = document.getElementById("username");
+        var userLevel = $("#userlevel").val();
+        var userElement = $("#username")[0];
         var fail;
         if (userElement){
             var userName = userElement.firstChild.data;
@@ -223,12 +221,12 @@ function updateSaveButtons(game, state){
         //Enable the "Save as Game..." button for
         //an appropriate user
         if (!fail){
-            saveXMLButton.disabled = false;
-            overwriteXMLstate.disabled = false;
+            $saveXMLButton.prop("disabled", false);
+            $overwriteXMLstate.prop("disabled", false);
         }
         else {
-            saveXMLButton.disabled = true;
-            overwriteXMLstate.disabled = true;
+            $saveXMLButton.prop("disabled", true);
+            $overwriteXMLstate.prop("disabled", true);
         }
     };
     //Fill in the game and state number
