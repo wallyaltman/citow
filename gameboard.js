@@ -1099,7 +1099,6 @@ function buildScoreBoardControls(){
         pp.update = updateScoreBoard;
         pp.owner = players[i];   //For use by the createUpDownButtons function
         pp.draw = pp.update;
-        pp.addValue = addValue;  //For use with the board mousewheel listener
         pp.addEventListener('input',peasants.update,false);
         pp.onpropertychange = function(evt){
             var e = evt || window.event;
@@ -2186,36 +2185,6 @@ function drawBoard(blank, local){
         document.onmouseup = null;
     };
     board.onmousedown = board.press;
-    //Create the mousewheel handler
-    var wheelPP = function(amount, evt){
-        var board = document.getElementById("board");
-        var score = board.map.score;
-        var players = score.players;
-        var rows = document.getElementById("scorebody").rows;
-        var coord = this.cursorPos(evt);
-        var x = coord.x;
-        var y = coord.y;
-        //Check for a mousewheel-sensitive
-        //area under the cursor
-        for (var i = 0; i < players.length; i++){
-            if (players[i].playerRow.x0 <= x && x < players[i].playerRow.x1 && players[i].playerRow.y0 <= y && y < players[i].playerRow.y1){
-                //Look for the matching player name
-                //in the scoreboard controls table
-                var playerName = players[i].displayName;
-                for (var j = 0; j < rows.length; j++){
-                    if (rows[j].firstChild.innerText == playerName){
-                        //Call the add value method on
-                        //the PP input element
-                        rows[j].cells[2].firstChild.addValue(amount);
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-        return false;
-    };
-    addMouseWheelListener(board, wheelPP);
     //Set a handler for the onunload event that
     //saves the board to local storage if it
     //reports that it is unsaved
