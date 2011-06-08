@@ -125,15 +125,16 @@ echo '        <img src="'.$rooturl.'/chaos/icons/figure_effects_txt2.png" id="wo
            canvas element.  Get a better browser!</span>
     </canvas>
     <div id="resetbox">
-      <span class="emphasis">Reset PP:</span>
-      <div id="resetpp"></div>
       <span class="emphasis">Reset DACs:</span>
       <div id="resetdacs"></div>
+      <span class="emphasis">Reset Effects:</span>
+      <div id="reseteffects"></div>
     </div>
     <div id="ppbox">
-      <div id="inputbox" class="arrows">
-        <span id="ppspan" class="emphasis">PP:</span>
-      </div>
+      <div id="inputbox" class="arrows"></div>
+			<span id="ppspan" class="emphasis">PP:</span>
+      <div id="resetpp"></div>
+      <span class="emphasis">Reset PP:</span>
     </div>
   </div>
   <div id="piecesbox">

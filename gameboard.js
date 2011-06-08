@@ -999,13 +999,6 @@ function buildScoreBoardControls(){
     /*** PP and DACs reset buttons ***/
     var resetPP = document.getElementById("resetpp");
     var resetDACs = document.getElementById("resetdacs");
-    //Clean up any old stuff
-    while (resetPP.childNodes.length > 0){
-        resetPP.removeChild(resetPP.firstChild);
-    }
-    while (resetDACs.childNodes.length > 0){
-        resetDACs.removeChild(resetDACs.firstChild);
-    }
     //Set up the reset buttons and arming toggles
     var buttonPP = document.createElement("input");
     buttonPP.type = "button";
@@ -1591,6 +1584,21 @@ function closePanels(evt){
     }
 }
 
+/**
+ * Clear effect markers from all figures, and
+ * redraw all regions.
+ */
+function clearEffects(){
+		var $board = $("#board");
+		var regions = $board[0].map.regions;
+		$.each(regions, function(ind, region){
+				$.each(region.figures, function(indF, figure){
+						figure.clearAll();	
+				});
+				region.draw();
+		});
+}
+
 /* Build and draw a new board.  A value of true for
  * the "blank" parameter draws a blank board.
  */
@@ -1783,6 +1791,13 @@ function drawBoard(blank, local){
                 figCount = (k < 10) ? "0" + String(k) : String(k);
                 figure.objectID = modelTypes[j].substr(0,3) + figCount + newPlayer.name.substr(0,3);
                 figure.objectID.toUpperCase();
+								//Create a method to clear all markers
+								//from a figure
+								figure.clearAll = function(){
+										this.marker = false;
+										this.musk = false;
+										this.shield = false;
+								};
                 newPlayer[figTypes].push(figure);
             }
         }
@@ -2209,6 +2224,21 @@ function drawBoard(blank, local){
         if (!board.saved){
             saveBoardXML("local");
         }
+    };
+		//Hook up the figure effects reset control
+    var effectButton = document.createElement("input");
+    effectButton.type = "button";
+    effectButton.className = "right";
+    effectButton.disabled = "disabled";
+    effectButton.value = "Go!";
+    var toggleEffect = createToggleSwitch(effectButton, null, null, "disabled", true);
+    toggleEffect.className += " right";
+		$resetEffect = $("#reseteffects");
+    $resetEffect.append(effectButton);
+    $resetEffect.append(toggleEffect);
+    effectButton.onclick = function(){
+        clearEffects(); 
+        toggleEffect.flip();
     };
 }
 
@@ -2962,7 +2992,6 @@ function initialize(){
         $cchead[0].close = clickClosed;
         $cchead.mousedown($cchead[0].open);
         //Set up the list of Old World cards
-        //HERE HERE
         var $owchead = $("#owchead");
         $owchead[0].items =  $("#owc")[0];
         $owchead[0].open = clickOpen;
