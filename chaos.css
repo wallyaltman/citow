@@ -396,13 +396,13 @@ div.shiftbox img.black{
   background-color:#111111;
   border:4px ridge #8A08CC;
   height:75px;
-  width:180px;
 }
 #workbox > canvas {
   background-color:#303030;
 }
 #workbox > div {
   display:inline-block;
+	vertical-align:top;
 }
 #workbox > div > div:nth-of-type(2n-1){
   clear:both;
