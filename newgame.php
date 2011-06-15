@@ -51,28 +51,41 @@ $fail = false;
 //User verification, etc.
 if (!isset($_SESSION['username'])){
     $fail = true;
-    $error = '01';
+    $error = '01'; //Not logged in
+}
+else if (!isset($game)){
+		$fail = true;
+		$error = '12'; //No game number given
 }
 else if ($game < 1000 && $userlevel < 2){
     $fail = true;
-    $error = '02';
+    $error = '02'; //Insufficient user permissions
 }
 //Check for an existing file with the
 //same game & state numbers
 else if (file_exists($dir.$file)){
     $fail = true;
-    $error = '11';
+    $error = '11'; //Game already exists
 }
 //Check the HTTP_REFERER header, and fail if it's no good
 if (isset($_SERVER['HTTP_REFERER'])){
     $domain = parse_url($_SERVER['HTTP_REFERER']);
     $hostlist = array('localhost', 'www.appliednerditry.com', 'appliednerditry.com', 'appliednerditry.wallyaltman.com');
+		$matches = array();
+		preg_match('/^(\/chaos(dev)?)/', $domain['path'], $matches);
+		$path = (isset($matches[1]) && $matches[1] !== '')
+									? $matches[1]
+									: '/chaos';
     if (!in_array(strtolower($domain['host']), $hostlist)){
         $fail = true;
+				$error = '07'; //Invalid referer
+				$uri = 'http://appliednerditry.com/chaos';
     }
+		else {
+				$uri = 'http://' . $domain['host'] . $path;
+		}
 }    
 
-$uri = preg_replace('/\/\w+\.php$/', '', $_SERVER['HTTP_REFERER']);
 
 //Read in the blank board, edit it a bit, then write
 //it out as a new file
@@ -204,3 +217,4 @@ if (isset($error)){
     header('Location: ' . $uri . '/index.php?error=' . $error);
 }
 ?>
+

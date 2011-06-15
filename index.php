@@ -48,7 +48,9 @@ if (isset($_GET['error'])){
     $errorcode = $_GET['error'];
     //Create a table of error messages
     $errorlist = array( '01'=>'ERROR: Not logged in', '02'=>'ERROR: Insufficient user permissions',
-                        '11'=>'ERROR: File already exists', '51'=>'ERROR: Unknown I/O error');
+												'07'=>'ERROR: Invalid HTTP referer',
+												'11'=>'ERROR: File already exists', '12'=>'ERROR: No game number provided',
+												'51'=>'ERROR: Unknown I/O error');
     $message = $errorlist[$errorcode];
     $messageclass = is_numeric($errorcode)
                       ? 'errormsg msg'
