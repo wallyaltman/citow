@@ -137,7 +137,7 @@ function updateGameStateList(game, state){
         //Identify the desired game
         var selectedStates = gamesObject[game];
         //Reset the select options
-				$statePick.children().remove();
+        $statePick.children().remove();
         var opt;
         //If no state was specified, then set
         //the last state to be selected
@@ -504,6 +504,7 @@ function getOldWorldCards(cardSet){
             if (this.readyState == 4 && this.status == 200){
                 var xmlDoc = this.responseXML;
                 var board = document.getElementById("board");
+                var map = board.map;
                 var players = board.map.score.players;
                 var oldWorldCards = xmlDoc.getElementsByTagName("card");
                 var $owc = $("#owc");
@@ -519,8 +520,15 @@ function getOldWorldCards(cardSet){
                         symbol : {},
                         symbol2 : {},
                         type : "oldworld",
-                        dataid : oldWorldCards[i].getAttribute("dataid")
+                        dataid : oldWorldCards[i].getAttribute("dataid"),
+                        holder : (oldWorldCards[i].getAttribute("holder") == "true")
                     };
+                    //If the card can hold figures, insert
+                    //it into the holder cards array
+                    if (card.holder){
+                        map.holderCards.push(card);
+                        card.figures = [];
+                    }
                     card.symbol.name = "smallcomet";
                     card.symbol.draw = drawToken;
                     card.symbol2.name = "darkcomet";
@@ -593,6 +601,7 @@ function getChaosCards(expansion){
                 var xmlDoc = this.responseXML;
                 var chaosCards = xmlDoc.getElementsByTagName("card");
                 var board = document.getElementById("board");
+                var map = board.map;
                 var players = board.map.score.players;
                 $cc0 = $("#cc0");
                 $cc0.children().remove();
@@ -609,8 +618,15 @@ function getChaosCards(expansion){
                         draw : drawCard,
                         magic : (chaosCards[i].getAttribute("magic") == "true"),
                         magicIcon : {},
-                        type : "chaos"
+                        type : "chaos",
+                        holder : (chaosCards[i].getAttribute("holder") == "true")
                     };
+                    //If the card can hold figures, insert
+                    //it into the holder cards array
+                    if (card.holder) {
+                        map.holderCards.push(card);
+                        card.figures = [];
+                    }
                     //Check the player list for the card's owner, and
                     //link them.  Skip the rest if the card's owner
                     //isn't a player in the game (or the Old World).
@@ -1588,14 +1604,14 @@ function closePanels(evt){
  * redraw all regions.
  */
 function clearEffects(){
-		var $board = $("#board");
-		var regions = $board[0].map.regions;
-		$.each(regions, function(ind, region){
-				$.each(region.figures, function(indF, figure){
-						figure.clearAll();	
-				});
-				region.draw();
-		});
+    var $board = $("#board");
+    var regions = $board[0].map.regions;
+    $.each(regions, function(ind, region){
+        $.each(region.figures, function(indF, figure){
+            figure.clearAll();	
+        });
+        region.draw();
+    });
 }
 
 /* Build and draw a new board.  A value of true for
@@ -1790,13 +1806,13 @@ function drawBoard(blank, local){
                 figCount = (k < 10) ? "0" + String(k) : String(k);
                 figure.objectID = modelTypes[j].substr(0,3) + figCount + newPlayer.name.substr(0,3);
                 figure.objectID.toUpperCase();
-								//Create a method to clear all markers
-								//from a figure
-								figure.clearAll = function(){
-										this.marker = false;
-										this.musk = false;
-										this.shield = false;
-								};
+                //Create a method to clear all markers
+                //from a figure
+                figure.clearAll = function(){
+                    this.marker = false;
+                    this.musk = false;
+                    this.shield = false;
+                };
                 newPlayer[figTypes].push(figure);
             }
         }
@@ -1816,6 +1832,7 @@ function drawBoard(blank, local){
     var tempTokenList, tokenXML;
     map.idCrd = 0;
     map.idOWC = 0;
+    map.holderCards = [];
     for (i = 0; i < regionCount; i++){
         //Set up basic region information
         //and region methods
@@ -1885,9 +1902,23 @@ function drawBoard(blank, local){
                 cost : tempCardList[j].getAttribute("cost"),
                 magic : (tempCardList[j].getAttribute("magic") == "true"),
                 magicIcon : magicIcon,
-                name : tempCardList[j].firstChild.data,
-                type : "chaos"
+                type : "chaos",
+                holder : (tempCardList[j].getAttribute("holder") == "true")
             };
+            //Retrieve the card name
+            var nameArray = tempCardList[j].getElementsByTagName("cardname");
+            if (nameArray.length > 0){
+                newCard.name = nameArray[0].firstChild.data;
+            }
+            else {
+                newCard.name = tempCardList[j].firstChild.data;
+            }
+            //If the card can hold figures, insert
+            //it into the holder cards array
+            if (newCard.holder){
+                map.holderCards.push(newCard);
+                newCard.figures = [];
+            }
             newRegion.cards.push(newCard);
             tempOwner = tempCardList[j].getAttribute("owner");
             for (k = 0; k < playerCount; k++){
@@ -2055,16 +2086,30 @@ function drawBoard(blank, local){
     };
     for (i = 0; i < oldWorldCards.length; i++){
         newCard = {
-            name : oldWorldCards[i].firstChild.data,
             event : (oldWorldCards[i].getAttribute("event") == "true"),
             active : (oldWorldCards[i].getAttribute("active") == "true"),
             ctx : ctx,
             draw : drawCard,
             symbol : symbol,
             symbol2 : symbol2,
-            type : "oldworld"
+            type : "oldworld",
+            holder : (oldWorldCards[j].getAttribute("holder") == "true")
         };
-        map.idOWC++
+        //Find the card name
+        nameArray = oldWorldCards[j].getElementsByTagName("cardname");
+        if (nameArray.length > 0){
+            newCard.name = nameArray[0].firstChild.data;
+        }
+        else {
+            newCard.name = oldWorldCards[j].firstChild.data;
+        }
+        //If the card can hold figures, insert
+        //it into the holder cards array
+        if (newCard.holder){
+            map.holderCards.push(newCard);
+            newCard.figures = [];
+        }
+        map.idOWC++;
         idString = String(map.idOWC);
         idString = (idString.length == 1) ? "0" + idString : idString;
         newCard.objectID = "owc" + idString;
@@ -2134,7 +2179,7 @@ function drawBoard(blank, local){
             var y = coord.y;
             //Check for an object target
             //area under the cursor
-            var areas = this.map.regions.concat([this.map.oldWorld]);
+            var areas = this.map.holderCards.concat(this.map.regions.concat, this.map.oldWorld);
             for (i = 0; i < areas.length; i++){
                 if (areas[i].x0 <= x && x < areas[i].x1 && areas[i].y0 <= y && y < areas[i].y1){
                     areas[i].drop();
@@ -2194,7 +2239,7 @@ function drawBoard(blank, local){
             saveBoardXML("local");
         }
     };
-		//Hook up the figure effects reset control
+    //Hook up the figure effects reset control
     var effectButton = document.createElement("input");
     effectButton.type = "button";
     effectButton.className = "right";
@@ -2202,11 +2247,11 @@ function drawBoard(blank, local){
     effectButton.value = "Go!";
     var toggleEffect = createToggleSwitch(effectButton, null, null, "disabled", true);
     toggleEffect.className += " right";
-		$resetEffect = $("#reseteffects");
+    $resetEffect = $("#reseteffects");
     $resetEffect.append(effectButton);
     $resetEffect.append(toggleEffect);
     effectButton.onclick = function(){
-        clearEffects(); 
+        clearEffects();
         toggleEffect.flip();
     };
 }
@@ -2286,8 +2331,14 @@ function dropObject(){
         }
         pen.held = null;
     }
-    else if (pen.source){
-        pen.source.draw();
+    else {
+        if (pen.held.holder){
+            var index = map.holderCards.indexOf(pen.held);
+            map.holderCards.splice(index, 1);
+        }
+        if (pen.source){
+            pen.source.draw();
+        }
     }
     if (pen.held != null && pen.source != null){
         unsavedBoard();
@@ -2436,7 +2487,7 @@ function saveBoardXML(saveType){
     //whether there was an error that will
     //prevent saving on the server)
     var makeXML = function(gameNumber, gameState, newGame, local){
-        var i, j, node, node2, node3, textNode, value;
+        var i, j, node, node2, node3, textNode, cardName, value;
         //Create the board and find the root element
         var xmlDoc = newXMLDocument("boardstate");
         var boardState = xmlDoc.documentElement;
@@ -2458,9 +2509,11 @@ function saveBoardXML(saveType){
         var cards = board.map.oldWorld.cards;
         for (i = 0; i < cards.length; i++){
             node = xmlDoc.createElement("card");
-            textNode = xmlDoc.createTextNode('');
+            cardName = xmlDoc.createElement("cardname");
+            textNode = xmlDoc.createTextNode("");
             textNode.data = cards[i].name;
-            node.appendChild(textNode);
+            cardName.appendChild(textNode)
+            node.appendChild(cardName);
             if (cards[i].active){
                 node.setAttribute("active","true");
             }
@@ -2547,9 +2600,11 @@ function saveBoardXML(saveType){
                 if (regions[i].cards[j].magic){
                     node3.setAttribute("magic", true);
                 }
-                textNode = xmlDoc.createTextNode('');
-                textNode.data = regions[i].cards[j].name;
-                node3.appendChild(textNode);
+                cardName = xmlDoc.createElement("cardname");
+                textNode = xmlDoc.createTextNode("");
+                textNode.data = regions[i].cards[i].name;
+                cardName.appendChild(textNode);
+                node3.appendChild(cardName);
                 node2.appendChild(node3);
             }
             node.appendChild(node2);
@@ -2772,7 +2827,7 @@ function checkLocalStorage(){
             if (root && root.getAttribute){
                 //Clear out the local copy
                 delete localStorage["gameboard"];
-								board.creator = root.getAttribute("creator");
+                board.creator = root.getAttribute("creator");
                 //Return the board
                 return xmlDoc;
             }
@@ -2921,7 +2976,7 @@ function initialize(){
         var $gamePick = $("#gamepick");
         var $statePick = $("#statepick");
         $gamePick.change(getStates);
-				var prohibitLocal = $("#localreferer").val() == 'true';
+        var prohibitLocal = $("#localreferer").val() == 'true';
         $("#drawnow").click(function(){
             //Reload the page with the requested data
             var game = Number($gamePick[0].options[$gamePick[0].selectedIndex].value);
@@ -2946,7 +3001,7 @@ function initialize(){
         $body.append($pen);
         //Check for a board in local storage,
         //and restore it if one is found unless
-				//we got here from another board.
+        //we got here from another board.
         if (checkCompatibility().localStorage && !prohibitLocal){
             var localBoard = checkLocalStorage();
         }

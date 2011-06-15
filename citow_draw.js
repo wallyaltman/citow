@@ -11,6 +11,7 @@ function drawCard(x, y, ctx){
     var card = this;
     var x1 = x + 7;
     var y1 = y;
+    var width = 170;
     ctx.textBaseline = "bottom";
     //Draw a backdrop so that nothing shows
     //through the gaps when a card is moved
@@ -20,7 +21,7 @@ function drawCard(x, y, ctx){
     else if (card.type == "oldworld"){
         ctx.fillStyle = "#000000";
     }
-    ctx.fillRect(x1, y1, 170, 16);
+    ctx.fillRect(x1, y1, width, 16);
     ctx.beginPath();
     ctx.moveTo(x1 + .5, y1 + .65);
     ctx.bezierCurveTo(x1 - 7, y1 + .65, x1 - 7, y1 + 16.35, x1 + .5, y1 + 16.35);
@@ -30,9 +31,9 @@ function drawCard(x, y, ctx){
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(x1, y1 + .5);
-    ctx.lineTo(x1 + 170, y1 + .5);
+    ctx.lineTo(x1 + width, y1 + .5);
     ctx.moveTo(x1, y1 + 16.5);
-    ctx.lineTo(x1 + 170, y1 + 16.5);
+    ctx.lineTo(x1 + width, y1 + 16.5);
     //Draw two left-end cells for
     //Chaos cards
     if (card.type == "chaos"){
@@ -47,13 +48,13 @@ function drawCard(x, y, ctx){
         ctx.moveTo(x1 + 9.5, y1);
         ctx.lineTo(x1 + 9.5, y1 + 16);
     }
-    ctx.moveTo(x1 + 169.5, y1);
-    ctx.lineTo(x1 + 169.5, y1 + 16);
+    ctx.moveTo(x1 + width - 0.5, y1);
+    ctx.lineTo(x1 + width - 0.5, y1 + 16);
     ctx.stroke();
     //Draw the curved endcap
     ctx.lineWidth = 1.3;
     ctx.beginPath();
-    ctx.moveTo(x1 + .5, y1 + .65);
+    ctx.moveTo(x1 + 0.5, y1 + .65);
     ctx.bezierCurveTo(x1 - 7, y1 + .65, x1 - 7, y1 + 16.35, x1 + .5, y1 + 16.35);
     ctx.stroke();
     //Draw the fill for a Chaos card
@@ -64,7 +65,7 @@ function drawCard(x, y, ctx){
         //Draw the fill
         ctx.fillStyle = shadow || card.bgcolor;
         ctx.fillRect(x1 + 8, y1 + 2, 9, 13);
-        ctx.fillRect(x1 + 20, y1 + 2, 149, 13);
+        ctx.fillRect(x1 + 20, y1 + 2, width - 21, 13);
         ctx.fillRect(x1, y1 + 2, 5, 13);
     }
     //Draw the fill for an Old World card
@@ -73,7 +74,7 @@ function drawCard(x, y, ctx){
         var color2 = "#595959";
         ctx.fillStyle = "#111111";
         ctx.fillRect(x1, y1 + 2, 8, 13);
-        ctx.fillRect(x1 + 11, y1 + 2, 158, 13);
+        ctx.fillRect(x1 + 11, y1 + 2, width - 12, 13);
     }
     ctx.beginPath();
     ctx.moveTo(x1, y1 + 2);
@@ -84,7 +85,7 @@ function drawCard(x, y, ctx){
     if (!card.placeholder){
         //Set the card's bounding box
         card.x0 = x;
-        card.x1 = x + 178;
+        card.x1 = x + width + 8;
         card.y0 = y;
         card.y1 = y + 17;
         ctx.font = "12px Tahoma, Helvetica, sans-serif";
@@ -111,6 +112,67 @@ function drawCard(x, y, ctx){
                 }
             }
         }
+    }
+    //Draw figures held on the card
+    if (this.figures && this.figures.length > 0) {
+        /*//Count the figures of each type to
+        //determine spacing between groups
+        var space = width - 8;
+        for (i = 0; i < this.figures.length; i++){
+            if (this.figures[i].model == "cultist"){
+                space -= 9;
+            }
+            else if (this.figures[i].model == "warrior"){
+                space -= 12;
+            }
+            else {
+                space -= 16;
+            }
+        }
+        //If there's not enough space, shrink the figures
+        x1 = x + 5;
+        y1 = y + height - 1;
+        ctx.save();
+        var eachSpace, factor, transform;
+        if (space < 0){
+            ctx.translate(x1, y1);
+            factor = (width - 8) / (width - 8 - space);
+            //Keep two decimal places
+            factor = Math.floor(factor * 100) / 100;
+            ctx.scale(factor, factor);
+            //Save the transformation, to be applied to the
+            //figure's bounding box
+            transform = {
+                x : x1,
+                y : y1,
+                factor : factor
+            };
+            x1 = 0;
+            y1 = 0;
+            eachSpace = 0;
+        }
+        else {
+            transform = false;
+            eachSpace = Math.floor(space / (players.length - 1));
+        }*/
+        ctx.save();
+        var figure, transform;
+        transform = {
+            x : 0,
+            y : 0,
+            factor : -1
+        };
+        ctx.scale(-1, -1);
+        for (i = 0; i < players.length; i++){
+            playerName = players[i].name;
+            for (j = 0; j < this.figures.length; j++){
+                figure = this.figures[j];
+                if (playerName == figure.owner.name){
+                    x1 = figure.draw(x1, y1, ctx, transform);
+                }
+            }
+        }
+        ctx.restore();
     }
 }
 
@@ -605,7 +667,7 @@ function drawRegion(){
     var currentUpgrades;
     var thirdCard = false;
     for (i = 2; i < cards.length; i++){
-        currentUpgrades = cards[i].owner 
+        currentUpgrades = cards[i].owner
                                 ? (cards[i].owner.upgrades
                                         ? cards[i].owner.upgrades
                                         : [])
