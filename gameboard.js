@@ -523,12 +523,6 @@ function getOldWorldCards(cardSet){
                         dataid : oldWorldCards[i].getAttribute("dataid"),
                         holder : (oldWorldCards[i].getAttribute("holder") == "true")
                     };
-                    //If the card can hold figures, insert
-                    //it into the holder cards array
-                    if (card.holder){
-                        map.holderCards.push(card);
-                        card.figures = [];
-                    }
                     card.symbol.name = "smallcomet";
                     card.symbol.draw = drawToken;
                     card.symbol2.name = "darkcomet";
@@ -567,6 +561,13 @@ function getOldWorldCards(cardSet){
                             var idString = String(map.idOWC);
                             idString = (idString.length == 1) ? "0" + idString : idString;
                             pen.held.objectID = "owc" + idString;
+                            //If the card can hold figures, insert
+                            //it into the holder cards array
+                            if (pen.held.holder){
+                                map.holderCards.push(pen.held);
+                                pen.held.figures = [];
+                                pen.held.drop = dropObject;
+                            }
                             //Begin moving the card
                             pen.move(evt, xOffset, yOffset);
                         }
@@ -621,12 +622,6 @@ function getChaosCards(expansion){
                         type : "chaos",
                         holder : (chaosCards[i].getAttribute("holder") == "true")
                     };
-                    //If the card can hold figures, insert
-                    //it into the holder cards array
-                    if (card.holder) {
-                        map.holderCards.push(card);
-                        card.figures = [];
-                    }
                     //Check the player list for the card's owner, and
                     //link them.  Skip the rest if the card's owner
                     //isn't a player in the game (or the Old World).
@@ -683,6 +678,13 @@ function getChaosCards(expansion){
                                 var idString = String(map.idCrd);
                                 idString = (idString.length == 1) ? "0" + idString : idString;
                                 pen.held.objectID = "crd" + idString;
+                                //If the card can hold figures, insert
+                                //it into the holder cards array
+                                if (pen.held.holder){
+                                    map.holderCards.push(pen.held);
+                                    pen.held.figures = [];
+                                    pen.held.drop = dropObject;
+                                }
                                 //Begin moving the card
                                 pen.move(evt, xOffset, yOffset);
                             }
@@ -1801,7 +1803,8 @@ function drawBoard(blank, local){
                     type : "figure",
                     marker : false,
                     musk : false,
-                    shield : false
+                    shield : false,
+                    heldBy : newPlayer
                 };
                 figCount = (k < 10) ? "0" + String(k) : String(k);
                 figure.objectID = modelTypes[j].substr(0,3) + figCount + newPlayer.name.substr(0,3);
@@ -1903,7 +1906,8 @@ function drawBoard(blank, local){
                 magic : (tempCardList[j].getAttribute("magic") == "true"),
                 magicIcon : magicIcon,
                 type : "chaos",
-                holder : (tempCardList[j].getAttribute("holder") == "true")
+                holder : (tempCardList[j].getAttribute("holder") == "true"),
+                heldBy : newRegion
             };
             //Retrieve the card name
             var nameArray = tempCardList[j].getElementsByTagName("cardname");
@@ -1918,6 +1922,7 @@ function drawBoard(blank, local){
             if (newCard.holder){
                 map.holderCards.push(newCard);
                 newCard.figures = [];
+                newCard.drop = dropObject;
             }
             newRegion.cards.push(newCard);
             tempOwner = tempCardList[j].getAttribute("owner");
@@ -1971,6 +1976,7 @@ function drawBoard(blank, local){
                 }
                 if (token){
                     newRegion.tokens.push(token);
+                    token.heldBy = newRegion;
                 }
             }
         }
@@ -1996,6 +2002,7 @@ function drawBoard(blank, local){
                     figure.marker = (figureXML.getAttribute("marker") == "true");
                 }
                 newRegion.figures.push(figure);
+                figure.heldBy = newRegion;
             }
         }
     }
@@ -2093,21 +2100,23 @@ function drawBoard(blank, local){
             symbol : symbol,
             symbol2 : symbol2,
             type : "oldworld",
-            holder : (oldWorldCards[j].getAttribute("holder") == "true")
+            holder : (oldWorldCards[i].getAttribute("holder") == "true"),
+            heldBy : oldWorld
         };
         //Find the card name
-        nameArray = oldWorldCards[j].getElementsByTagName("cardname");
+        nameArray = oldWorldCards[i].getElementsByTagName("cardname");
         if (nameArray.length > 0){
             newCard.name = nameArray[0].firstChild.data;
         }
         else {
-            newCard.name = oldWorldCards[j].firstChild.data;
+            newCard.name = oldWorldCards[i].firstChild.data;
         }
         //If the card can hold figures, insert
         //it into the holder cards array
         if (newCard.holder){
             map.holderCards.push(newCard);
             newCard.figures = [];
+            newCard.drop = dropObject;
         }
         map.idOWC++;
         idString = String(map.idOWC);
@@ -2179,7 +2188,7 @@ function drawBoard(blank, local){
             var y = coord.y;
             //Check for an object target
             //area under the cursor
-            var areas = this.map.holderCards.concat(this.map.regions.concat, this.map.oldWorld);
+            var areas = this.map.holderCards.concat(this.map.regions, this.map.oldWorld);
             for (i = 0; i < areas.length; i++){
                 if (areas[i].x0 <= x && x < areas[i].x1 && areas[i].y0 <= y && y < areas[i].y1){
                     areas[i].drop();
@@ -2217,6 +2226,18 @@ function drawBoard(blank, local){
                 }
                 //Clear any object other than a figure
                 else {
+                    //If the object holds figures, remove it
+                    //from the holders array and return
+                    //its held figures
+                    if (pen.held.holder){
+                        var index = map.holderCards.indexOf(pen.held);
+                        map.holderCards.splice(index, 1);
+                        while (pen.held.figures.length > 0) {
+                            var figure = pen.held.figures.pop();
+                            figure.owner[figure.model + "s"].push(figure);
+                            figure.owner.draw();
+                        }
+                    }
                     pen.held = null;
                     //If the object was removed from a board
                     //location, flag the board as unsaved
@@ -2256,7 +2277,7 @@ function drawBoard(blank, local){
     };
 }
 
-/* Find the object (if any) that is the target
+/* Find te object (if any) that is the target
  * of a mouseclick within an area, and
  * activate it or begin dragging it.
  */
@@ -2307,7 +2328,8 @@ function dropObject(){
     else if (type == "token" && name == "peasant" && this.type == "playerrow"){
         objects = this.tokens;
     }
-    else if (type == "figure" && (this.type == "region" || this.type == "workshop")){
+    else if (type == "figure" && (this.type == "region" || this.type == "workshop" 
+                                || this.type == "chaos" || this.type == "oldworld")){
         objects = this.figures;
     }
     else if (type == "figure" && this.type == "player"){
@@ -2323,7 +2345,13 @@ function dropObject(){
     //place it and redraw the destination
     if (objects){
         objects.push(pen.held);
-        this.draw();
+        pen.held.heldBy = this;
+        if (this.type == "chaos" || this.type == "oldworld") {
+            this.heldBy.draw();
+        }
+        else {
+            this.draw();
+        }
         //If the destination is different than
         //the source, flag the board as "unsaved"
         if (this !== pen.source){
@@ -2332,7 +2360,18 @@ function dropObject(){
         pen.held = null;
     }
     else {
+        pen.held.heldBy = null;
+        //If the object holds figures, remove it
+        //from the holders array and return
+        //its held figures
         if (pen.held.holder){
+            var board = $("#board")[0];
+            var map = board.map;
+            while (pen.held.figures.length > 0) {
+                var figure = pen.held.figures.pop();
+                figure.owner[figure.model + "s"].push(figure);
+                figure.owner.draw();
+            }
             var index = map.holderCards.indexOf(pen.held);
             map.holderCards.splice(index, 1);
         }
@@ -2520,6 +2559,26 @@ function saveBoardXML(saveType){
             if (cards[i].event){
                 node.setAttribute("event","true");
             }
+            if (cards[i].holder){
+                node.setAttribute("holder","true");
+            }
+            if (cards[i].figures && cards[i].figures.length > 0){
+                node2 = xmlDoc.createElement("figures");
+                for (j = 0; j < cards[i].figures.length; j++){
+                    node3 = xmlDoc.createElement(cards[i].figures[j].model);
+                    node3.setAttribute("owner", cards[i].figures[j].owner.name);
+                    if (cards[i].figures[j].shield){
+                        node3.setAttribute("shield", "true");
+                    }
+                    if (cards[i].figures[j].musk){
+                        node3.setAttribute("musk", "true");
+                    }
+                    if (cards[i].figures[j].marker){
+                        node3.setAttribute("marker", "true");
+                    }
+                    node2.appendChild(node3);
+                }
+            }
             oldWorld.appendChild(node);
         }
         boardState.appendChild(oldWorld);
@@ -2600,9 +2659,12 @@ function saveBoardXML(saveType){
                 if (regions[i].cards[j].magic){
                     node3.setAttribute("magic", true);
                 }
+                if (regions[i].cards[j].holder){
+                    node3.setAttribute("holder", true);
+                }
                 cardName = xmlDoc.createElement("cardname");
                 textNode = xmlDoc.createTextNode("");
-                textNode.data = regions[i].cards[i].name;
+                textNode.data = regions[i].cards[j].name;
                 cardName.appendChild(textNode);
                 node3.appendChild(cardName);
                 node2.appendChild(node3);

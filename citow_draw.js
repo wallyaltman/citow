@@ -115,60 +115,31 @@ function drawCard(x, y, ctx){
     }
     //Draw figures held on the card
     if (this.figures && this.figures.length > 0) {
-        /*//Count the figures of each type to
-        //determine spacing between groups
-        var space = width - 8;
+        //Count the figures of each type to
+        //determine the space required
+        var space = 0;
         for (i = 0; i < this.figures.length; i++){
             if (this.figures[i].model == "cultist"){
-                space -= 9;
+                space += 9;
             }
             else if (this.figures[i].model == "warrior"){
-                space -= 12;
+                space += 12;
             }
             else {
-                space -= 16;
+                space += 16;
             }
         }
-        //If there's not enough space, shrink the figures
-        x1 = x + 5;
-        y1 = y + height - 1;
-        ctx.save();
-        var eachSpace, factor, transform;
-        if (space < 0){
-            ctx.translate(x1, y1);
-            factor = (width - 8) / (width - 8 - space);
-            //Keep two decimal places
-            factor = Math.floor(factor * 100) / 100;
-            ctx.scale(factor, factor);
-            //Save the transformation, to be applied to the
-            //figure's bounding box
-            transform = {
-                x : x1,
-                y : y1,
-                factor : factor
-            };
-            x1 = 0;
-            y1 = 0;
-            eachSpace = 0;
-        }
-        else {
-            transform = false;
-            eachSpace = Math.floor(space / (players.length - 1));
-        }*/
-        ctx.save();
-        var figure, transform;
-        transform = {
-            x : 0,
-            y : 0,
-            factor : -1
-        };
-        ctx.scale(-1, -1);
+        var figure;
+        var y2 = y1 + 16;
+        //Set the starting position for figure drawing
+        x1 = x1 + width - space - 2;
+        players = $("#board")[0].map.players;
         for (i = 0; i < players.length; i++){
             playerName = players[i].name;
             for (j = 0; j < this.figures.length; j++){
                 figure = this.figures[j];
                 if (playerName == figure.owner.name){
-                    x1 = figure.draw(x1, y1, ctx, transform);
+                    x1 = figure.draw(x1, y2, ctx);
                 }
             }
         }
