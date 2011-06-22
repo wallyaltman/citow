@@ -115,15 +115,15 @@ function drawCard(x, y, ctx){
         }
     }
     //Draw figures held on the card
-    if (this.figures && this.figures.length > 0) {
+    if (this.slot && this.slot.figures.length > 0) {
         //Count the figures of each type to
         //determine the space required
         var space = 0;
-        for (i = 0; i < this.figures.length; i++){
-            if (this.figures[i].model === "cultist"){
+        for (j = 0; j < this.slot.figures.length; j++){
+            if (this.slot.figures[j].model === "cultist"){
                 space += 9;
             }
-            else if (this.figures[i].model === "warrior"){
+            else if (this.slot.figures[j].model === "warrior"){
                 space += 12;
             }
             else {
@@ -135,16 +135,23 @@ function drawCard(x, y, ctx){
         //Set the starting position for figure drawing
         x1 = x1 + width - space - 2;
         players = $("#board")[0].map.players;
-        for (i = 0; i < players.length; i++){
-            playerName = players[i].name;
-            for (j = 0; j < this.figures.length; j++){
-                figure = this.figures[j];
+        for (j = 0; j < players.length; j++){
+            playerName = players[j].name;
+            for (k = 0; k < this.slot.figures.length; k++){
+                figure = this.slot.figures[k];
                 if (playerName === figure.owner.name){
                     x1 = figure.draw(x1, y2, ctx);
                 }
             }
         }
         ctx.restore();
+    }
+    if (this.slot) {
+        //Set the slot's bounding box (same as the card)
+        this.slot.x0 = x;
+        this.slot.x1 = x + width + 8;
+        this.slot.y0 = y;
+        this.slot.y1 = y + 17;
     }
 }
 
@@ -623,7 +630,7 @@ function drawRegion(){
     //cards (if any), inserting empty placeholder
     //cards where needed
     var cards = this.cards;
-    var blankCard;
+    var blankCard, slotNum;
     while (cards.length < 2){
         blankCard = {
             placeholder : true,
@@ -635,6 +642,7 @@ function drawRegion(){
     for (i = 0; i < 2; i++){
         cards[i].bgcolor = bgcolor;
         cards[i].bgcolor2 = bgcolor2;
+        cards[i].slot = this.slots[i];
         cards[i].draw(xWidth - 179, y + 22 + (18 * i), ctx);
     }
     //Draw a third card over the region name, if
@@ -913,6 +921,7 @@ function drawOldWorld(noslider){
         currentCard.color2 = color2;
         currentCard.bgcolor1 = bgcolor1;
         currentCard.bgcolor2 = bgcolor2;
+        currentCard.slot = this.slots[i];
         currentCard.draw(x - 16, y + (16 * i), ctx);
     }
     //Dispose of the placeholder cards

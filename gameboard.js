@@ -1812,7 +1812,7 @@ function drawBoard(blank, local){
     var idString;
     var borderXML, tempLinkList;
     var corruptionXML, corruptingPlayers, ruinTemp;
-    var tempFigureList, tempEffects, figure, figureXML, tempPlayers;
+    var tempFigureList, tempEffects, figure, figureXML, slotID, figureSlots, tempPlayers;
     var tempCardList, tempOwner, cards, newCard, magicIcon;
     var tempTokenList, tokenXML;
     map.idCrd = 0;
@@ -1947,7 +1947,17 @@ function drawBoard(blank, local){
         }
         /***Set up the region's figures***/
         tempFigureList = newRegion.xmlData.getElementsByTagName("figures")[0].childNodes;
+        figureSlots = newRegion.xmlData.getElementsByTagName("slot");
         newRegion.figures = [];
+        newRegion.slots = [];
+        for (j = 0; j < 3; j++) {
+            newRegion.slots[j] = {
+                figures : [],
+                type : "cardslot",
+                drop : dropObject,
+                heldBy : newRegion
+            }
+        }
         //Set up name-keyed references
         //to the players
         tempPlayers = {};
@@ -1955,6 +1965,7 @@ function drawBoard(blank, local){
             tempPlayers[players[j].name] = players[j];
         }
         //Divvy up the models
+        //Handle figures in the region base
         for (j = 0; j < tempFigureList.length; j++){
             figureXML = tempFigureList[j];
             if (figureXML.nodeType == 1){
@@ -1968,6 +1979,25 @@ function drawBoard(blank, local){
                 }
                 newRegion.figures.push(figure);
                 figure.heldBy = newRegion;
+            }
+        }
+        //Handle figures in the slots
+        for (j = 0; j < figureSlots.length; j++) {
+            tempFigureList = figureSlots[j].childNodes;
+            for (k = 0; k < tempFigureList.length; k++){
+                figureXML = tempFigureList[k];
+                if (figureXML.nodeType == 1){
+                    playerName = figureXML.getAttribute("owner");
+                    figTypes = figureXML.nodeName + "s";
+                    figure = tempPlayers[playerName][figTypes].shift();
+                    if (figure){
+                        figure.shield = (figureXML.getAttribute("shield") == "true");
+                        figure.musk = (figureXML.getAttribute("musk") == "true");
+                        figure.marker = (figureXML.getAttribute("marker") == "true");
+                    }
+                    newRegion.figures.push(figure);
+                    figure.heldBy = newRegion;
+                }
             }
         }
     }
@@ -2073,6 +2103,38 @@ function drawBoard(blank, local){
         newCard.objectID = "owc" + idString;
         oldWorld.cards.push(newCard);
     }
+    //Set up figure slots for the Old World track
+    oldWorld.slots = [];
+    for (i = 0; i < 7; i++) {
+        oldWorld.slots[i] = {
+            figures : [],
+            type : "cardslot",
+            drop : dropObject,
+            heldBy : oldWorld
+        }
+    }
+    figureSlots = oldWorldXML.getElementsByTagName("slot");
+    var slotNum;
+    //Handle figures in the slots
+    for (i = 0; i < figureSlots.length; i++) {
+        slotNum = figureSlots[i].getAttribute("id");
+        tempFigureList = figureSlots[i].childNodes;
+        for (j = 0; j < tempFigureList.length; j++){
+            figureXML = tempFigureList[j];
+            if (figureXML.nodeType == 1){
+                playerName = figureXML.getAttribute("owner");
+                figTypes = figureXML.nodeName + "s";
+                figure = tempPlayers[playerName][figTypes].shift();
+                if (figure){
+                    figure.shield = (figureXML.getAttribute("shield") == "true");
+                    figure.musk = (figureXML.getAttribute("musk") == "true");
+                    figure.marker = (figureXML.getAttribute("marker") == "true");
+                }
+                oldWorld.slots[slotNum].figures.push(figure);
+                figure.heldBy = oldWorld.slots[slotNum];
+            }
+        }
+    }
     //Set up the Old World active card
     //selection slider
     var owActive = document.getElementById("activate");
@@ -2137,7 +2199,18 @@ function drawBoard(blank, local){
             var y = coord.y;
             //Check for an object target
             //area under the cursor
-            var areas = this.map.regions.concat([this.map.oldWorld]);
+            var slots = [];
+            var regionCount = this.map.regions.length;
+            for (i = 0; i < regionCount; i++) {
+                for (j = 0; j < 3; j++) {
+                    slots.push(this.map.regions[i].slots[j]);
+                }
+            }
+            var oldWorldCount = this.map.oldWorld.slots.length;
+            for (i = 0; i < oldWorldCount; i++) {
+                slots.push(this.map.oldWorld.slots[i]);
+            }
+            var areas = slots.concat(this.map.regions, [this.map.oldWorld]);
             for (i = 0; i < areas.length; i++){
                 if (areas[i].x0 <= x && x < areas[i].x1 && areas[i].y0 <= y && y < areas[i].y1){
                     areas[i].drop();
@@ -2214,7 +2287,7 @@ function drawBoard(blank, local){
     };
 }
 
-/* Find te object (if any) that is the target
+/* Find the object (if any) that is the target
  * of a mouseclick within an area, and
  * activate it or begin dragging it.
  */
@@ -2222,6 +2295,14 @@ function dragObject(evt, x, y){
     var pen = document.getElementById("pen");
     //Figures in a region
     var figs = this.figures || [];
+    //Figures on a card slot
+    var slotFigs = [];
+    var i;
+    if (this.slots) {
+        for (i = 0; i < this.slots.length; i++) {
+            slotFigs[i] = this.slots[i].figures;
+        }
+    }
     //Figures in reserves
     var culs = this.cultists || [];
     var wars = this.warriors || [];
@@ -2229,6 +2310,7 @@ function dragObject(evt, x, y){
     var toks = this.tokens || [];
     var crds = this.cards || [];
     var objects = [figs, culs, wars, daes, toks, crds];
+    objects.concat(slotFigs);
     var i, j, xOffset, yOffset, nullCard;
     for (i = 0; i < objects.length; i++){
         for (j = 0; j < objects[i].length; j++){
@@ -2251,37 +2333,42 @@ function dropObject(){
     var pen = document.getElementById("pen");
     //Identify the type of object
     var type = pen.held.type;
-    var name = pen.held.name;
     var objects;
-    if (type == "chaos" && this.type == "region"){
-        objects = this.cards;
+    var target = this;
+    if (type !== "figure" && this.type === "cardslot") {
+        target = this.heldBy;
     }
-    else if (type == "oldworld" && this.type == "oldworldtrack"){
-        objects = this.cards;
+    if (type == "chaos" && target.type == "region"){
+        objects = target.cards;
     }
-    else if (type == "token" && (this.type == "region" || this.type == "pool")){
-        objects = this.tokens;
+    else if (type == "oldworld" && target.type == "oldworldtrack"){
+        objects = target.cards;
     }
-    else if (type == "token" && name == "peasant" && this.type == "playerrow"){
-        objects = this.tokens;
+    else if (type == "token" && (target.type == "region" || target.type == "pool")){
+        objects = target.tokens;
     }
-    else if (type == "figure" && (this.type == "region" || this.type == "workshop")){
-        objects = this.figures;
+    else if (type == "token" && name == "peasant" && target.type == "playerrow"){
+        objects = target.tokens;
     }
-    else if (type == "figure" && this.type == "player"){
+    else if (type == "figure" && (target.type == "region" || target.type == "workshop" || target.type == "cardslot" )){
+        objects = target.figures;
+    }
+    else if (type == "figure" && target.type == "player"){
         var figTypes = pen.held.model + "s";
-        objects = this[figTypes];
+        objects = target[figTypes];
         //Strip effects when returning a
         //figure to reserves
-        pen.held.shield = false;
-        pen.held.musk = false;
-        pen.held.marker = false;
+        pen.held.clearAll();
     }
     //If the destination matches the object,
     //place it and redraw the destination
     if (objects){
         objects.push(pen.held);
-        this.draw();
+        if (target.type === "cardslot") {
+            target.heldBy.draw();
+        } else {
+            target.draw();
+        }
         //If the destination is different than
         //the source, flag the board as "unsaved"
         if (this !== pen.source){
