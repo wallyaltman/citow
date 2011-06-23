@@ -514,6 +514,7 @@ function getOldWorldCards(cardSet){
                         xmlData : oldWorldCards[i],
                         name : oldWorldCards[i].firstChild.data,
                         event : (oldWorldCards[i].getAttribute("event") == "true"),
+                        holder : (oldWorldCards[i].getAttribute("holder") == "true"),
                         active : true,
                         draw : drawCard,
                         symbol : {},
@@ -608,6 +609,7 @@ function getChaosCards(expansion){
                         power : chaosCards[i].getAttribute("owner"),
                         draw : drawCard,
                         magic : (chaosCards[i].getAttribute("magic") == "true"),
+                        holder : (chaosCards[i].getAttribute("holder") == "true"),
                         magicIcon : {},
                         type : "chaos"
                     };
@@ -1884,6 +1886,7 @@ function drawBoard(blank, local){
         for (j = 0; j < tempCardList.length; j++){
             var newCard = {
                 cost : tempCardList[j].getAttribute("cost"),
+                holder : (tempCardList[j].getAttribute("holder") == "true"),
                 magic : (tempCardList[j].getAttribute("magic") == "true"),
                 magicIcon : magicIcon,
                 name : tempCardList[j].firstChild.data,
@@ -1955,7 +1958,8 @@ function drawBoard(blank, local){
                 figures : [],
                 type : "cardslot",
                 drop : dropObject,
-                heldBy : newRegion
+                heldBy : newRegion,
+                index : j
             }
         }
         //Set up name-keyed references
@@ -1984,6 +1988,7 @@ function drawBoard(blank, local){
         //Handle figures in the slots
         for (j = 0; j < figureSlots.length; j++) {
             tempFigureList = figureSlots[j].childNodes;
+            slotID = figureSlots[j].getAttribute("slotid");
             for (k = 0; k < tempFigureList.length; k++){
                 figureXML = tempFigureList[k];
                 if (figureXML.nodeType == 1){
@@ -1995,8 +2000,8 @@ function drawBoard(blank, local){
                         figure.musk = (figureXML.getAttribute("musk") == "true");
                         figure.marker = (figureXML.getAttribute("marker") == "true");
                     }
-                    newRegion.figures.push(figure);
-                    figure.heldBy = newRegion;
+                    newRegion.slots[slotID].figures.push(figure);
+                    figure.heldBy = newRegion.slots[slotID];
                 }
             }
         }
@@ -2091,6 +2096,7 @@ function drawBoard(blank, local){
             name : oldWorldCards[i].firstChild.data,
             event : (oldWorldCards[i].getAttribute("event") == "true"),
             active : (oldWorldCards[i].getAttribute("active") == "true"),
+            holder : (oldWorldCards[i].getAttribute("holder") == "true"),
             ctx : ctx,
             draw : drawCard,
             symbol : symbol,
@@ -2110,14 +2116,14 @@ function drawBoard(blank, local){
             figures : [],
             type : "cardslot",
             drop : dropObject,
-            heldBy : oldWorld
+            heldBy : oldWorld,
+            index : i
         }
     }
     figureSlots = oldWorldXML.getElementsByTagName("slot");
-    var slotNum;
     //Handle figures in the slots
     for (i = 0; i < figureSlots.length; i++) {
-        slotNum = figureSlots[i].getAttribute("id");
+        slotID = figureSlots[i].getAttribute("slotid");
         tempFigureList = figureSlots[i].childNodes;
         for (j = 0; j < tempFigureList.length; j++){
             figureXML = tempFigureList[j];
@@ -2130,8 +2136,8 @@ function drawBoard(blank, local){
                     figure.musk = (figureXML.getAttribute("musk") == "true");
                     figure.marker = (figureXML.getAttribute("marker") == "true");
                 }
-                oldWorld.slots[slotNum].figures.push(figure);
-                figure.heldBy = oldWorld.slots[slotNum];
+                oldWorld.slots[slotID].figures.push(figure);
+                figure.heldBy = oldWorld.slots[slotID];
             }
         }
     }
@@ -2309,8 +2315,7 @@ function dragObject(evt, x, y){
     var daes = this.daemons || [];
     var toks = this.tokens || [];
     var crds = this.cards || [];
-    var objects = [figs, culs, wars, daes, toks, crds];
-    objects.concat(slotFigs);
+    var objects = slotFigs.concat([figs, culs, wars, daes, toks, crds]);
     var i, j, xOffset, yOffset, nullCard;
     for (i = 0; i < objects.length; i++){
         for (j = 0; j < objects[i].length; j++){
@@ -2319,9 +2324,17 @@ function dragObject(evt, x, y){
                 pen.source = this;
                 xOffset = x - pen.held.x0;
                 yOffset = y - pen.held.y0;
+                //If the object being grabbed is a card, leave
+                //behind any figures
+                if (pen.held.slot) {
+                    pen.held.slot = null;
+                }
                 pen.move(evt, xOffset, yOffset);
                 break;
             }
+        }
+        if (pen.held) {
+            break;
         }
     }
 }
@@ -2335,8 +2348,14 @@ function dropObject(){
     var type = pen.held.type;
     var objects;
     var target = this;
-    if (type !== "figure" && this.type === "cardslot") {
-        target = this.heldBy;
+    if (this.type  === "cardslot") {
+        if (type !== "figure") {
+            target = this.heldBy;
+        } else if (!this.heldBy.cards[this.index] || !this.heldBy.cards[this.index].holder) {
+            target = this.heldBy.type === "region"
+                           ? this.heldBy
+                           : pen.held.owner;
+        }
     }
     if (type == "chaos" && target.type == "region"){
         objects = target.cards;
@@ -2526,7 +2545,7 @@ function saveBoardXML(saveType){
     //whether there was an error that will
     //prevent saving on the server)
     var makeXML = function(gameNumber, gameState, newGame, local){
-        var i, j, node, node2, node3, textNode, value;
+        var i, j, k, node, node2, node3, textNode, value;
         //Create the board and find the root element
         var xmlDoc = newXMLDocument("boardstate");
         var boardState = xmlDoc.documentElement;
@@ -2546,7 +2565,9 @@ function saveBoardXML(saveType){
         var oldWorld = xmlDoc.createElement("oldworld");
         oldWorld.setAttribute("set", board.owcset);
         var cards = board.map.oldWorld.cards;
+        var slots = board.map.oldWorld.slots;
         for (i = 0; i < cards.length; i++){
+            //Card data
             node = xmlDoc.createElement("card");
             textNode = xmlDoc.createTextNode('');
             textNode.data = cards[i].name;
@@ -2557,7 +2578,30 @@ function saveBoardXML(saveType){
             if (cards[i].event){
                 node.setAttribute("event","true");
             }
+            if (cards[i].holder){
+                node.setAttribute("holder","true");
+            }
             oldWorld.appendChild(node);
+            //Figures in card slot
+            if (slots[i].figures && slots[i].figures.length > 0) {
+                node = xmlDoc.createElement("slot");
+                node.setAttribute("slotid", i);
+                for (j = 0; j < slots[i].figures.length; j++) {
+                    node2 = xmlDoc.createElement(slots[i].figures[j].model);
+                    node2.setAttribute("owner", slots[i].figures[j].owner.name);
+                    if (slots[i].figures[j].shield){
+                        node2.setAttribute("shield", "true");
+                    }
+                    if (slots[i].figures[j].musk){
+                        node2.setAttribute("musk", "true");
+                    }
+                    if (slots[i].figures[j].marker){
+                        node2.setAttribute("marker", "true");
+                    }
+                    node.appendChild(node2);
+                }
+                oldWorld.appendChild(node);
+            }
         }
         boardState.appendChild(oldWorld);
         //Scoreboard
@@ -2615,6 +2659,7 @@ function saveBoardXML(saveType){
         //Regions map
         var map = xmlDoc.createElement("map");
         var regions = board.map.regions;
+        var slot;
         for (i = 0; i < regions.length; i++){
             //Region name
             node = xmlDoc.createElement("region");
@@ -2637,10 +2682,33 @@ function saveBoardXML(saveType){
                 if (regions[i].cards[j].magic){
                     node3.setAttribute("magic", true);
                 }
+                if (regions[i].cards[j].holder){
+                    node3.setAttribute("holder", true);
+                }
                 textNode = xmlDoc.createTextNode('');
                 textNode.data = regions[i].cards[j].name;
                 node3.appendChild(textNode);
                 node2.appendChild(node3);
+                if (regions[i].slots[j].figures && regions[i].slots[j].figures.length > 0) {
+                    node3 = xmlDoc.createElement("slot");
+                    node3.setAttribute("slotid", j);
+                    slot = regions[i].slots[j];
+                    for (k = 0; k < slot.figures.length; k++) {
+                        node4 = xmlDoc.createElement(slot.figures[k].model);
+                        node4.setAttribute("owner", slot.figures[k].owner.name);
+                        if (slot.figures[k].shield){
+                            node4.setAttribute("shield", "true");
+                        }
+                        if (slot.figures[k].musk){
+                            node4.setAttribute("musk", "true");
+                        }
+                        if (slot.figures[k].marker){
+                            node4.setAttribute("marker", "true");
+                        }
+                        node3.appendChild(node4);
+                    }
+                    node2.appendChild(node3);
+                }
             }
             node.appendChild(node2);
             //Corruption
