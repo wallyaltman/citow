@@ -515,6 +515,7 @@ function getOldWorldCards(cardSet){
                         name : oldWorldCards[i].firstChild.data,
                         event : (oldWorldCards[i].getAttribute("event") == "true"),
                         holder : (oldWorldCards[i].getAttribute("holder") == "true"),
+                        skull : (oldWorldCards[i].getAttribute("skull") == "true"),
                         active : true,
                         draw : drawCard,
                         symbol : {},
@@ -610,6 +611,7 @@ function getChaosCards(expansion){
                         draw : drawCard,
                         magic : (chaosCards[i].getAttribute("magic") == "true"),
                         holder : (chaosCards[i].getAttribute("holder") == "true"),
+                        skull : (chaosCards[i].getAttribute("skull") == "true"),
                         magicIcon : {},
                         type : "chaos"
                     };
@@ -1594,7 +1596,7 @@ function clearEffects(){
     var regions = $board[0].map.regions;
     $.each(regions, function(ind, region){
         $.each(region.figures, function(indF, figure){
-            figure.clearAll();	
+            figure.clearAll();
         });
         region.draw();
     });
@@ -1799,6 +1801,7 @@ function drawBoard(blank, local){
                     this.marker = false;
                     this.musk = false;
                     this.shield = false;
+                    this.skull = false;
                 };
                 newPlayer[figTypes].push(figure);
             }
@@ -1819,6 +1822,14 @@ function drawBoard(blank, local){
     var tempTokenList, tokenXML;
     map.idCrd = 0;
     map.idOWC = 0;
+    magicIcon = {
+        draw : drawToken,
+        name : "magic"
+    };
+    board.skullIcon = {
+        draw: drawToken,
+        name : "skull"
+    }
     for (i = 0; i < regionCount; i++){
         //Set up basic region information
         //and region methods
@@ -1879,14 +1890,11 @@ function drawBoard(blank, local){
         //Set up the region's chaos cards
         newRegion.cards = [];
         tempCardList = newRegion.xmlData.getElementsByTagName("card");
-        magicIcon = {
-            draw : drawToken,
-            name : "magic"
-        };
         for (j = 0; j < tempCardList.length; j++){
             var newCard = {
                 cost : tempCardList[j].getAttribute("cost"),
                 holder : (tempCardList[j].getAttribute("holder") == "true"),
+                skull : (tempCardList[j].getAttribute("skull") == "true"),
                 magic : (tempCardList[j].getAttribute("magic") == "true"),
                 magicIcon : magicIcon,
                 name : tempCardList[j].firstChild.data,
@@ -1980,6 +1988,7 @@ function drawBoard(blank, local){
                     figure.shield = (figureXML.getAttribute("shield") == "true");
                     figure.musk = (figureXML.getAttribute("musk") == "true");
                     figure.marker = (figureXML.getAttribute("marker") == "true");
+                    figure.skull = (figureXML.getAttribute("skull") == "true");
                 }
                 newRegion.figures.push(figure);
                 figure.heldBy = newRegion;
@@ -1999,6 +2008,7 @@ function drawBoard(blank, local){
                         figure.shield = (figureXML.getAttribute("shield") == "true");
                         figure.musk = (figureXML.getAttribute("musk") == "true");
                         figure.marker = (figureXML.getAttribute("marker") == "true");
+                        figure.skull = (figureXML.getAttribute("skull") == "true");
                     }
                     newRegion.slots[slotID].figures.push(figure);
                     figure.heldBy = newRegion.slots[slotID];
@@ -2097,6 +2107,7 @@ function drawBoard(blank, local){
             event : (oldWorldCards[i].getAttribute("event") == "true"),
             active : (oldWorldCards[i].getAttribute("active") == "true"),
             holder : (oldWorldCards[i].getAttribute("holder") == "true"),
+            skull : (oldWorldCards[i].getAttribute("skull") == "true"),
             ctx : ctx,
             draw : drawCard,
             symbol : symbol,
@@ -2135,6 +2146,7 @@ function drawBoard(blank, local){
                     figure.shield = (figureXML.getAttribute("shield") == "true");
                     figure.musk = (figureXML.getAttribute("musk") == "true");
                     figure.marker = (figureXML.getAttribute("marker") == "true");
+                    figure.skull = (figureXML.getAttribute("skull") == "true");
                 }
                 oldWorld.slots[slotID].figures.push(figure);
                 figure.heldBy = oldWorld.slots[slotID];
@@ -2383,6 +2395,13 @@ function dropObject(){
     //place it and redraw the destination
     if (objects){
         objects.push(pen.held);
+        //If the target is a card that holds dead
+        //figures, clear figure effects and set
+        //the skull marker
+        if (type === "figure" && !isNaN(target.index) && target.heldBy.cards && target.heldBy.cards[target.index].skull) {
+            pen.held.clearAll();
+            pen.held.skull = true;
+        }
         if (target.type === "cardslot") {
             target.heldBy.draw();
         } else {
@@ -2581,6 +2600,9 @@ function saveBoardXML(saveType){
             if (cards[i].holder){
                 node.setAttribute("holder","true");
             }
+            if (cards[i].skull){
+                node.setAttribute("skull","true");
+            }
             oldWorld.appendChild(node);
             //Figures in card slot
             if (slots[i].figures && slots[i].figures.length > 0) {
@@ -2597,6 +2619,9 @@ function saveBoardXML(saveType){
                     }
                     if (slots[i].figures[j].marker){
                         node2.setAttribute("marker", "true");
+                    }
+                    if (slots[i].figures[j].skull){
+                        node2.setAttribute("skull", "true");
                     }
                     node.appendChild(node2);
                 }
@@ -2685,6 +2710,9 @@ function saveBoardXML(saveType){
                 if (regions[i].cards[j].holder){
                     node3.setAttribute("holder", true);
                 }
+                if (regions[i].cards[j].skull){
+                    node3.setAttribute("skull", true);
+                }
                 textNode = xmlDoc.createTextNode('');
                 textNode.data = regions[i].cards[j].name;
                 node3.appendChild(textNode);
@@ -2704,6 +2732,9 @@ function saveBoardXML(saveType){
                         }
                         if (slot.figures[k].marker){
                             node4.setAttribute("marker", "true");
+                        }
+                        if (slot.figures[k].skull){
+                            node4.setAttribute("skull", "true");
                         }
                         node3.appendChild(node4);
                     }

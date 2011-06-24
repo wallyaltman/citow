@@ -271,6 +271,12 @@ function drawFigure(x0, y0, ctx, transform){
         ctx.beginPath();
         ctx.arc(x4, y4, 0.5, 0, 2 * Math.PI, true);
     }
+    //Skull marker
+    if (this.skull) {
+        x4 = Math.floor(x1 - ((r1 + 0.5)/ 2) - 4);
+        y4 = Math.floor(y0 - 8);
+        board.skullIcon.draw(x4, y4, ctx);
+    }
     //Store the figure's bounding box, accounting for
     //any transformations
     if (!transform){
@@ -312,7 +318,7 @@ function drawToken(x, y, ctx){
         this.x1 = x + dimX;
         this.y1 = y + dimY;
     };
-    
+
     //This is a special method, used only
     //for icons drawn with an alpha value
     var drawIconAlpha = function(x, y, ctx){
@@ -331,7 +337,7 @@ function drawToken(x, y, ctx){
         //Reset the alpha value
         ctx.globalAlpha = 1;
     };
-    
+
     //This method is for drawing upgrades
     //(which have uniform dimensions, and 
     //carry their own coordinate data)
@@ -348,11 +354,11 @@ function drawToken(x, y, ctx){
         this.x1 = x + dimX;
         this.y1 = y + dimY;
     };
-    
+
     board = document.getElementById("board");
     //Create a list of icons other than upgrades
-    allIcons = ["event", "hero", "noble", "peasant", "skaven", "warpstone",
-                "dac", "select", "unselect", "smallcomet", "darkcomet", "magic"];
+    allIcons = ["event", "hero", "noble", "peasant", "skaven", "warpstone", "dac",
+                "select", "unselect", "smallcomet", "darkcomet", "magic", "skull"];
     //Check whether this is an icon or upgrade,
     //and proceed accordingly
     if (allIcons.indexOf(this.name) >= 0){
@@ -374,8 +380,8 @@ function drawToken(x, y, ctx){
             if (!board.iconList.hasOwnProperty(this.name)){
                 //Starting (upper-left) coordinate positions for
                 //the tokens, in order (from the list above)
-                pos = [{x:1,y:1}, {x:21,y:1}, {x:41,y:1}, {x:1,y:21}, {x:21,y:21}, {x:41,y:21},
-                       {x:73,y:21}, {x:61,y:3}, {x:77,y:3}, {x:61,y:19}, {x:61,y:19}, {x:61,y:31}];
+                pos = [{x:1,y:1}, {x:21,y:1}, {x:41,y:1}, {x:1,y:21}, {x:21,y:21}, {x:41,y:21}, {x:73,y:21},
+                       {x:61,y:3}, {x:77,y:3}, {x:61,y:19}, {x:61,y:19}, {x:61,y:31}, {x:93,y:33}];
                 //Get the index of the current icon with respect
                 //to the icon list
                 number = allIcons.indexOf(this.name);
@@ -411,6 +417,10 @@ function drawToken(x, y, ctx){
                 else if (this.name === "magic"){
                     icon.width = 9;
                     icon.height = 9;
+                }
+                else if (this.name === "skull") {
+                    icon.width = 7;
+                    icon.height = 7;
                 }
                 //Insert the icon in the list
                 board.iconList[this.name] = icon;
