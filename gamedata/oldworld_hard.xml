@@ -5,7 +5,7 @@
   <card dataid="owc103" event="true">High Elf Protection</card>
   <card dataid="owc011">The Horned One's Due</card>
   <card dataid="owc104" event="true">The Light of Day</card>
-  <card dataid="owc105" holder="true">Morrslieb Eclipsed</card>
+  <card dataid="owc105" holder="true" skull="true">Morrslieb Eclipsed</card>
   <card dataid="owc106">Rousing the Rabble</card>
   <card dataid="owc107">Vermin Outbreak</card>
   <card dataid="owc108">The Warrens Erupt!</card>

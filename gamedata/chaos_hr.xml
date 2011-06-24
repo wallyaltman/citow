@@ -4,7 +4,7 @@
   <card owner="Khorne" cost="0">Terror</card>
   <card owner="Khorne" cost="1" holder="true">Hate</card>
   <card owner="Khorne" cost="1">Rampage</card>
-  <card owner="Khorne" cost="1" holder="true">Skulltaker</card>
+  <card owner="Khorne" cost="1" holder="true" skull="true">Skulltaker</card>
   <card owner="Khorne" cost="2">Lambs to the Slaughter</card>
   <card owner="Khorne" cost="4">Lure of Battle</card>
   <card owner="Nurgle" cost="0" magic="true">Filth</card>
