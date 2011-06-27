@@ -10,10 +10,14 @@ $docroot = realpath(getcwd() . $slash . '..');
 $dir = realpath($docroot.'/chaos/capture/').'/';
 
 //Get the raw POST data
-if (isset($GLOBALS["HTTP_RAW_POST_DATA"])){
-	// Get the data
-	$canvas = $GLOBALS['HTTP_RAW_POST_DATA'];
+$canvas = urldecode(file_get_contents("php://input"));
 
+//debug data
+$fp = fopen($dir . 'check.txt', 'w');
+fwrite($fp, $canvas . "\n");
+fclose($fp);
+
+if (isset($canvas)){
     //Remove the headers
     $canvasFiltered = substr($canvas, strpos($canvas, ',') + 1);
 
@@ -32,5 +36,11 @@ if (isset($GLOBALS["HTTP_RAW_POST_DATA"])){
     exec($command);
 
     echo $canvas;
+}
+else {
+    //Write debug data to a file
+    $fp = fopen($dir . 'fail.txt', 'w');
+    fwrite($fp, "It did not work" . "\n");
+    fclose($fp);
 }
 ?>
