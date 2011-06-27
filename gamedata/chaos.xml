@@ -23,7 +23,7 @@
   <card owner="Tzeentch" cost="1">The Meddling of Skaven</card>
   <card owner="Tzeentch" cost="1" magic="true">The Persistence of Change</card>
   <card owner="Tzeentch" cost="2" magic="true">Dazzle</card>
-  <card owner="Tzeentch" cost="-">--------------Horror--------------</card>
+  <card owner="Tzeentch" cost="-" holder="true">---Horror---</card>
   <card owner="Slaanesh" cost="0" magic="true">Abyssal Pact</card>
   <card owner="Slaanesh" cost="0">Perverse Infiltration</card>
   <card owner="Slaanesh" cost="1" magic="true">Dark Influence</card>
