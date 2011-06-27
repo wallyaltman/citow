@@ -547,6 +547,7 @@ function drawOldWorldActive(noRedraw){
 function drawRegion(){
     var ctx = this.ctx;
     var players = this.players;
+    var map = this.map;
     var i, j, k, l;
     ctx.textBaseline = "bottom";
     ctx.strokeStyle = "rgba(172, 49, 16, 1)";
@@ -800,9 +801,14 @@ function drawRegion(){
             ctx.fillText(corruption, x1 - 1, y1 + 13);
         }
     }
+    //Check whether the ruination card needs to be updated
+    var numRuined = Math.min(board.numRuined(), 4);
+    var ruinCard = board.ruination[numRuined];
+    if (ruinCard !== map.ruinCard) {
+        map.ruinCard = ruinCard;
+        ruinCard.draw();
+    }
     //Insert the old world tokens, if any
-    //var xArray = [2, 22, 42, 62, 2, 22, 42, 62, 2, 22, 42, 62, 82, 102, 122, 142, 162];
-    //var yArray = [21, 21, 21, 21, 41, 41, 41, 41, 61, 61, 61, 61, 61, 61, 61, 61, 61];
     var xArray = [2, 22, 42, 2, 22, 42, 2, 22, 42, 62, 82, 102, 122, 142];
     var yArray = [21, 21, 21, 41, 41, 41, 61, 61, 61, 61, 61, 61, 61, 61];
     for (i = 0; i < this.tokens.length; i++){
@@ -879,7 +885,8 @@ function drawOldWorld(noslider){
     var ctx = this.ctx;
     var x = 24;
     var y = 29;
-    var x2 = x + 161;
+    var width = 161;
+    var x2 = x + width;
     var i;
     var color1 = "#B0B0B0";
     var color2 = "#595959";
@@ -887,7 +894,7 @@ function drawOldWorld(noslider){
     var bgcolor2 = "#000000";
     //Clear the drawing area
     ctx.fillStyle = "#332211";
-    ctx.fillRect(x - 10, y - 24, x2, y + 112);
+    ctx.fillRect(x - 10, y - 24, width, 112);
     //Draw the outside border and fill
     //for the title box
     ctx.lineWidth = 1;
@@ -966,6 +973,106 @@ function drawOldWorld(noslider){
     this.y0 = y - 19;
     this.x1 = x2;
     this.y1 = y + 112;
+}
+
+/**
+ * Draw the currently showing ruination card.
+ */
+function drawRuination() {
+    var ctx = this.ctx;
+    var x = 195;    //Coordinates of the upper-left corner
+    var y = 29;     //of the ruination card
+    var width = 56;
+    var lineHeight = 14;
+    //Get the list of abbreviated region names
+    var shortRegions = $.map(this.map.regions, function (region) {
+        return region.shortName;
+    });
+    var bgcolor = "#1A1109";
+    var textcolor = "#CC7711";
+    var bordercolor = "#BB7711";
+    ctx.strokeStyle = bordercolor;
+    ctx.lineWidth = 1;
+    ctx.font = "12px Tahoma, Helvetica, sans-serif";
+    var x1 = x;
+    var y1 = y;
+    var x2 = x + width;
+    var y2 = y + lineHeight;
+    var value, lastValue;
+    var textString, count, textWidth;
+    //Draw the top cell, with the ruiners VP
+    //Draw the cell borders
+    ctx.fillStyle = bgcolor;
+    ctx.fillRect(x1, y1, width, lineHeight);
+    ctx.beginPath();
+    ctx.moveTo(x1 + 0.5, y2);
+    ctx.lineTo(x1 + 0.5, y1);
+    ctx.moveTo(x1, y1 + 0.5);
+    ctx.lineTo(x2, y1 + 0.5);
+    ctx.moveTo(x2 - 0.5, y1);
+    ctx.lineTo(x2 - 0.5, y2);
+    ctx.moveTo(x2, y2 + 0.5);
+    ctx.lineTo(x1, y2 + 0.5);
+    ctx.stroke();
+    //Draw the text
+    ctx.fillStyle = textcolor;
+    ctx.fillText("Ruiners:", x1 + 2, y2);
+    textWidth = ctx.measureText(this.ruiners).width;
+    ctx.fillText(this.ruiners, x2 - (textWidth + 1), y2);
+    //Increment the y-coordinates
+    y1 = y2;
+    y2 += lineHeight;
+    //Loop through all the regions, build text strings,
+    //and draw them
+    $(this.regions).each(function (i) {
+        value = String(this);
+        if (value === lastValue && count < 2) {
+            count += 1;
+            textString += "," + shortRegions[i];
+        } else {
+            if (lastValue) {
+                /** Draw the previous card entry **/
+                //Draw the cell borders
+                ctx.fillStyle = bgcolor;
+                ctx.fillRect(x1, y1 + 1, width, lineHeight);
+                ctx.beginPath();
+                ctx.moveTo(x1 + 0.5, y2);
+                ctx.lineTo(x1 + 0.5, y1);
+                ctx.moveTo(x2 - 0.5, y1);
+                ctx.lineTo(x2 - 0.5, y2);
+                ctx.stroke();
+                //Draw the text
+                ctx.fillStyle = textcolor;
+                ctx.fillText(textString, x1 + 2, y2);
+                textWidth = ctx.measureText(lastValue).width;
+                ctx.fillText(lastValue, x2 - (textWidth + 1), y2);
+                //Increment the y-coordinates
+                y1 = y2;
+                y2 += lineHeight;
+            }
+            //Replace the text string
+            count = 0;
+            textString = shortRegions[i];
+        }
+        lastValue = value;
+    });
+    /** Draw the final card entry **/
+    //Draw the cell borders
+    ctx.fillStyle = bgcolor;
+    ctx.fillRect(x1, y1, width, lineHeight);
+    ctx.beginPath();
+    ctx.moveTo(x1 + 0.5, y1);
+    ctx.lineTo(x1 + 0.5, y2);
+    ctx.moveTo(x1, y2 + 0.5);
+    ctx.lineTo(x2, y2 + 0.5);  //Close the bottom
+    ctx.moveTo(x2 - 0.5, y2);
+    ctx.lineTo(x2 - 0.5, y1);
+    ctx.stroke();
+    //Draw the text
+    ctx.fillStyle = textcolor;
+    ctx.fillText(textString, x1 + 2, y2);
+    textWidth = ctx.measureText(lastValue).width;
+    ctx.fillText(lastValue, x2 - (textWidth + 1), y2);
 }
 
 /* Draw the scoreboard.

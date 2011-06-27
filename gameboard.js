@@ -1653,7 +1653,7 @@ function drawBoard(blank, local){
     board.map = {};
     var map = board.map;
     map.xmlData = mapXML;
-    var regionsXML = mapXML.getElementsByTagName("region");
+    var $regionsXML = $(mapXML).find("region");
     var scoreXML = state.getElementsByTagName("scoreboard")[0];
     var playersXML = scoreXML.getElementsByTagName("player");
     var playerCount = playersXML.length;
@@ -1669,16 +1669,10 @@ function drawBoard(blank, local){
     //Load the Old World cards
     getOldWorldCards(board.owcset);
     //Create references to the XML setup data
-    var powerSetupXML = info.getElementsByTagName("ruinouspowers")[0]; //XML node
-    var regionSetupXML = info.getElementsByTagName("region");  //Array of nodes
-    var regionCount = regionSetupXML.length;
-    var tokensTemp = info.getElementsByTagName("tokens")[0].childNodes;
-    var tokenSetupXML = [];
-    for (i = 0; i < tokensTemp.length; i++){
-        if (tokensTemp[i].nodeType == 1){
-            tokenSetupXML.push(tokensTemp[i]);
-        }
-    }
+    var $powerSetupXML = $(info).find("ruinouspowers").children();
+    var $regionSetupXML = $(info).find("region");
+    var regionCount = $regionSetupXML.length;
+    var $tokenSetupXML = $(info).find("tokens").children();
     //Set up the old world tokens pool
     map.tokenPool = {};
     var tokenName, token, supply, tempArray;
@@ -1716,11 +1710,11 @@ function drawBoard(blank, local){
     var tokenSet = [pool.event, pool.hero, pool.noble, pool.peasant, pool.skaven, pool.warpstone];
     for (i = 0; i < tokenSet.length; i++){
         tokenName = tokenSet[i].name;
-        for (j = 0; j < tokenSetupXML.length; j++){
-            if (tokenSetupXML[j].nodeName == tokenName){
-                supply = tokenSetupXML[j].firstChild.data;
+        $tokenSetupXML.each(function () {
+            if (this.nodeName === tokenName){
+                supply = $(this).text();
             }
-        }
+        });
         for (j = 0; j < supply; j++){
             token = {
                 draw : drawToken,
@@ -1743,7 +1737,7 @@ function drawBoard(blank, local){
     var numPowers = 0;
     //Dump the XML data for the individual powers into
     //an object, as jQuery objects keyed by name
-    $("power", powerSetupXML).each(function(){
+    $powerSetupXML.each(function () {
         var name = $(this).find("name").text();
         allPowers[name] = $(this);
         numPowers += 1;
@@ -1814,15 +1808,9 @@ function drawBoard(blank, local){
     //Set up the regions array
     var regions = [];
     map.regions = regions;
-    var newRegion, playerName;
-    var idString;
-    var borderXML, tempLinkList;
-    var corruptionXML, corruptingPlayers, ruinTemp;
-    var tempFigureList, tempEffects, figure, figureXML, slotID, figureSlots, tempPlayers;
-    var tempCardList, tempOwner, cards, newCard, magicIcon;
-    var tempTokenList, tokenXML;
     map.idCrd = 0;
     map.idOWC = 0;
+    var magicIcon, skullIcon;
     magicIcon = {
         draw : drawToken,
         name : "magic"
@@ -1831,37 +1819,47 @@ function drawBoard(blank, local){
         draw: drawToken,
         name : "skull"
     }
-    for (i = 0; i < regionCount; i++){
+    $regionSetupXML.each(function (i) {
+        var newRegion, regionXML, playerName;
+        var idString;
+        var $borderXML, $tempLinkList;
+        var $corruptionXML, corruptPlayerCount, corruptingPlayers, $ruinTemp;
+        var $tempFigureList, tempEffects, figure, figureXML, slotID, $figureSlots, tempPlayers;
+        var tempCardList, tempOwner, cards, newCard;
+        var $tempTokenList;
+        regionXML = $regionsXML[i];
         //Set up basic region information
         //and region methods
         newRegion = {
-            name : regionSetupXML[i].getElementsByTagName("name")[0].firstChild.data,
+            name : $(this).find("name").text(),
+            shortName : $(this).attr("short"),
             idNum : i,
             draw : drawRegion,
             drag : dragObject,
             drop : dropObject,
             ctx : ctx,
             players : players,
-            xmlData : regionsXML[i],
-            populated : (regionSetupXML[i].getAttribute("populated") == "true"),
-            resistance : regionSetupXML[i].getElementsByTagName("resistance")[0].firstChild.data,
-            type : "region"
+            xmlData : regionXML,
+            populated : ($(this).attr("populated") === "true"),
+            resistance : $(this).find("resistance").text(),
+            type : "region",
+            map : map
         };
         regions.push(newRegion);
         //Set up the region's border and links
         //to adjacent regions
-        borderXML = regionSetupXML[i].getElementsByTagName("border")[0];
+        $borderXML = $(this).find("border");
         newRegion.border = {
-            row : Number(borderXML.getAttribute("row")),
-            col : Number(borderXML.getAttribute("col"))
+            row : Number($borderXML.attr("row")),
+            col : Number($borderXML.attr("col"))
         };
-        tempLinkList = borderXML.getElementsByTagName("link");
+        $tempLinkList = $borderXML.find("link");
         newRegion.links = [];
-        for (j = 0; j < tempLinkList.length; j++){
-            newRegion.links.push(tempLinkList[j].firstChild.data);
-        }
+        $tempLinkList.each(function () {
+            newRegion.links.push($(this).text());
+        });
         //Set up the region's corruption
-        corruptionXML = newRegion.xmlData.getElementsByTagName("corruption");
+        $corruptionXML = $(regionXML).find("corruption");
         newRegion.corruption = [];
         corruptPlayerCount = 0;
         for (j = 0; j < playerCount; j++){
@@ -1878,33 +1876,37 @@ function drawBoard(blank, local){
             newRegion.corruption[corruptPlayerCount - 1].draw = function(){
                 this.region.draw();
             };
-            for (k = 0; k < corruptionXML.length; k++){
-                if (newRegion.corruption[corruptPlayerCount - 1].owner.name == corruptionXML[k].getAttribute("owner")){
-                    newRegion.corruption[corruptPlayerCount - 1].value = Number(corruptionXML[k].firstChild.data);
-                    break;
+            $corruptionXML.each(function () {
+                if (newRegion.corruption[corruptPlayerCount - 1].owner.name === $(this).attr("owner")){
+                    newRegion.corruption[corruptPlayerCount - 1].value = Number($(this).text());
                 }
-            }
+            });
         }
+        //Set up the region's ruination values
+        newRegion.ruination = [];
+        $(this).find("ruination").children().each(function (j) {
+            newRegion.ruination[j] = $(this).text();
+        });
         //Set the region's ruination rank, if ruined
-        ruinTemp = newRegion.xmlData.getElementsByTagName("ruined")[0];
-        newRegion.ruined = ruinTemp ? ruinTemp.firstChild.data : 0;
+        $ruinTemp = $(this).find("ruined");
+        newRegion.ruined = $ruinTemp ? $ruinTemp.text() : 0;
         //Set up the region's chaos cards
         newRegion.cards = [];
-        tempCardList = newRegion.xmlData.getElementsByTagName("card");
-        for (j = 0; j < tempCardList.length; j++){
+        $tempCardList = $(regionXML).find("card");
+        $tempCardList.each(function () {
             var newCard = {
-                cost : tempCardList[j].getAttribute("cost"),
-                holder : (tempCardList[j].getAttribute("holder") == "true"),
-                skull : (tempCardList[j].getAttribute("skull") == "true"),
-                magic : (tempCardList[j].getAttribute("magic") == "true"),
+                cost : $(this).attr("cost"),
+                holder : ($(this).attr("holder") === "true"),
+                skull : ($(this).attr("skull") === "true"),
+                magic : ($(this).attr("magic") === "true"),
                 magicIcon : magicIcon,
-                name : tempCardList[j].firstChild.data,
+                name : $(this).text(),
                 type : "chaos"
             };
             newRegion.cards.push(newCard);
-            tempOwner = tempCardList[j].getAttribute("owner");
+            tempOwner = $(this).attr("owner");
             for (k = 0; k < playerCount; k++){
-                if (tempOwner == players[k].name){
+                if (tempOwner === players[k].name){
                     newCard.owner = players[k];
                     map.idCrd++;
                     idString = String(map.idCrd);
@@ -1923,43 +1925,40 @@ function drawBoard(blank, local){
                 newCard.objectID.toUpperCase();
                 newCard.draw = drawCard;
             }
-        }
+        });
         //Assign the old world tokens
-        tempTokenList = newRegion.xmlData.getElementsByTagName("tokens")[0].childNodes;
+        $tempTokenList = $(regionXML).find("tokens").children();
         newRegion.tokens = [];
-        for (j = 0; j < tempTokenList.length; j++){
-            tokenXML = tempTokenList[j];
-            if (tokenXML.nodeType == 1){
-                tokenName = tokenXML.nodeName;
-                switch (tokenName){
-                case "event":
-                    token = map.tokenPool.event.tokens.shift();
-                    break;
-                case "hero":
-                    token = map.tokenPool.hero.tokens.shift();
-                    break;
-                case "noble":
-                    token = map.tokenPool.noble.tokens.shift();
-                    break;
-                case "peasant":
-                    token = map.tokenPool.peasant.tokens.shift();
-                    break;
-                case "skaven":
-                    token = map.tokenPool.skaven.tokens.shift();
-                    break;
-                case "warpstone":
-                    token = map.tokenPool.warpstone.tokens.shift();
-                    break;
-                }
-                if (token){
-                    newRegion.tokens.push(token);
-                    token.heldBy = newRegion;
-                }
+        $tempTokenList.each(function () {
+            tokenName = this.nodeName;
+            switch (tokenName){
+            case "event":
+                token = map.tokenPool.event.tokens.shift();
+                break;
+            case "hero":
+                token = map.tokenPool.hero.tokens.shift();
+                break;
+            case "noble":
+                token = map.tokenPool.noble.tokens.shift();
+                break;
+            case "peasant":
+                token = map.tokenPool.peasant.tokens.shift();
+                break;
+            case "skaven":
+                token = map.tokenPool.skaven.tokens.shift();
+                break;
+            case "warpstone":
+                token = map.tokenPool.warpstone.tokens.shift();
+                break;
             }
-        }
+            if (token){
+                newRegion.tokens.push(token);
+                token.heldBy = newRegion;
+            }
+        });
         /***Set up the region's figures***/
-        tempFigureList = newRegion.xmlData.getElementsByTagName("figures")[0].childNodes;
-        figureSlots = newRegion.xmlData.getElementsByTagName("slot");
+        $tempFigureList = $(regionXML).find("figures").children();
+        $figureSlots = $(regionXML).find("slot");
         newRegion.figures = [];
         newRegion.slots = [];
         for (j = 0; j < 3; j++) {
@@ -1977,45 +1976,66 @@ function drawBoard(blank, local){
         for (j = 0; j < playerCount; j++){
             tempPlayers[players[j].name] = players[j];
         }
-        //Divvy up the models
         //Handle figures in the region base
-        for (j = 0; j < tempFigureList.length; j++){
-            figureXML = tempFigureList[j];
-            if (figureXML.nodeType == 1){
-                playerName = figureXML.getAttribute("owner");
-                figTypes = figureXML.nodeName + "s";
+        $tempFigureList.each(function () {
+            playerName = $(this).attr("owner");
+            figTypes = this.nodeName + "s";
+            figure = tempPlayers[playerName][figTypes].shift();
+            if (figure){
+                figure.shield = ($(this).attr("shield") === "true");
+                figure.musk = ($(this).attr("musk") === "true");
+                figure.marker = ($(this).attr("marker") === "true");
+                figure.skull = ($(this).attr("skull") === "true");
+            }
+            newRegion.figures.push(figure);
+            figure.heldBy = newRegion;
+        });
+        //Handle figures in the slots
+        $figureSlots.each(function () {
+            $tempFigureList = $(this).children();
+            slotID = $(this).attr("slotid");
+            $tempFigureList.each(function () {
+                playerName = $(this).attr("owner");
+                figTypes = this.nodeName + "s";
                 figure = tempPlayers[playerName][figTypes].shift();
                 if (figure){
-                    figure.shield = (figureXML.getAttribute("shield") == "true");
-                    figure.musk = (figureXML.getAttribute("musk") == "true");
-                    figure.marker = (figureXML.getAttribute("marker") == "true");
-                    figure.skull = (figureXML.getAttribute("skull") == "true");
+                    figure.shield = ($(this).attr("shield") === "true");
+                    figure.musk = ($(this).attr("musk") === "true");
+                    figure.marker = ($(this).attr("marker") === "true");
+                    figure.skull = ($(this).attr("skull") === "true");
                 }
-                newRegion.figures.push(figure);
-                figure.heldBy = newRegion;
+                newRegion.slots[slotID].figures.push(figure);
+                figure.heldBy = newRegion.slots[slotID];
+            });
+        });
+    });
+    //Create a method to count ruined regions
+    board.numRuined = function () {
+        var count = 0;
+        $(regions).each(function (j) {
+            if (this.ruined) {
+                count += 1;
             }
-        }
-        //Handle figures in the slots
-        for (j = 0; j < figureSlots.length; j++) {
-            tempFigureList = figureSlots[j].childNodes;
-            slotID = figureSlots[j].getAttribute("slotid");
-            for (k = 0; k < tempFigureList.length; k++){
-                figureXML = tempFigureList[k];
-                if (figureXML.nodeType == 1){
-                    playerName = figureXML.getAttribute("owner");
-                    figTypes = figureXML.nodeName + "s";
-                    figure = tempPlayers[playerName][figTypes].shift();
-                    if (figure){
-                        figure.shield = (figureXML.getAttribute("shield") == "true");
-                        figure.musk = (figureXML.getAttribute("musk") == "true");
-                        figure.marker = (figureXML.getAttribute("marker") == "true");
-                        figure.skull = (figureXML.getAttribute("skull") == "true");
-                    }
-                    newRegion.slots[slotID].figures.push(figure);
-                    figure.heldBy = newRegion.slots[slotID];
-                }
-            }
-        }
+        });
+        return count;
+    };
+    //Construct the stack of ruination cards
+    var ruination = [];
+    board.ruination = ruination;
+    var ruinCard;
+    var ruinersArray = [3, 4, 4, 5, 5];  //VP for ruiners
+    for (i = 0; i < 5; i++) {
+        ruinCard = {
+            ruiners : ruinersArray[i],
+            regions : [],
+            draw : drawRuination,
+            map : map,
+            ctx : ctx
+        };
+        $(regions).each(function (j) {
+            ruinCard.regions[j] = this.ruination[i];
+        });
+        ruination[i] = ruinCard;
     }
     //Set up the scoreboard
     var score = {};
@@ -2080,9 +2100,13 @@ function drawBoard(blank, local){
         currentPlayer.dacs = dialXML.getElementsByTagName("dac")[0].firstChild ? dialXML.getElementsByTagName("dac")[0].firstChild.data : 0;
     }
     //Draw the regions
-    for (i = 0; i < regionCount; i++){
-        regions[i].draw();
-    }
+    $(regions).each(function () {
+        this.draw();
+    });
+    //Identify the current ruination card and draw it
+    var numRuined = Math.min(board.numRuined(), 4);
+    map.ruinCard = board.ruination[numRuined];
+    map.ruinCard.draw();
     //Draw the scoreboard
     score.draw();
     //Set up the scoreboard controls
@@ -2106,6 +2130,7 @@ function drawBoard(blank, local){
         name : "darkcomet",
         draw : drawToken
     };
+    var newCard;
     for (i = 0; i < oldWorldCards.length; i++){
         newCard = {
             name : oldWorldCards[i].firstChild.data,
