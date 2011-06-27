@@ -119,11 +119,11 @@
       </border>
       <resistance>1</resistance>
       <ruination>
+        <ruin>6/3</ruin>
+        <ruin>7/3</ruin>
+        <ruin>7/3</ruin>
         <ruin>8/4</ruin>
-        <ruin>9/4</ruin>
-        <ruin>9/4</ruin>
-        <ruin>10/5</ruin>
-        <ruin>10/5</ruin>
+        <ruin>8/4</ruin>
       </ruination>
     </region>
     <region id="2" short="K" populated="true">
@@ -134,11 +134,11 @@
       </border>
       <resistance>3</resistance>
       <ruination>
-        <ruin>6/3</ruin>
-        <ruin>7/3</ruin>
-        <ruin>7/3</ruin>
         <ruin>8/4</ruin>
-        <ruin>8/4</ruin>
+        <ruin>9/4</ruin>
+        <ruin>9/4</ruin>
+        <ruin>10/5</ruin>
+        <ruin>10/5</ruin>
       </ruination>
     </region>
     <region id="3" short="Em" populated="true">
