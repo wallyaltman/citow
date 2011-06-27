@@ -2060,6 +2060,10 @@ function drawBoard(blank, local){
             if ($(this).attr("extracard") == "true"){
                 obj.extraCard = true;
             }
+            //Upgrade allowing a chaos card to be placed on another card
+            if ($(this).attr("covercard") == "true"){
+                obj.coverCard = true;
+            }
             currentPlayer.upgrades.push(obj);
         });
         //Set up scores
@@ -2360,10 +2364,26 @@ function dropObject(){
     var type = pen.held.type;
     var objects;
     var target = this;
+    var holder;
+    var targetSlot;
     if (this.type  === "cardslot") {
+        holder = this.heldBy.cards[this.index] && this.heldBy.cards[this.index].holder;
         if (type !== "figure") {
+            if (type === "chaos") {
+                currentUpgrades = pen.held.owner
+                                        ? (pen.held.owner.upgrades
+                                                ? pen.held.owner.upgrades
+                                                : [])
+                                        : [];
+                for (j = 0; j < currentUpgrades.length; j++){
+                    if (currentUpgrades[j].coverCard && currentUpgrades[j].active){
+                        targetSlot = this.index;
+                        break;
+                    }
+                }
+            }
             target = this.heldBy;
-        } else if (!this.heldBy.cards[this.index] || !this.heldBy.cards[this.index].holder) {
+        } else if (!holder) {
             target = this.heldBy.type === "region"
                            ? this.heldBy
                            : pen.held.owner;
@@ -2394,7 +2414,13 @@ function dropObject(){
     //If the destination matches the object,
     //place it and redraw the destination
     if (objects){
-        objects.push(pen.held);
+        //Overwrite the existing object in
+        //the targeted slot, if applicable
+        if (!isNaN(targetSlot)) {
+            objects[targetSlot] = pen.held;
+        } else {
+            objects.push(pen.held);
+        }
         //If the target is a card that holds dead
         //figures, clear figure effects and set
         //the skull marker
@@ -3171,8 +3197,7 @@ function initialize(){
         $savePNG.click(function(){
             var $board = $("#board");
             var canvasData = $board[0].toDataURL("image/png");
-            var postData = "canvas=" + canvasData;
-            $.post('savepng.php', postData, function(){
+            $.post('savepng.php', { canvas: canvasData }, function(){
                 var board = $("#board")[0];
                 window.open("getmap.php?game=" + board.game + "&state=" + board.state, "_self");
             });

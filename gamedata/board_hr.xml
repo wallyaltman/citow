@@ -57,12 +57,12 @@
         <cultist srcx="1" srcy="41" />
         <warrior srcx="25" srcy="41" />
         <daemon srcx="49" srcy="41" />
-        <mystical srcx="73" srcy="41" />
-        <well srcx="97" srcy="41" />      
+        <mystical srcx="73" srcy="41" covercard="true" />
+        <well srcx="97" srcy="41" />
       </upgrades>
     </power>
     <power id="3" highlight="#9922CC" shadow="#2D0D3B">
-      <name>Slaanesh</name>    
+      <name>Slaanesh</name>
       <dial cap="7">4,8,11,16,19,24,27</dial>
       <figures>
         <cultists>6</cultists>
@@ -79,7 +79,7 @@
       </upgrades>
     </power>
     <power id="4" highlight="#999999" shadow="#282828" nocorruption="true">
-      <name>Horned_Rat</name>    
+      <name>Horned_Rat</name>
       <dial cap="8">0,5,9,12,16,20,24,28</dial>
       <figures>
         <cultists>11</cultists>

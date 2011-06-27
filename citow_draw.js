@@ -547,7 +547,7 @@ function drawOldWorldActive(noRedraw){
 function drawRegion(){
     var ctx = this.ctx;
     var players = this.players;
-    var i;
+    var i, j, k, l;
     ctx.textBaseline = "bottom";
     ctx.strokeStyle = "rgba(172, 49, 16, 1)";
     ctx.lineWidth = 1;
@@ -670,8 +670,26 @@ function drawRegion(){
                 thirdCard = true;
                 cards[i].bgcolor = bgcolor;
                 cards[i].bgcolor2 = bgcolor2;
+                cards[i].slot = this.slots[2];
                 cards[i].draw(xWidth - 179, y + 2, ctx);
                 break;
+            } else if (currentUpgrades[j].coverCard && currentUpgrades[j].active) {
+                for (k = 0; k < players.length; k++) {
+                    for (l = 0; l < players[k].upgrades.length; l++) {
+                        if (players[k].upgrades[l].extraCard && players[k].upgrades[l].active){
+                            thirdCard = true;
+                            cards[i].bgcolor = bgcolor;
+                            cards[i].bgcolor2 = bgcolor2;
+                            cards[i].slot = this.slots[2];
+                            cards[i].draw(xWidth - 179, y + 2, ctx);
+                            break;
+                        }
+                    }
+                    //Stop after three
+                    if (thirdCard){
+                        break;
+                    }
+                }
             }
         }
         //Stop after three
