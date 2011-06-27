@@ -23,8 +23,8 @@ Files
 + **newgame.php** - The script called by index.php to take the provided parameters
   and create a new XML game file.
 + **chaos.css** - CSS for gameboard.php and index.php.
-+ **/gamedata/** - Static XML game data lives here.
-+ **/icons/** - PNG game assets live here.
++ **gamedata/** - Static XML game data lives here.
++ **icons/** - PNG game assets live here.
 
 [citow]: http://www.fantasyflightgames.com/edge_minisite.asp?eidm=84 "Chaos in the Old World - Fantasy Flight Games"
 [ffg]: http://www.fantasyflightgames.com/index.asp "Fantasy Flight Games"
