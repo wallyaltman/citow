@@ -234,6 +234,7 @@ function updateSaveButtons(game, state){
 }
 
 /* Read in a saved XML board state file.
+ * TODO: Make this function asynchronous
  */
 function getBoardState(blank, expansion){
     var xmlhttp = xmlRequest();
