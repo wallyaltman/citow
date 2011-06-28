@@ -2030,7 +2030,8 @@ function drawBoard(blank, local){
             regions : [],
             draw : drawRuination,
             map : map,
-            ctx : ctx
+            ctx : ctx,
+            index : i
         };
         $(regions).each(function (j) {
             ruinCard.regions[j] = this.ruination[i];

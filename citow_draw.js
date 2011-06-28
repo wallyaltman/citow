@@ -991,17 +991,44 @@ function drawRuination() {
     var bgcolor = "#1A1109";
     var textcolor = "#CC7711";
     var bordercolor = "#BB7711";
-    ctx.strokeStyle = bordercolor;
-    ctx.lineWidth = 1;
-    ctx.font = "12px Tahoma, Helvetica, sans-serif";
     var x1 = x;
     var y1 = y;
     var x2 = x + width;
     var y2 = y + lineHeight;
+    var yTop = y - 19;
     var value, lastValue;
-    var textString, count, textWidth;
+    var textString, count, textWidth, space;
+    ctx.strokeStyle = bordercolor;
+    ctx.lineWidth = 1;
+    //Draw the title box
+    ctx.fillStyle = bgcolor;
+    ctx.font = "15px Tahoma, Helvetica, sans-serif";
+    ctx.beginPath();
+    ctx.moveTo(x1 + 0.5, y1);
+    ctx.lineTo(x1 + 0.5, yTop + 6.5);
+    ctx.bezierCurveTo(x1 + 0.5, yTop + 2.5, x1 + 2.5, yTop + 0.5, x1 + 6.5, yTop + 0.5);
+    ctx.lineTo(x2 - 6.5, yTop + 0.5);
+    ctx.bezierCurveTo(x2 - 2.5, yTop + 0.5, x2 - 0.5, yTop + 2.5, x2 - 0.5, yTop + 6.5);
+    ctx.lineTo(x2 - 0.5, y1);
+    ctx.fill();
+    ctx.stroke();
+    //Redraw the corner curves at a
+    //greater thickness
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(x1 + 0.5, yTop + 6.5);
+    ctx.bezierCurveTo(x1 + 0.5, yTop + 2.5, x1 + 2.5, yTop + 0.5, x1 + 6.5, yTop + 0.5);
+    ctx.moveTo(x2 - 6.5, yTop + 0.5);
+    ctx.bezierCurveTo(x2 - 2.5, yTop + 0.5, x2 - 0.5, yTop + 2.5, x2 - 0.5, yTop + 6.5);
+    ctx.stroke();
+    ctx.lineWidth = 1;
+    //Draw the text
+    ctx.fillStyle = textcolor;
+    textString = "Ruin " + String(Math.min(this.index + 1, 5));
+    textWidth = ctx.measureText(textString).width;
+    space = Math.floor((width - textWidth) / 2);
+    ctx.fillText(textString, x1 + space, y1);
     //Draw the top cell, with the ruiners VP
-    //Draw the cell borders
     ctx.fillStyle = bgcolor;
     ctx.fillRect(x1, y1, width, lineHeight);
     ctx.beginPath();
@@ -1016,6 +1043,7 @@ function drawRuination() {
     ctx.stroke();
     //Draw the text
     ctx.fillStyle = textcolor;
+    ctx.font = "12px Tahoma, Helvetica, sans-serif";
     ctx.fillText("Ruiners:", x1 + 2, y2);
     textWidth = ctx.measureText(this.ruiners).width;
     ctx.fillText(this.ruiners, x2 - (textWidth + 1), y2);
