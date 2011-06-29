@@ -1108,7 +1108,7 @@ function drawRuination() {
 function drawScoreBoard(){
     var players = this.players;
     var ctx = this.ctx;
-    var x = 18;
+    var x = 13;
     var y = 170;
     var width = 501 - x;  //not counting left caps
     var height = 26 * players.length + 1;  //not counting headers
