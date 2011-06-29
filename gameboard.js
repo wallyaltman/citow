@@ -1660,6 +1660,8 @@ function drawBoard(blank, local){
     var oldWorldXML = state.getElementsByTagName("oldworld")[0];
     //Check for the game type (for Chaos cards)
     board.expansion = state.documentElement.getAttribute("expansion");
+    //Check for a game thread number (forums.penny-arcade.com/showthread.php?thread=...)
+    board.threadNum = state.documentElement.getAttribute("thread");
     //Get the board setup
     var info = getGameSetup(board.expansion);
     board.info = info;
@@ -2633,6 +2635,8 @@ function saveBoardXML(saveType){
         boardState.setAttribute("state", gameState || board.state);
         //Set the game expansion
         boardState.setAttribute("expansion", board.expansion);
+        //Set the game thread number
+        boardState.setAttribute("thread", board.threadNum);
         //Old World cards
         var oldWorld = xmlDoc.createElement("oldworld");
         oldWorld.setAttribute("set", board.owcset);

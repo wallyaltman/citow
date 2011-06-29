@@ -39,6 +39,7 @@ foreach ($powerlist as $power){
 $ccardset = $_POST['ccardset'];
 $owcardset = $_POST['owcardset'];
 $owtokens = $_POST['owtokens'];
+$threadnum = $_POST['threadnum'];
 
 //Generate the file name
 while (strlen($game) < 4){
@@ -54,8 +55,8 @@ if (!isset($_SESSION['username'])){
     $error = '01'; //Not logged in
 }
 else if (!isset($game)){
-		$fail = true;
-		$error = '12'; //No game number given
+    $fail = true;
+    $error = '12'; //No game number given
 }
 else if ($game < 1000 && $userlevel < 2){
     $fail = true;
@@ -71,20 +72,20 @@ else if (file_exists($dir.$file)){
 if (isset($_SERVER['HTTP_REFERER'])){
     $domain = parse_url($_SERVER['HTTP_REFERER']);
     $hostlist = array('localhost', 'www.appliednerditry.com', 'appliednerditry.com', 'appliednerditry.wallyaltman.com');
-		$matches = array();
-		preg_match('/^(\/chaos(dev)?)/', $domain['path'], $matches);
-		$path = (isset($matches[1]) && $matches[1] !== '')
-									? $matches[1]
-									: '/chaos';
+    $matches = array();
+    preg_match('/^(\/chaos(dev)?)/', $domain['path'], $matches);
+    $path = (isset($matches[1]) && $matches[1] !== '')
+                  ? $matches[1]
+                  : '/chaos';
     if (!in_array(strtolower($domain['host']), $hostlist)){
         $fail = true;
-				$error = '07'; //Invalid referer
-				$uri = 'http://appliednerditry.com/chaos';
+        $error = '07'; //Invalid referer
+        $uri = 'http://appliednerditry.com/chaos';
     }
-		else {
-				$uri = 'http://' . $domain['host'] . $path;
-		}
-}    
+    else {
+        $uri = 'http://' . $domain['host'] . $path;
+    }
+}
 
 
 //Read in the blank board, edit it a bit, then write
@@ -172,6 +173,9 @@ if (!$fail){
     if (strtolower($ccardset) == 'morrslieb'){
         $documentnode->setAttribute('expansion', 'morrslieb');
     }
+    if (isset($threadnum)){
+        $documentnode->setAttribute('thread', $threadnum);
+    }
     //Set the Old World card set
     $newgame->getElementsByTagName('oldworld')->item(0)->setAttribute('set', $owcardset);
     //Dump the XML data to a string
@@ -189,7 +193,7 @@ if (!$fail){
             $indent += $level;
         } 
         else {
-            if (preg_match('/^<\/.+>$/', $el)) {            
+            if (preg_match('/^<\/.+>$/', $el)) {
                 $indent -= $level;  // closing tag, decrease indent
             }
             if ($indent < 0) {

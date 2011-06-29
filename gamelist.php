@@ -66,6 +66,9 @@ foreach ($gamestartfiles as $filename){
             if ($xmlgame->moveToAttribute('expansion')){
                 $gamestarts[$gnum]['expansion'] = $xmlgame->value;
             }
+            if ($xmlgame->moveToAttribute('thread')){
+                $gamestarts[$gnum]['thread'] = $xmlgame->value;
+            }
             $gamestarts[$gnum]['modified'] = $modtimes[$gnum];
         }
         $xmlgame->close();

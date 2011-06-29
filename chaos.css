@@ -5,7 +5,7 @@ body {
 }
 
 hgroup {
-	margin:0 0 10px 45px;
+  margin:0 0 10px 45px;
 }
 h1 {
   color:#BB1111;
@@ -13,17 +13,17 @@ h1 {
   padding:4px;
 }
 hgroup > h1 {
-	margin:-5px 0 3px 0;
+  margin:-5px 0 3px 0;
 }
 hgroup > h2 {
   color:#BB1111;
   text-shadow: #200000 0px 0px 3px;
-	font-size:1.6em;
-	display:block;
-	margin-left:15px;
-	width:auto;
+  font-size:1.6em;
+  display:block;
+  margin-left:15px;
+  width:auto;
 }
-/* Server time */ 
+/* Server time */
 time {
   position:relative;
   top:-20px;
@@ -133,12 +133,16 @@ input:checked + label[for="hornedrat"]{
   text-shadow: #282828 1px 1px 0;
 }
 /** Game number, official vs. other game **/
-form > fieldset:nth-of-type(2){
+form > fieldset:nth-of-type(1){
   height:43px;
 }
 /* Game number input */
 #gamenumber {
   width:80px;
+}
+/* Game thread entry */
+input[type="url"] {
+  width:350px;
 }
 /*** My Games / Recent Games***/
 /** Game links **/
@@ -176,6 +180,24 @@ section a.more:active {
   color:#000000;
   text-shadow: #B300FF 1px 1px 0, #B300FF 1px -1px 0, #B300FF -1px -1px 0, #B300FF -1px 1px 0;
 }
+/** Game thread links**/
+section a.thread {
+  text-decoration:none;
+  font-weight:bold;
+  margin-left:4px;
+}
+section a.thread:link {
+  color:#001d69;
+  text-shadow: #000011 1px 1px 0;
+}
+section a.thread:visited { 
+  color:#295CE3;
+  text-shadow: #000030 1px 1px 0;
+} 
+section a.thread:active {
+  color:#000000;
+  text-shadow: #0000E0 1px 1px 0, #0000E0 1px -1px 0, #0000E0 -1px -1px 0, #0000E0 -1px 1px 0;
+}
 /*** Other ***/
 .hideme {
   display:none;
@@ -183,19 +205,19 @@ section a.more:active {
 /**** gameboard.php ****/
 /*** Navigation ***/
 nav {
-	position:relative;
-	top:-75px;
+  position:relative;
+  top:-75px;
 }
 nav > ul {
-	float:right;
-	padding:0;
+  float:right;
+  padding:0;
 }
 nav li {
-	display:inline-block;
-	padding-right:8px;
+  display:inline-block;
+  padding-right:8px;
 }
 nav a {
-	font-weight:bold;
+  font-weight:bold;
 }
 nav a:link, nav a:visited {
   color:#9922CC;
