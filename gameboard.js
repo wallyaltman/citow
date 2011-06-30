@@ -2867,9 +2867,6 @@ function saveBoardXML(saveType){
                             board.state = gameState;
                             //If the save represents a new game, update
                             //the game list
-                            if (newGame){
-                                getGames(gameNumber);
-                            }
                             updateGameStateList(gameNumber, gameState);
                             //Show the "Success!" message
                             showMessage(this.responseText, "okay");
