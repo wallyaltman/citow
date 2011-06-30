@@ -549,6 +549,7 @@ function drawRegion(){
     var players = this.players;
     var map = this.map;
     var i, j, k, l;
+    var board = $("#board")[0];
     ctx.textBaseline = "bottom";
     ctx.strokeStyle = "rgba(172, 49, 16, 1)";
     ctx.lineWidth = 1;
