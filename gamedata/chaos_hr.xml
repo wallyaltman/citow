@@ -2,9 +2,9 @@
 <chaoscards>
   <card owner="Khorne" cost="0">Bloodbath</card>
   <card owner="Khorne" cost="0">Terror</card>
-  <card owner="Khorne" cost="1">Hate</card>
+  <card owner="Khorne" cost="1" holder="true">Hate</card>
   <card owner="Khorne" cost="1">Rampage</card>
-  <card owner="Khorne" cost="1">Skulltaker</card>
+  <card owner="Khorne" cost="1" holder="true" skull="true">Skulltaker</card>
   <card owner="Khorne" cost="2">Lambs to the Slaughter</card>
   <card owner="Khorne" cost="4">Lure of Battle</card>
   <card owner="Nurgle" cost="0" magic="true">Filth</card>
@@ -21,16 +21,16 @@
   <card owner="Tzeentch" cost="0" magic="true">Warpstorm</card>
   <card owner="Tzeentch" cost="1">The Blue Scribes</card>
   <card owner="Tzeentch" cost="1" magic="true">Convocation</card>
-  <card owner="Tzeentch" cost="1" magic="true">Warp Shock</card>
+  <card owner="Tzeentch" cost="1" magic="true">Warpshock</card>
   <card owner="Tzeentch" cost="2" magic="true">Havoc</card>
   <card owner="Tzeentch" cost="2">Transmogrify</card>
-  <card owner="Slaanesh" cost="0" magic="true">Daemonic Subtelty</card>
+  <card owner="Slaanesh" cost="0" magic="true">Daemonic Subtlety</card>
   <card owner="Slaanesh" cost="0">Festival of Sinew</card>
   <card owner="Slaanesh" cost="1">Corrupt from Within</card>
   <card owner="Slaanesh" cost="1">Rapturous Excess</card>
-  <card owner="Slaanesh" cost="1" magic="true">Shroud of Secrecy</card>
+  <card owner="Slaanesh" cost="1" magic="true">Shroud of Secrets</card>
   <card owner="Slaanesh" cost="2" magic="true">Ascenion to Power</card>
-  <card owner="Slaanesh" cost="2">Joyous Surrender</card>
+  <card owner="Slaanesh" cost="2" holder="true">Joyous Surrender</card>
   <card owner="Slaanesh" cost="2">Pleasure Shield</card>
   <card owner="Slaanesh" cost="3">Debauchery</card>
   <card owner="Horned_Rat" cost="0">Empty the Warrens</card>

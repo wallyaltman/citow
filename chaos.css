@@ -4,10 +4,32 @@ body {
   line-height:1.2;
 }
 
+hgroup {
+  margin:0 0 10px 45px;
+}
 h1 {
   color:#BB1111;
   text-shadow: #200000 0px 0px 3px;
   padding:4px;
+}
+hgroup > h1 {
+  margin:-5px 0 3px 0;
+}
+hgroup > h2 {
+  color:#BB1111;
+  text-shadow: #200000 0px 0px 3px;
+  font-size:1.6em;
+  display:block;
+  margin-left:15px;
+  width:auto;
+}
+/* Server time */
+time {
+  position:relative;
+  top:-20px;
+  font-size:1em;
+  float:right;
+  padding:8px;
 }
 
 /**** index.php ****/
@@ -111,12 +133,16 @@ input:checked + label[for="hornedrat"]{
   text-shadow: #282828 1px 1px 0;
 }
 /** Game number, official vs. other game **/
-form > fieldset:nth-of-type(2){
+form > fieldset:nth-of-type(1){
   height:43px;
 }
 /* Game number input */
 #gamenumber {
   width:80px;
+}
+/* Game thread entry */
+input[type="url"] {
+  width:350px;
 }
 /*** My Games / Recent Games***/
 /** Game links **/
@@ -154,19 +180,53 @@ section a.more:active {
   color:#000000;
   text-shadow: #B300FF 1px 1px 0, #B300FF 1px -1px 0, #B300FF -1px -1px 0, #B300FF -1px 1px 0;
 }
-/*** Other ***/
-/* Server time */ 
-time {
-  position:relative;
-  top:-20px;
-  font-size:1em;
-  float:right;
-  padding:8px;
+/** Game thread links**/
+section a.thread {
+  text-decoration:none;
+  font-weight:bold;
+  margin-left:4px;
 }
+section a.thread:link {
+  color:#001d69;
+  text-shadow: #000011 1px 1px 0;
+}
+section a.thread:visited { 
+  color:#295CE3;
+  text-shadow: #000030 1px 1px 0;
+} 
+section a.thread:active {
+  color:#000000;
+  text-shadow: #0000E0 1px 1px 0, #0000E0 1px -1px 0, #0000E0 -1px -1px 0, #0000E0 -1px 1px 0;
+}
+/*** Other ***/
 .hideme {
   display:none;
 }
 /**** gameboard.php ****/
+/*** Navigation ***/
+nav {
+  position:relative;
+  top:-75px;
+}
+nav > ul {
+  float:right;
+  padding:0;
+}
+nav li {
+  display:inline-block;
+  padding-right:8px;
+}
+nav a {
+  font-weight:bold;
+}
+nav a:link, nav a:visited {
+  color:#9922CC;
+  text-shadow: #110000 1px 1px 0;
+}
+nav a:active {
+  color:#000000;
+  text-shadow: #B300FF 1px 1px 0, #B300FF 1px -1px 0, #B300FF -1px -1px 0, #B300FF -1px 1px 0;
+}
 /*** Main content area (including canvas, and items appearing over it) ***/
 #main {
   float:left;
@@ -358,13 +418,13 @@ div.shiftbox img.black{
   background-color:#111111;
   border:4px ridge #8A08CC;
   height:75px;
-  width:180px;
 }
 #workbox > canvas {
   background-color:#303030;
 }
 #workbox > div {
   display:inline-block;
+	vertical-align:top;
 }
 #workbox > div > div:nth-of-type(2n-1){
   clear:both;
@@ -377,23 +437,38 @@ div.shiftbox img.black{
 }
 /** PP controls **/
 #ppbox {
-  top:319px;
-  left:30px;
+  top:308px;
+  left:45px;
+	width:160px;
 }
-#ppbox span {
+#ppbox > span {
   margin:4px 0 0 2px;
-  float:left;
-}
-#ppbox input {
+	padding-right:6px;
+	text-align:right;
   float:right;
+	width:61px;
 }
-/** Controls for resetting PP / DACs **/
-#main #resetbox {
+#ppbox > div {
+	float:right;
+	clear:right;
+	width:88px;
+}
+#resetpp > input, #resetpp > div {
+	float:right;
+}
+#resetpp > div {
+	margin:0 3px;
+	vertical-align:text-top;
+}
+#resetpp img.toggle{
+  margin:4px 4px 0 3px;
+}
+/** Controls for resetting effects / DACs **/
+#resetbox {
   top:489px;
   left:45px;
   padding-bottom:6px;
-  width:150px;
-  height:44px;
+  width:170px;
 }
 #resetbox > span {
   margin:4px 0 0 2px;

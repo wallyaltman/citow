@@ -17,7 +17,7 @@
   <card dataid="owc104" event="true">The Light of Day</card>
   <card dataid="owc012">Mass Exodus</card>
   <card dataid="owc013">Meteor Showers</card>
-  <card dataid="owc105">Morrslieb Eclipsed</card>
+  <card dataid="owc105" holder="true" skull="true">Morrslieb Eclipsed</card>
   <card dataid="owc014" event="true">Norse Reavers</card>
   <card dataid="owc015">Peasant Uprising</card>
   <card dataid="owc016">Plunged Into Chaos</card>

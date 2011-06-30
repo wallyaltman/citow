@@ -25,7 +25,7 @@
         <daemon srcx="49" srcy="1" />
         <crimson srcx="73" srcy="1" />
         <vengeance srcx="97" srcy="1" />
-      </upgrades>    
+      </upgrades>
     </power>
     <power id="1" highlight="#339911" shadow="#112C08">
       <name>Nurgle</name>
@@ -57,12 +57,12 @@
         <cultist srcx="1" srcy="41" />
         <warrior srcx="25" srcy="41" />
         <daemon srcx="49" srcy="41" />
-        <mystical srcx="73" srcy="41" />
-        <well srcx="97" srcy="41" />      
+        <mystical srcx="73" srcy="41" covercard="true" />
+        <well srcx="97" srcy="41" />
       </upgrades>
     </power>
     <power id="3" highlight="#9922CC" shadow="#2D0D3B">
-      <name>Slaanesh</name>    
+      <name>Slaanesh</name>
       <dial cap="7">4,8,11,16,19,24,27</dial>
       <figures>
         <cultists>6</cultists>
@@ -79,7 +79,7 @@
       </upgrades>
     </power>
     <power id="4" highlight="#999999" shadow="#282828" nocorruption="true">
-      <name>Horned_Rat</name>    
+      <name>Horned_Rat</name>
       <dial cap="8">0,5,9,12,16,20,24,28</dial>
       <figures>
         <cultists>11</cultists>
@@ -97,30 +97,51 @@
     </power>
   </ruinouspowers>
   <map>
-    <region id="0">
+    <region id="0" short="N">
       <name>Norsca</name>
       <border row="0" col="1">
         <link>E</link>
       </border>
       <resistance>1</resistance>
+      <ruination>
+        <ruin>6/3</ruin>
+        <ruin>7/3</ruin>
+        <ruin>7/3</ruin>
+        <ruin>8/4</ruin>
+        <ruin>8/4</ruin>
+      </ruination>
     </region>
-    <region id="1">
+    <region id="1" short="TC">
       <name>Troll Country</name>
       <border row="0" col="2">
         <link>W</link>
         <link>S</link>
       </border>
       <resistance>1</resistance>
+      <ruination>
+        <ruin>6/3</ruin>
+        <ruin>7/3</ruin>
+        <ruin>7/3</ruin>
+        <ruin>8/4</ruin>
+        <ruin>8/4</ruin>
+      </ruination>
     </region>
-    <region id="2" populated="true">
+    <region id="2" short="K" populated="true">
       <name>Kislev</name>
       <border row="1" col="2">
         <link>N</link>
         <link>S</link>
       </border>
       <resistance>3</resistance>
+      <ruination>
+        <ruin>8/4</ruin>
+        <ruin>9/4</ruin>
+        <ruin>9/4</ruin>
+        <ruin>10/5</ruin>
+        <ruin>10/5</ruin>
+      </ruination>
     </region>
-    <region id="3" populated="true">
+    <region id="3" short="Em" populated="true">
       <name>The Empire</name>
       <border row="2" col="2">
         <link>N</link>
@@ -128,8 +149,15 @@
         <link>SW</link>
       </border>
       <resistance>5</resistance>
+      <ruination>
+        <ruin>10/5</ruin>
+        <ruin>11/5</ruin>
+        <ruin>11/5</ruin>
+        <ruin>12/6</ruin>
+        <ruin>12/6</ruin>
+      </ruination>
     </region>
-    <region id="4" populated="true">
+    <region id="4" short="Br" populated="true">
       <name>Bretonnia</name>
       <border row="2.5" col="1">
         <link>NE</link>
@@ -138,16 +166,30 @@
         <link>SW</link>
       </border>
       <resistance>3</resistance>
+      <ruination>
+        <ruin>8/4</ruin>
+        <ruin>9/4</ruin>
+        <ruin>9/4</ruin>
+        <ruin>10/5</ruin>
+        <ruin>10/5</ruin>
+      </ruination>
     </region>
-    <region id="5" populated="true">
+    <region id="5" short="Es" populated="true">
       <name>Estalia</name>
       <border row="3" col="0">
         <link>NE</link>
         <link>SE</link>
       </border>
       <resistance>4</resistance>
+      <ruination>
+        <ruin>9/4</ruin>
+        <ruin>10/5</ruin>
+        <ruin>10/5</ruin>
+        <ruin>11/5</ruin>
+        <ruin>11/5</ruin>
+      </ruination>
     </region>
-    <region id="6">
+    <region id="6" short="T">
       <name>Tilea</name>
       <border row="3.5" col="1">
         <link>NE</link>
@@ -155,8 +197,15 @@
         <link>N</link>
       </border>
       <resistance>2</resistance>
+      <ruination>
+        <ruin>7/3</ruin>
+        <ruin>8/4</ruin>
+        <ruin>8/4</ruin>
+        <ruin>9/4</ruin>
+        <ruin>9/4</ruin>
+      </ruination>
     </region>
-    <region id="7">
+    <region id="7" short="BP">
       <name>The Border Princes</name>
       <border row="3" col="2">
         <link>N</link>
@@ -165,13 +214,27 @@
         <link>NW</link>
       </border>
       <resistance>1</resistance>
+      <ruination>
+        <ruin>7/3</ruin>
+        <ruin>8/4</ruin>
+        <ruin>8/4</ruin>
+        <ruin>9/4</ruin>
+        <ruin>9/4</ruin>
+      </ruination>
     </region>
-    <region id="8">
+    <region id="8" short="Ba">
       <name>The Badlands</name>
       <border row="4" col="2">
         <link>N</link>
       </border>
       <resistance>1</resistance>
+      <ruination>
+        <ruin>6/3</ruin>
+        <ruin>7/3</ruin>
+        <ruin>7/3</ruin>
+        <ruin>8/4</ruin>
+        <ruin>8/4</ruin>
+      </ruination>
     </region>
   </map>
 </gameboard>

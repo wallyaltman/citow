@@ -48,9 +48,9 @@ if (isset($_GET['error'])){
     $errorcode = $_GET['error'];
     //Create a table of error messages
     $errorlist = array( '01'=>'ERROR: Not logged in', '02'=>'ERROR: Insufficient user permissions',
-												'07'=>'ERROR: Invalid HTTP referer',
-												'11'=>'ERROR: File already exists', '12'=>'ERROR: No game number provided',
-												'51'=>'ERROR: Unknown I/O error');
+                        '07'=>'ERROR: Invalid HTTP referer',
+                        '11'=>'ERROR: File already exists', '12'=>'ERROR: No game number provided',
+                        '51'=>'ERROR: Unknown I/O error');
     $message = $errorlist[$errorcode];
     $messageclass = is_numeric($errorcode)
                       ? 'errormsg msg'
@@ -97,19 +97,19 @@ if (isset($_GET['error'])){
             <input type="radio" id="ccardsetmorrslieb" name="ccardset" checked="checked" value="morrslieb"/>
             <label for="ccardsetmorrslieb">The Horned Rat</label>
           </fieldset>
+          <fieldset>
+            <legend>Old World Card Set</legend>
+            <input type="radio" id="owcardsetbase" name="owcardset" value='citow' />
+            <label for="owcardsetbase">CitOW Only</label>
+            <input type="radio" id="owcardsetall" name="owcardset" checked="checked" value="all" />
+            <label for="owcardsetall">CitOW + The Horned Rat</label>
+            <input type="radio" id="owcardsetmorrslieb" name="owcardset" value="morrslieb" />
+            <label for="owcardsetmorrslieb">The Horned Rat Only</label>
+          </fieldset>
         </div>
         <fieldset>
-          <legend>Old World Card Set</legend>
-          <input type="radio" id="owcardsetbase" name="owcardset" value='citow' />
-          <label for="owcardsetbase">CitOW Only</label>
-          <input type="radio" id="owcardsetall" name="owcardset" checked="checked" value="all" />
-          <label for="owcardsetall">CitOW + The Horned Rat</label>
-          <input type="radio" id="owcardsetmorrslieb" name="owcardset" value="morrslieb" />
-          <label for="owcardsetmorrslieb">The Horned Rat Only</label>
-        </fieldset>
-        <fieldset>
           <legend>Game Number</legend>
-          <input type="number" id="gamenumber" name="gamenumber" />
+          <input type="number" id="gamenumber" name="gamenumber" required="required" />
 <?php
 $disabled = $userlevel > 1 ? '' : 'disabled="disabled" ';
 echo '          <input type="radio" id="officialgame" name="gamerank" ', $disabled, '/>', "\n";
@@ -118,19 +118,30 @@ echo '          <input type="radio" id="officialgame" name="gamerank" ', $disabl
           <input type="radio" id="othergame" name="gamerank" checked="checked" />
           <label for="othergame">Unofficial Game</label>
 <?php
-echo '          <img src="', $rooturl, '/graphics/check23.png" id="check"',
+echo '          <img src="', $rooturl, '/graphics/check23.png" id="checkgame"',
      ' height="23" width="23" alt="Game number is OK" class="hideme" />', "\n";
-echo '          <img src="', $rooturl, '/graphics/error23.png" id="error" height="23"',
+echo '          <img src="', $rooturl, '/graphics/error23.png" id="errorgame" height="23"',
      ' width="23" alt="Game number is too low or already taken" class="hideme" />', "\n";
 ?>
         </fieldset>
-          <fieldset>
-            <legend>Initial Old World Token Placement</legend>
-            <input type="radio" id="owtokensyes" name="owtokens" checked="checked" value="auto" />
-            <label for="owtokensyes">Automatic</label>
-            <input type="radio" id="owtokensno" name="owtokens" value="manual" />
-            <label for="owtokensno">Manual</label>
-          </fieldset>
+        <fieldset>
+          <legend>Initial Old World Token Placement</legend>
+          <input type="radio" id="owtokensyes" name="owtokens" checked="checked" value="auto" />
+          <label for="owtokensyes">Automatic</label>
+          <input type="radio" id="owtokensno" name="owtokens" value="manual" />
+          <label for="owtokensno">Manual</label>
+        </fieldset>
+        <fieldset novalidate="novalidate">
+          <legend>PA Forums Game Thread</legend>
+          <input type="url" id="pathread" name="pathread" size="80" />
+<?php
+echo '          <img src="', $rooturl, '/graphics/check23.png" id="checkthread"',
+     ' height="23" width="23" alt="Game number is OK" class="hideme" />', "\n";
+echo '          <img src="', $rooturl, '/graphics/error23.png" id="errorthread" height="23"',
+     ' width="23" alt="Game number is too low or already taken" class="hideme" />', "\n";
+?>
+        <input type="hidden" id="threadnum" name="threadnum" />
+        </fieldset>
         <fieldset>
           <input type="submit" id="submit" />
         </fieldset>
@@ -186,6 +197,10 @@ foreach ($moddates as $gnum => $modtime){
     $expansion = (isset($gamedata[$gnum]->expansion))
                        ? $gamedata[$gnum]->expansion
                        : '';
+    $threadnum = $gamedata[$gnum]->thread;
+    $threadurl = isset($threadnum)
+                       ? 'http://forums.penny-arcade.com/showthread.php?t=' . $threadnum
+                       : '';
     if ($modtimeobj > $today){
         $modstring = $modtimeobj->format('g:i A');
     }
@@ -201,6 +216,7 @@ foreach ($moddates as $gnum => $modtime){
     $thisrow = array('game' => $gnum,
                      'creator' => $creator,
                      'expansion' => $expansion,
+                     'threadurl' => $threadurl,
                      'modified' => $modstring);
     $allrows[] = $thisrow;
     if ($creator === $user){
@@ -211,14 +227,17 @@ foreach ($moddates as $gnum => $modtime){
 //List the current user's recent games, if any
 if (count($myrows) > 0){
     echo '    <section>', "\n";
-    echo '      <h1>My Games</h2>', "\n";
+    echo '      <h1>My Games</h1>', "\n";
     $rowcounter = 0;
     $hidestring = '';
     foreach ($myrows as $row){
         $expstring = $row['expansion'] == 'morrslieb' ? ' (The Horned Rat)' : '';
+        $threadstring = $row['threadurl'] == ''
+                          ? ''
+                          : '<a class="thread" href="' . $row['threadurl'] . '">(game&nbsp;thread)</a>';
         echo '        <p', $hidestring, '><a href="gameboard.php?game=',
              $row['game'], '">', 'Game ', $row['game'], '</a>', $expstring,
-             ': last modified ', $row['modified'], '</p>', "\n";
+             ': last modified ', $row['modified'], $threadstring, '</p>', "\n";
         $rowcounter += 1;
         //Hide games after 5 by default
         if ($rowcounter == 5 && !$expmy){
@@ -253,7 +272,7 @@ if (count($myrows) > 0){
 
 ?>
     <section>
-      <h1>Recent Activity</h2>
+      <h1>Recent Activity</h1>
 <?php
 //See if the "recent" section should be expanded
 $rowcounter = 0;
@@ -261,9 +280,12 @@ $hidestring = '';
 //List all recent games
 foreach ($allrows as $row){
     $expstring = $row['expansion'] == 'morrslieb' ? ' (The Horned Rat)' : '';
+        $threadstring = $row['threadurl'] == ''
+                          ? ''
+                          : '<a class="thread" href="' . $row['threadurl'] . '">(game&nbsp;thread)</a>';
     echo '        <p', $hidestring, '><a href="gameboard.php?game=', $row['game'],
-        '">','Game ', $row['game'], '</a>', $expstring, ': last modified by ',
-        $row['creator'], ', ', $row['modified'], '</p>', "\n";
+         '">','Game ', $row['game'], '</a>', $expstring, ': last modified by ',
+         $row['creator'], ', ', $row['modified'], $threadstring, '</p>', "\n";
     $rowcounter += 1;
     //Hide games after 5 by default
     if ($rowcounter == 5 && !$expall){

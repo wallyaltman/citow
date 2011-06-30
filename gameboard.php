@@ -20,7 +20,10 @@ include $headerurl;
   <meta charset="utf-8" />
   <title>Chaos in the Old World - Game Board</title>
 <?php
-$v = 8;
+$gamenum = $_GET['game'];
+$statenum = $_GET['state'];
+
+$v = 9;
 echo '  <link rel="shortcut icon" href="favicon.ico" />'."\n";
 echo '  <link rel="stylesheet" href="'.$rooturl.'/style.css" />'."\n";
 echo '  <link rel="stylesheet" href="chaos.css?v='.$v.'" />'."\n";
@@ -31,9 +34,82 @@ echo '  <script src="citow_draw.js" type="text/javascript"></script>'."\n";
 echo '  <script src="gameboard.js?v='.$v.'" type="text/javascript"></script>'."\n";
 echo '</head>'."\n";
 echo '<body id="body">'."\n";
+
 //Header bar is from header.php, included at the top
 echo $headerbar;
+
+//Display current time
+echo '  <time datetime="', date(DATE_ATOM), '">Current server time: ',
+     date('g:i A T'), '</time>', "\n";
+
+//Read in the game metadata, generating it first
+//if necessary
+if (!file_exists($dir.'owned_games.json')){
+    include "gamelist_q.php";
+}
+$rawdata = file_get_contents($dir.'owned_games.json');
+$jsondata = json_decode($rawdata);
+
+$dir = $docroot.$slash.'chaos'.$slash.'saves';
+
+$matches = array();
+$states = array();
+
+//Read the file list
+$files = array();
+if ($handle = opendir($dir)){
+    while (false !== ($filename = readdir($handle))){
+        $files[] = $filename;
+    }
+    closedir($handle);
+}
+
+//Identify CitOW game files
+
+$gamefiles = preg_grep('/game[0-9]+state[0-9]+\.xml/', $files);
+
+/***Create the select dropdown for games***/
+//Create separate arrays for games
+//under and over 1000
+$games = array();
+$games2 = array();
+$tempstates = array();
+foreach ($gamefiles as $filename){
+    preg_match('/game([0-9]+)state([0-9]+)/', $filename, $matches);
+    if ($matches[1] < 1000){
+        $games[] = $matches[1];
+    }
+    else {
+        $games2[] = $matches[1];
+    }
+    $tempstates[] = array($matches[1], $matches[2]);
+}
+$games = array_unique($games);
+sort($games);
+//Count the under-1000 games
+$len = count($games);
+$games2 = array_unique($games2);
+sort($games2);
+//Append the 1000+ games to the
+//end of the array
+$games = array_merge($games, $games2);
+$gamechoice = ($gamenum == '') ? intval($games[$len - 1]) : intval($gamenum);
+//Fill in gamenum, if it is missing
+if ($gamenum == '') {
+    $gamenum = $gamechoice;
+}
+$creator = $jsondata->$gamenum->creator;
+echo '  <hgroup>', "\n";
+echo '    <h1>Chaos in the Old World - Game ', $gamenum, ' </h1>', "\n";
+echo '    <h2>Hosted by ', $creator, '</h2>', "\n";
+echo '  </hgroup>', "\n";
 ?>
+  <nav>
+    <ul>
+      <li><a href="index.php">Return to Index</a></li>
+      <li><a href="http://appliednerditry.com/tracker/bug_report_page.php">Report a Bug</a></li>
+    </ul>
+  </nav>
   <div id="handlebox">
     <div id="activehandle" class="lefthandle">
       <div id="activate" class="handlecontents"></div>
@@ -98,15 +174,16 @@ echo '        <img src="'.$rooturl.'/chaos/icons/figure_effects_txt2.png" id="wo
            canvas element.  Get a better browser!</span>
     </canvas>
     <div id="resetbox">
-      <span class="emphasis">Reset PP:</span>
-      <div id="resetpp"></div>
       <span class="emphasis">Reset DACs:</span>
       <div id="resetdacs"></div>
+      <span class="emphasis">Reset Effects:</span>
+      <div id="reseteffects"></div>
     </div>
     <div id="ppbox">
-      <div id="inputbox" class="arrows">
-        <span id="ppspan" class="emphasis">PP:</span>
-      </div>
+      <div id="inputbox" class="arrows"></div>
+			<span id="ppspan" class="emphasis">PP:</span>
+      <div id="resetpp"></div>
+      <span class="emphasis">Reset PP:</span>
     </div>
   </div>
   <div id="piecesbox">
@@ -130,55 +207,8 @@ echo '        <img src="'.$rooturl.'/chaos/icons/figure_effects_txt2.png" id="wo
     </div>
   </div>
   <div class="floatbox buttons clear">
+
 <?php
-$dir = $docroot.$slash.'chaos'.$slash.'saves';
-
-$gamenum = $_GET['game'];
-$statenum = $_GET['state'];
-
-$matches = array();
-$states = array();
-
-//Read the file list
-$files = array();
-if ($handle = opendir($dir)){
-    while (false !== ($filename = readdir($handle))){
-        $files[] = $filename;
-    }
-    closedir($handle);
-}
-
-//Identify CitOW game files
-
-$gamefiles = preg_grep('/game[0-9]+state[0-9]+\.xml/', $files);
-
-/***Create the select dropdown for games***/
-//Create separate arrays for games
-//under and over 1000
-$games = array();
-$games2 = array();
-$tempstates = array();
-foreach ($gamefiles as $filename){
-    preg_match('/game([0-9]+)state([0-9]+)/', $filename, $matches);
-    if ($matches[1] < 1000){
-        $games[] = $matches[1];
-    }
-    else {
-        $games2[] = $matches[1];
-    }
-    $tempstates[] = array($matches[1], $matches[2]);
-}
-$games = array_unique($games);
-sort($games);
-//Count the under-1000 games
-$len = count($games);
-$games2 = array_unique($games2);
-sort($games2);
-//Append the 1000+ games to the
-//end of the array
-$games = array_merge($games, $games2);
-$gamechoice = ($gamenum == '') ? intval($games[$len - 1]) : intval($gamenum);
-
 echo '    <select id="gamepick">'."\n";
 foreach ($games as $x){
     $gameshort = intval($x);
