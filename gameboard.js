@@ -3217,9 +3217,9 @@ function initialize(){
         $owthead.mousedown($owthead[0].open);
         //Set relations so that the reserve
         //drawers can close each other
-        $cchead[0].next = owchead;
-        $owchead[0].next = owthead;
-        $owthead[0].next = cchead;
+        $cchead[0].next = $owchead[0];
+        $owchead[0].next = $owthead[0];
+        $owthead[0].next = $cchead[0];
         //Set up the save PNG button
         var $savePNG = $("#savepng");
         $savePNG.click(function(){
