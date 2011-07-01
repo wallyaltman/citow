@@ -1890,7 +1890,7 @@ function drawBoard(blank, local){
             newRegion.ruination[j] = $(this).text();
         });
         //Set the region's ruination rank, if ruined
-        $ruinTemp = $(this).find("ruined");
+        $ruinTemp = $(regionXML).find("ruined");
         newRegion.ruined = $ruinTemp ? $ruinTemp.text() : 0;
         //Set up the region's chaos cards
         newRegion.cards = [];
