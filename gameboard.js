@@ -2391,6 +2391,7 @@ function dropObject(){
     var pen = document.getElementById("pen");
     //Identify the type of object
     var type = pen.held.type;
+    var name = pen.held.name;
     var objects;
     var target = this;
     var holder;
