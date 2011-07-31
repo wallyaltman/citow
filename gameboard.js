@@ -2165,6 +2165,12 @@ function drawBoard(blank, local){
         }
     }
     figureSlots = oldWorldXML.getElementsByTagName("slot");
+    //Set up name-keyed references
+    //to the players
+    var tempPlayers = {};
+    for (j = 0; j < playerCount; j++){
+        tempPlayers[players[j].name] = players[j];
+    }
     //Handle figures in the slots
     for (i = 0; i < figureSlots.length; i++) {
         slotID = figureSlots[i].getAttribute("slotid");
