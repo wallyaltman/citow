@@ -1115,7 +1115,7 @@ function buildScoreBoardControls(){
         pp.type = numType;
         pp.className = "score pp"
         pp.min = "0";
-        pp.max = "9";
+        pp.max = "30";
         pp.value = players[i].pp;
         ppCell = document.createElement("td");
         ppCell.className = "centered";
