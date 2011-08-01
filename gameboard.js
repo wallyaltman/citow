@@ -469,10 +469,10 @@ function createUpDownButtons(target){
     div.onmousedown = function(){ return false; };
     var stepMethod = function(amount){
         this.target.value = Number(this.target.value) + amount;
-        if (this.target.value > this.target.max){
+        if (Number(this.target.value) > Number(this.target.max)){
             this.target.value = this.target.max;
         }
-        else if (this.target.value < this.target.min){
+        else if (Number(this.target.value) < Number(this.target.min)){
             this.target.value = this.target.min;
         }
         else {
@@ -1115,7 +1115,7 @@ function buildScoreBoardControls(){
         pp.type = numType;
         pp.className = "score pp"
         pp.min = "0";
-        pp.max = "9";
+        pp.max = "30";
         pp.value = players[i].pp;
         ppCell = document.createElement("td");
         ppCell.className = "centered";
@@ -2165,6 +2165,12 @@ function drawBoard(blank, local){
         }
     }
     figureSlots = oldWorldXML.getElementsByTagName("slot");
+    //Set up name-keyed references
+    //to the players
+    var tempPlayers = {};
+    for (j = 0; j < playerCount; j++){
+        tempPlayers[players[j].name] = players[j];
+    }
     //Handle figures in the slots
     for (i = 0; i < figureSlots.length; i++) {
         slotID = figureSlots[i].getAttribute("slotid");

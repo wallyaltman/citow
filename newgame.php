@@ -173,7 +173,7 @@ if (!$fail){
     if (strtolower($ccardset) == 'morrslieb'){
         $documentnode->setAttribute('expansion', 'morrslieb');
     }
-    if (isset($threadnum)){
+    if (isset($threadnum) && strlen($threadnum) >= 5){
         $documentnode->setAttribute('thread', $threadnum);
     }
     //Set the Old World card set
