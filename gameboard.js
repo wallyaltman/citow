@@ -469,10 +469,10 @@ function createUpDownButtons(target){
     div.onmousedown = function(){ return false; };
     var stepMethod = function(amount){
         this.target.value = Number(this.target.value) + amount;
-        if (this.target.value > this.target.max){
+        if (Number(this.target.value) > Number(this.target.max)){
             this.target.value = this.target.max;
         }
-        else if (this.target.value < this.target.min){
+        else if (Number(this.target.value) < Number(this.target.min)){
             this.target.value = this.target.min;
         }
         else {
