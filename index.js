@@ -96,9 +96,14 @@ function Index(){
     var validateGameURL = function(){
         var dfd = new $.Deferred();
         var url = $urlGameThread.attr("value");
+        //Old forum links:
         //Capture groups: /------------------------------1------------------------------\              /--4--\
         var pattern = /^((?:http:\/\/)?forums.penny-arcade.com\/show(thread|post)\.php\?)?(?:(t|p)=)?(\d{6,9})/i;
         //Capture groups:                                            \----2----/           \---3--/
+        //New forum links:
+        //Capture groups:   /-------------------------1-------------------------\   /--3--\
+        var newPattern = /^((?:http:\/\/)?forums.penny-arcade.com\/(discussion)\/)?(\d{6,9})/i;
+        //Capture groups:                                           \----2---/
         //Match the regular expression
         var matches = url.match(pattern);
         //Check for a valid forum thread
@@ -121,7 +126,12 @@ function Index(){
                 return false;
             }
         } else {
-            return false;
+            matches = url.match(newPattern);
+            if (matches) {
+                return matches[3];
+            } else {
+                return false;
+            }
         }
         return dfd.promise();
     }
