@@ -199,7 +199,7 @@ foreach ($moddates as $gnum => $modtime){
                        : '';
     $threadnum = $gamedata[$gnum]->thread;
     $threadurl = isset($threadnum)
-                       ? 'http://forums.penny-arcade.com/showthread.php?t=' . $threadnum
+                       ? 'http://forums.penny-arcade.com/discussion/' . $threadnum
                        : '';
     if ($modtimeobj > $today){
         $modstring = $modtimeobj->format('g:i A');
