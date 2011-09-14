@@ -2336,6 +2336,9 @@ function drawBoard(blank, local){
                         //Return stray tokens to their pool
                         pen.held.home.drop();
                     }
+                    else {
+                        pen.held = null;
+                    }
                 }
                 //Clear any object other than a figure
                 else {
