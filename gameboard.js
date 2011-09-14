@@ -1766,9 +1766,11 @@ function drawBoard(blank, local){
             cultists : [],
             warriors : [],
             daemons : [],
-            noCorruption : ($currentPower.attr("nocorruption") == "true"),
-            cache : []
+            noCorruption : ($currentPower.attr("nocorruption") == "true")
         };
+        if ($currentPower.find("cache").length > 0) {
+            newPlayer.cache = [];
+        }
         //Create a display name, with underscores swapped out for spaces
         newPlayer.displayName = newPlayer.name.replace(/_/, " ");
         //Total figure counts
@@ -1807,31 +1809,33 @@ function drawBoard(blank, local){
             }
         }
         //Find any cards in the cache
-        $tempCardList = $(currentPlayer).find("card");
-        $tempCardList.each(function () {
-            var tempOwner;
-            var newCard = {
-                cost : $(this).attr("cost"),
-                holder : ($(this).attr("holder") === "true"),
-                skull : ($(this).attr("skull") === "true"),
-                magic : ($(this).attr("magic") === "true"),
-                magicIcon : magicIcon,
-                name : $(this).text(),
-                type : "chaos"
-            };
-            tempOwner = $(this).attr("owner");
-            //Insert the card into the cache if the owner matches
-            if (tempOwner === newPlayer.displayName){
-                newCard.owner = newPlayer.displayName;
-                map.idCrd++;
-                idString = String(map.idCrd);
-                idString = (idString.length == 1) ? "0" + idString : idString;
-                newCard.objectID = "crd" + idString + tempOwner.substr(0,3);
-                newCard.objectID.toUpperCase();
-                newCard.draw = drawCard;
-                newPlayer.cache.push(newCard);
-            }
-        });
+        if (newPlayer.cache) {
+            $tempCardList = $(currentPlayer).find("card");
+            $tempCardList.each(function () {
+                var tempOwner;
+                var newCard = {
+                    cost : $(this).attr("cost"),
+                    holder : ($(this).attr("holder") === "true"),
+                    skull : ($(this).attr("skull") === "true"),
+                    magic : ($(this).attr("magic") === "true"),
+                    magicIcon : magicIcon,
+                    name : $(this).text(),
+                    type : "chaos"
+                };
+                tempOwner = $(this).attr("owner");
+                //Insert the card into the cache if the owner matches
+                if (tempOwner === newPlayer.displayName){
+                    newCard.owner = newPlayer.displayName;
+                    map.idCrd++;
+                    idString = String(map.idCrd);
+                    idString = (idString.length == 1) ? "0" + idString : idString;
+                    newCard.objectID = "crd" + idString + tempOwner.substr(0,3);
+                    newCard.objectID.toUpperCase();
+                    newCard.draw = drawCard;
+                    newPlayer.cache.push(newCard);
+                }
+            });
+        }
         players.push(newPlayer);
     }
     //Load the Chaos Cards
