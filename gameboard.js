@@ -2332,7 +2332,7 @@ function drawBoard(blank, local){
                             pen.held.home.drop();
                         }
                     }
-                    else {
+                    else if (pen.held.home) {
                         //Return stray tokens to their pool
                         pen.held.home.drop();
                     }
