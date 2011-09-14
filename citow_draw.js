@@ -1340,6 +1340,7 @@ function drawScoreBoard(){
             score.draw();
         };
         currentPlayer.playerRow = {
+            player : currentPlayer,
             tokens : currentPlayer.peasants,
             type : "playerrow",
             draw : scoreDraw,
