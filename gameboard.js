@@ -613,6 +613,7 @@ function getChaosCards(expansion){
                         magic : (chaosCards[i].getAttribute("magic") == "true"),
                         holder : (chaosCards[i].getAttribute("holder") == "true"),
                         skull : (chaosCards[i].getAttribute("skull") == "true"),
+                        cacheable : (chaosCards[i].getAttribute("cacheable") == "true"),
                         magicIcon : {},
                         type : "chaos"
                     };
@@ -1904,6 +1905,7 @@ function drawBoard(blank, local){
                 holder : ($(this).attr("holder") === "true"),
                 skull : ($(this).attr("skull") === "true"),
                 magic : ($(this).attr("magic") === "true"),
+                cacheable : ($(this).attr("cacheable") === "true"),
                 magicIcon : magicIcon,
                 name : $(this).text(),
                 type : "chaos"
@@ -2114,6 +2116,7 @@ function drawBoard(blank, local){
                     holder : ($(this).attr("holder") === "true"),
                     skull : ($(this).attr("skull") === "true"),
                     magic : ($(this).attr("magic") === "true"),
+                    cacheable : ($(this).attr("cacheable") === "true"),
                     magicIcon : magicIcon,
                     name : $(this).text(),
                     type : "chaos"
@@ -2312,9 +2315,9 @@ function drawBoard(blank, local){
                     var workshop = document.getElementById("workshop");
                     workshop.release(evt);
                 }
-                else if (pen.held.type == "token"){
-                    //Score peasants dropped on the scoreboard
-                    if (pen.held.name == "peasant"){
+                else if (pen.held.type == "token" || pen.held.type == "chaos"){
+                    //Score peasants or cacheable cards dropped on the scoreboard
+                    if (pen.held.name == "peasant" || pen.held.cacheable){
                         var players = this.map.players;
                         for (i = 0; i < players.length; i++){
                             if (players[i].playerRow.x0 <= x && x < players[i].playerRow.x1 && players[i].playerRow.y0 <= y && y < players[i].playerRow.y1){
@@ -2810,6 +2813,9 @@ function saveBoardXML(saveType){
                 }
                 if (regions[i].cards[j].skull){
                     node3.setAttribute("skull", true);
+                }
+                if (regions[i].cards[j].cacheable){
+                    node3.setAttribute("cacheable", true);
                 }
                 textNode = xmlDoc.createTextNode('');
                 textNode.data = regions[i].cards[j].name;

@@ -39,7 +39,7 @@
   <card owner="Horned_Rat" cost="1">Grey Seer</card>
   <card owner="Horned_Rat" cost="1" magic="true">Strength in Numbers</card>
   <card owner="Horned_Rat" cost="1">Verminous Horde</card>
-  <card owner="Horned_Rat" cost="2" magic="true">Warp Token Cache</card>
+  <card owner="Horned_Rat" cost="2" magic="true" cacheable="true">Warp Token Cache</card>
   <card owner="Horned_Rat" cost="3" magic="true">Screaming Bell</card>
   <card owner="Old_World" cost="-">------Horned One's Due------</card>
 </chaoscards>
