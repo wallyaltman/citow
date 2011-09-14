@@ -15,7 +15,7 @@ capture/*
 *.bak
 
 ### Vim swap files ###
-*.vim
+*.swp
 
 ### Eclipse project file ###
 .project
