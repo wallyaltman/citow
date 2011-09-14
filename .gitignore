@@ -14,6 +14,9 @@ capture/*
 ### Np++ backkups ###
 *.bak
 
+### Vim swap files ###
+*.vim
+
 ### Eclipse project file ###
 .project
 
