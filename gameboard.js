@@ -1734,8 +1734,6 @@ function drawBoard(blank, local){
     //Set up the players array
     var players = [];
     map.players = players;
-    map.idCrd = 0;
-    map.idOWC = 0;
     var currentPlayer, $currentPower, powerName, playerName, newPlayer, figCount, figTypes, $tempCardList;
     var allPowers = {};
     var numPowers = 0;
@@ -1768,7 +1766,7 @@ function drawBoard(blank, local){
             daemons : [],
             noCorruption : ($currentPower.attr("nocorruption") == "true")
         };
-        if ($currentPower.find("cache").length > 0) {
+        if ($currentPower.attr("cache") == "true") {
             newPlayer.cache = [];
         }
         //Create a display name, with underscores swapped out for spaces
@@ -1808,34 +1806,6 @@ function drawBoard(blank, local){
                 newPlayer[figTypes].push(figure);
             }
         }
-        //Find any cards in the cache
-        if (newPlayer.cache) {
-            $tempCardList = $(currentPlayer).find("card");
-            $tempCardList.each(function () {
-                var tempOwner;
-                var newCard = {
-                    cost : $(this).attr("cost"),
-                    holder : ($(this).attr("holder") === "true"),
-                    skull : ($(this).attr("skull") === "true"),
-                    magic : ($(this).attr("magic") === "true"),
-                    magicIcon : magicIcon,
-                    name : $(this).text(),
-                    type : "chaos"
-                };
-                tempOwner = $(this).attr("owner");
-                //Insert the card into the cache if the owner matches
-                if (tempOwner === newPlayer.displayName){
-                    newCard.owner = newPlayer.displayName;
-                    map.idCrd++;
-                    idString = String(map.idCrd);
-                    idString = (idString.length == 1) ? "0" + idString : idString;
-                    newCard.objectID = "crd" + idString + tempOwner.substr(0,3);
-                    newCard.objectID.toUpperCase();
-                    newCard.draw = drawCard;
-                    newPlayer.cache.push(newCard);
-                }
-            });
-        }
         players.push(newPlayer);
     }
     //Load the Chaos Cards
@@ -1843,6 +1813,8 @@ function drawBoard(blank, local){
     //Set up the regions array
     var regions = [];
     map.regions = regions;
+    map.idCrd = 0;
+    map.idOWC = 0;
     var magicIcon, skullIcon;
     magicIcon = {
         draw : drawToken,
@@ -2132,6 +2104,34 @@ function drawBoard(blank, local){
         dialXML = playersXML[i].getElementsByTagName("dial")[0];
         currentPlayer.dialValue = dialXML.getElementsByTagName("value")[0].firstChild.data;
         currentPlayer.dacs = dialXML.getElementsByTagName("dac")[0].firstChild ? dialXML.getElementsByTagName("dac")[0].firstChild.data : 0;
+        //Find any cards in the cache, if there is one
+        if (currentPlayer.cache) {
+            $tempCardList = $(playersXML[i]).find("card");
+            $tempCardList.each(function () {
+                var tempOwner;
+                var newCard = {
+                    cost : $(this).attr("cost"),
+                    holder : ($(this).attr("holder") === "true"),
+                    skull : ($(this).attr("skull") === "true"),
+                    magic : ($(this).attr("magic") === "true"),
+                    magicIcon : magicIcon,
+                    name : $(this).text(),
+                    type : "chaos"
+                };
+                tempOwner = $(this).attr("owner");
+                //Insert the card into the cache if the owner matches
+                if (tempOwner === currentPlayer.displayName){
+                    newCard.owner = currentPlayer.displayName;
+                    map.idCrd++;
+                    idString = String(map.idCrd);
+                    idString = (idString.length == 1) ? "0" + idString : idString;
+                    newCard.objectID = "crd" + idString + tempOwner.substr(0,3);
+                    newCard.objectID.toUpperCase();
+                    newCard.draw = drawCard;
+                    currentPlayer.cache.push(newCard);
+                }
+            });
+        }
     }
     //Draw the regions
     $(regions).each(function () {
@@ -2458,6 +2458,9 @@ function dropObject(){
     }
     if (type == "chaos" && target.type == "region"){
         objects = target.cards;
+    }
+    else if (type == "chaos" && target.type == "player" && target.cache) {
+        objects = target.cache;
     }
     else if (type == "oldworld" && target.type == "oldworldtrack"){
         objects = target.cards;
