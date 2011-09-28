@@ -1433,7 +1433,7 @@ function drawCache(){
         }
     }
     //Draw the cached cards (six at most)
-    cacheSize = Math.min(cachedCards.length, 6);
+    cacheSize = Math.min(cachedCards.length, 4);
     for (i = 0; i < cacheSize; i++) {
         x1 = x + offsetX * (Math.floor(i / 2));
         y1 = y + offsetY * (i % 2);
