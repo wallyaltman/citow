@@ -1406,12 +1406,13 @@ function drawScoreBoard(){
 function drawCache(){
     var cachedCards = [];
     var x = 15;
-    var y = 315;
-    var x1, y1;
+    var y = 312;
+    var x1, y1, y0;
     var width = 235;
-    var height = 40;
+    var height = 45;
     var offsetX = 45;
-    var offsetY = 18;
+    var offsetY = 26;
+    var stepY = 8;
     var bgcolor = "#332211";
     var bgcolor2 = "#332211";
     var ctx = this.ctx;
@@ -1436,7 +1437,8 @@ function drawCache(){
     cacheSize = Math.min(cachedCards.length, 4);
     for (i = 0; i < cacheSize; i++) {
         x1 = x + offsetX * (Math.floor(i / 2));
-        y1 = y + offsetY * (i % 2);
+        y0 = y + stepY * (Math.floor(i / 2));
+        y1 = y0 + offsetY * (i % 2);
         cachedCards[i].bgcolor = bgcolor;
         cachedCards[i].bgcolor2 = bgcolor2;
         cachedCards[i].draw(x1, y1, ctx);
