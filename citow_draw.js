@@ -1410,7 +1410,7 @@ function drawCache(){
     var x1, y1;
     var width = 235;
     var height = 40;
-    var offsetX = 27;
+    var offsetX = 45;
     var offsetY = 18;
     var bgcolor = "#332211";
     var bgcolor2 = "#332211";
