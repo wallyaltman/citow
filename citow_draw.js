@@ -1406,13 +1406,14 @@ function drawScoreBoard(){
 function drawCache(){
     var cachedCards = [];
     var x = 15;
-    var y = 305;
+    var y = 315;
     var x1, y1;
     var width = 235;
-    var height = 50;
-    var offsetX = 30;
+    var height = 40;
+    var offsetX = 27;
     var offsetY = 18;
     var bgcolor = "#332211";
+    var bgcolor2 = "#332211";
     var ctx = this.ctx;
     var players = this.players;
     var numPlayers = players.length;
@@ -1436,6 +1437,8 @@ function drawCache(){
     for (i = 0; i < cacheSize; i++) {
         x1 = x + offsetX * (Math.floor(i / 2));
         y1 = y + offsetY * (i % 2);
+        cachedCards[i].bgcolor = bgcolor;
+        cachedCards[i].bgcolor2 = bgcolor2;
         cachedCards[i].draw(x1, y1, ctx);
     }
     //Set the card cache's bounding box
