@@ -741,9 +741,6 @@ div.buttons {
 input[type="button"].unsaved {
   background-color: #D66D6d;
 }
-input[type="button"].right {
-  float: right;
-}
 
 /*** Mobile canvas (display for dragged pieces) ***/
 div.dragframe {
