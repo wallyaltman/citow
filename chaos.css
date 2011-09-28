@@ -738,6 +738,13 @@ div.buttons {
   margin-left:50px;
 }
 
+input[type="button"].unsaved {
+  background-color: #D66D6d;
+}
+input[type="button"].right {
+  float: right;
+}
+
 /*** Mobile canvas (display for dragged pieces) ***/
 div.dragframe {
   background:transparent;
