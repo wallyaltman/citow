@@ -1401,6 +1401,50 @@ function drawScoreBoard(){
     }
 }
 
+/* Draw cached cards, if there are any
+ */
+function drawCache(){
+    var cachedCards = [];
+    var x = 15;
+    var y = 305;
+    var x1, y1;
+    var width = 235;
+    var height = 50;
+    var offsetX = 30;
+    var offsetY = 18;
+    var bgcolor = "#332211";
+    var ctx = this.ctx;
+    var players = this.players;
+    var numPlayers = players.length;
+    var currentPlayer;
+    var cacheSize;
+    var i, j;
+    //Clear the drawing area
+    ctx.fillStyle = bgcolor;
+    ctx.fillRect(x - 5, y - 5, width + 5, height + 5);
+    //Find all the cached cards
+    for (i = 0; i < numPlayers; i++) {
+        if (players[i].cache && players[i].cache.length > 0) {
+            currentPlayer = players[i];
+            for (j = 0; j < currentPlayer.cache.length; j++) {
+                cachedCards.push(currentPlayer.cache[j];
+            }
+        }
+    }
+    //Draw the cached cards (six at most)
+    cacheSize = Math.min(cachedCards.length, 6);
+    for (i = 0; i < cacheSize; i++) {
+        x1 = x + offsetX * (Math.floor(i / 2));
+        y1 = y + offsetY * (i % 2);
+        cachedCards[i].draw(x1, y1, ctx);
+    }
+    //Set the card cache's bounding box
+    this.x0 = x;
+    this.y0 = y;
+    this.x1 = x + width;
+    this.y1 = y + height;
+}
+
 /* Draw a player's reserve area
  */
 function drawReserves(){

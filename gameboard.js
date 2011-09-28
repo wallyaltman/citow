@@ -2048,7 +2048,7 @@ function drawBoard(blank, local){
     //Set up the scoreboard
     var score = {};
     map.score = score;
-    score.draw = drawScoreBoard;
+    score.drawMe = drawScoreBoard;
     score.ctx = ctx;
     score.players = players;
     score.xmlData = scoreXML;
@@ -2135,6 +2135,21 @@ function drawBoard(blank, local){
                 }
             });
         }
+    }
+    //Set up the card cache
+    var cache = {};
+    map.cache = cache;
+    cache.players = players;
+    cache.ctx = ctx;
+    cache.drawMe = drawCache;
+    //Redraw the cache when redrawing the scoreboard, and v.v.
+    score.draw = function () {
+        score.drawMe();
+        cache.drawMe();
+    }
+    cache.draw = function () {
+        score.drawMe();
+        cache.drawMe();
     }
     //Draw the regions
     $(regions).each(function () {
