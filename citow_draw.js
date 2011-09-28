@@ -1427,7 +1427,7 @@ function drawCache(){
         if (players[i].cache && players[i].cache.length > 0) {
             currentPlayer = players[i];
             for (j = 0; j < currentPlayer.cache.length; j++) {
-                cachedCards.push(currentPlayer.cache[j];
+                cachedCards.push(currentPlayer.cache[j]);
             }
         }
     }
