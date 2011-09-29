@@ -2141,7 +2141,9 @@ function drawBoard(blank, local){
     map.cache = cache;
     cache.players = players;
     cache.ctx = ctx;
+    cache.type = "cache";
     cache.drawMe = drawCache;
+    cache.drop = dropObject;
     //Redraw the cache when redrawing the scoreboard, and v.v.
     score.draw = function () {
         score.drawMe();
@@ -2494,7 +2496,7 @@ function dropObject(){
     if (type == "chaos" && target.type == "region"){
         objects = target.cards;
     }
-    else if (type == "chaos" && pen.held.owner.cache && (target.type == "playerrow" || target.type == "player")) {
+    else if (type == "chaos" && pen.held.owner.cache && (target.type == "playerrow" || target.type == "cache")) {
         objects = pen.held.owner.cache;
     }
     else if (type == "oldworld" && target.type == "oldworldtrack"){
