@@ -2357,9 +2357,6 @@ function drawBoard(blank, local){
                                 if (cache.x0 <= x && x < cache.x1 && cache.y0 <= y && y < cache.y1) {
                                     cache.drop();
                                 }
-                                else {
-                                    pen.held.home.drop();
-                                }
                             }
                             else {
                                 pen.held.home.drop();
@@ -2473,6 +2470,7 @@ function dropObject(){
     var target = this;
     var holder;
     var targetSlot;
+    var cache;
     if (this.type  === "cardslot") {
         holder = this.heldBy.cards[this.index] && this.heldBy.cards[this.index].holder;
         if (type !== "figure") {
@@ -2500,7 +2498,8 @@ function dropObject(){
         objects = target.cards;
     }
     else if (type == "chaos" && (target.type == "playerrow" || target.type == "cache")) {
-        objects = target.cards;
+        cache = $("board")[0].map.cache;
+        objects = cache.cards;
     }
     else if (type == "oldworld" && target.type == "oldworldtrack"){
         objects = target.cards;
