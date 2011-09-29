@@ -1421,23 +1421,9 @@ function drawCache(){
     var currentPlayer;
     var cacheSize;
     var i, j;
-    //Regenerate the cache's contents every time because
-    //I can't be bothered to do it properly
-    cache.cards = [];
     //Clear the drawing area
     ctx.fillStyle = bgcolor;
     ctx.fillRect(x - 5, y - 5, width + 5, height + 5);
-    //Find all the cached cards
-    for (i = 0; i < numPlayers; i++) {
-        if (players[i].cache && players[i].cache.length > 0) {
-            currentPlayer = players[i];
-            for (j = 0; j < currentPlayer.cache.length; j++) {
-                //Store the cards in reverse order, so that the ones on
-                //top will be the first ones grabbed if they overlap
-                cache.cards.unshift(currentPlayer.cache[j]);
-            }
-        }
-    }
     //Draw the cached cards (six at most)
     cacheSize = Math.min(cache.cards.length, 4);
     for (i = 0; i < cacheSize; i++) {
