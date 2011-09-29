@@ -2334,8 +2334,10 @@ function drawBoard(blank, local){
                     //Score peasants or cacheable cards dropped on the scoreboard
                     if (pen.held.name == "peasant" || pen.held.cacheable){
                         var players = this.map.players;
+                        var currentRow;
                         for (i = 0; i < players.length; i++){
-                            if (players[i].playerRow.x0 <= x && x < players[i].playerRow.x1 && players[i].playerRow.y0 <= y && y < players[i].playerRow.y1){
+                            currentRow = players[i].playerRow;
+                            if (currentRow.x0 <= x && x < currentRow.x1 && currentRow.y0 <= y && y < currentRow.y1){
                                 players[i].playerRow.drop();
                                 var fieldName = players[i].name + "_peasants";
                                 var control = document.getElementById(fieldName);
@@ -2344,7 +2346,19 @@ function drawBoard(blank, local){
                             }
                         }
                         if (i == players.length){
-                            pen.held.home.drop();
+                            //Attempt to drop a cacheable card at the rendered cache
+                            if (pen.held.cacheable) {
+                                var cache = this.map.cache;
+                                if (cache.x0 <= x && x < cache.x1 && cache.y0 <= y && y < cache.y1) {
+                                    pen.held.owner.drop();
+                                }
+                                else {
+                                    pen.held.home.drop();
+                                }
+                            }
+                            else {
+                                pen.held.home.drop();
+                            }
                         }
                     }
                     else if (pen.held.home) {
