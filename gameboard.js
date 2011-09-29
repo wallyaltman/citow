@@ -2357,6 +2357,9 @@ function drawBoard(blank, local){
                                 if (cache.x0 <= x && x < cache.x1 && cache.y0 <= y && y < cache.y1) {
                                     cache.drop();
                                 }
+                                else {
+                                    pen.held = null;
+                                }
                             }
                             else {
                                 pen.held.home.drop();
