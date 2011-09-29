@@ -1340,6 +1340,7 @@ function drawScoreBoard(){
             score.draw();
         };
         currentPlayer.playerRow = {
+            player : currentPlayer,
             tokens : currentPlayer.peasants,
             type : "playerrow",
             draw : scoreDraw,
@@ -1398,6 +1399,46 @@ function drawScoreBoard(){
         ctx.fillStyle = textcolor;
         ctx.fillText(headers[i], x1 + space, y - 1);
     }
+}
+
+/* Draw cached cards, if there are any
+ */
+function drawCache(){
+    var cache = this;
+    var x = 15;
+    var y = 312;
+    var x1, y1, y0;
+    var width = 235;
+    var height = 53;
+    var offsetX = 45;
+    var offsetY = 26;
+    var stepY = 8;
+    var bgcolor = "#332211";
+    var bgcolor2 = "#332211";
+    var ctx = this.ctx;
+    var players = this.players;
+    var numPlayers = players.length;
+    var currentPlayer;
+    var cacheSize;
+    var i, j;
+    //Clear the drawing area
+    ctx.fillStyle = bgcolor;
+    ctx.fillRect(x - 5, y - 5, width + 5, height + 5);
+    //Draw the cached cards (six at most)
+    cacheSize = Math.min(cache.cards.length, 4);
+    for (i = 0; i < cacheSize; i++) {
+        x1 = x + offsetX * (Math.floor(i / 2));
+        y0 = y + stepY * (Math.floor(i / 2));
+        y1 = y0 + offsetY * (i % 2);
+        cache.cards[i].bgcolor = bgcolor;
+        cache.cards[i].bgcolor2 = bgcolor2;
+        cache.cards[i].draw(x1, y1, ctx);
+    }
+    //Set the card cache's bounding box
+    this.x0 = x;
+    this.y0 = y;
+    this.x1 = x + width;
+    this.y1 = y + height;
 }
 
 /* Draw a player's reserve area
