@@ -2144,6 +2144,7 @@ function drawBoard(blank, local){
     cache.cards = [];
     cache.type = "cache";
     cache.drawMe = drawCache;
+    cache.drag = dragObject;
     cache.drop = dropObject;
     //Redraw the cache when redrawing the scoreboard, and v.v.
     score.draw = function () {
