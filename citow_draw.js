@@ -1409,7 +1409,7 @@ function drawCache(){
     var y = 312;
     var x1, y1, y0;
     var width = 235;
-    var height = 45;
+    var height = 53;
     var offsetX = 45;
     var offsetY = 26;
     var stepY = 8;
