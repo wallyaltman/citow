@@ -2494,7 +2494,7 @@ function dropObject(){
     if (type == "chaos" && target.type == "region"){
         objects = target.cards;
     }
-    else if (type == "chaos" && target.type == "playerrow" && pen.held.owner.cache) {
+    else if (type == "chaos" && pen.held.owner.cache && (target.type == "playerrow" || target.type == "player")) {
         objects = pen.held.owner.cache;
     }
     else if (type == "oldworld" && target.type == "oldworldtrack"){
