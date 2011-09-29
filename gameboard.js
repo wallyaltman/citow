@@ -2141,6 +2141,7 @@ function drawBoard(blank, local){
     map.cache = cache;
     cache.players = players;
     cache.ctx = ctx;
+    cache.cards = [];
     cache.type = "cache";
     cache.drawMe = drawCache;
     cache.drop = dropObject;
@@ -2282,6 +2283,7 @@ function drawBoard(blank, local){
             //area under the cursor
             var areas = this.map.regions.concat(this.map.players);
             areas.push(this.map.oldWorld);
+            areas.push(this.map.cache);
             for (l = 0; l < areas.length; l++){
                 if (areas[l].x0 <= x && x < areas[l].x1 && areas[l].y0 <= y && y < areas[l].y1){
                     areas[l].drag(evt, x, y);

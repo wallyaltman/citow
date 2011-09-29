@@ -1404,7 +1404,7 @@ function drawScoreBoard(){
 /* Draw cached cards, if there are any
  */
 function drawCache(){
-    var cachedCards = [];
+    var cache = this;
     var x = 15;
     var y = 312;
     var x1, y1, y0;
@@ -1421,6 +1421,9 @@ function drawCache(){
     var currentPlayer;
     var cacheSize;
     var i, j;
+    //Regenerate the cache's contents every time because
+    //I can't be bothered to do it properly
+    cache.cards = [];
     //Clear the drawing area
     ctx.fillStyle = bgcolor;
     ctx.fillRect(x - 5, y - 5, width + 5, height + 5);
@@ -1429,19 +1432,21 @@ function drawCache(){
         if (players[i].cache && players[i].cache.length > 0) {
             currentPlayer = players[i];
             for (j = 0; j < currentPlayer.cache.length; j++) {
-                cachedCards.push(currentPlayer.cache[j]);
+                //Store the cards in reverse order, so that the ones on
+                //top will be the first ones grabbed if they overlap
+                cache.cards.unshift(currentPlayer.cache[j]);
             }
         }
     }
     //Draw the cached cards (six at most)
-    cacheSize = Math.min(cachedCards.length, 4);
+    cacheSize = Math.min(cache.cards.length, 4);
     for (i = 0; i < cacheSize; i++) {
         x1 = x + offsetX * (Math.floor(i / 2));
         y0 = y + stepY * (Math.floor(i / 2));
         y1 = y0 + offsetY * (i % 2);
-        cachedCards[i].bgcolor = bgcolor;
-        cachedCards[i].bgcolor2 = bgcolor2;
-        cachedCards[i].draw(x1, y1, ctx);
+        cache.cards[i].bgcolor = bgcolor;
+        cache.cards[i].bgcolor2 = bgcolor2;
+        cache.cards[i].draw(x1, y1, ctx);
     }
     //Set the card cache's bounding box
     this.x0 = x;
