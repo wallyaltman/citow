@@ -2352,7 +2352,7 @@ function drawBoard(blank, local){
                             if (pen.held.cacheable) {
                                 var cache = this.map.cache;
                                 if (cache.x0 <= x && x < cache.x1 && cache.y0 <= y && y < cache.y1) {
-                                    pen.held.owner.drop();
+                                    cache.drop();
                                 }
                                 else {
                                     pen.held.home.drop();
