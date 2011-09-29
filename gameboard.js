@@ -2498,7 +2498,7 @@ function dropObject(){
         objects = target.cards;
     }
     else if (type == "chaos" && (target.type == "playerrow" || target.type == "cache")) {
-        cache = $("board")[0].map.cache;
+        cache = $("#board")[0].map.cache;
         objects = cache.cards;
     }
     else if (type == "oldworld" && target.type == "oldworldtrack"){
