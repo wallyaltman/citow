@@ -2129,7 +2129,7 @@ function drawBoard(blank, local){
             };
             tempOwner = $(this).attr("owner");
             //Insert the card into the cache if the owner matches
-            if (tempOwner === currentPlayer.displayName && newCard.cacheable){
+            if (tempOwner === currentPlayer.name && newCard.cacheable){
                 newCard.owner = currentPlayer;
                 map.idCrd++;
                 idString = String(map.idCrd);
