@@ -2137,7 +2137,7 @@ function drawBoard(blank, local){
                 newCard.objectID = "crd" + idString + tempOwner.substr(0,3);
                 newCard.objectID.toUpperCase();
                 newCard.draw = drawCard;
-                cache.push(newCard);
+                cache.cards.push(newCard);
             }
         });
     }
