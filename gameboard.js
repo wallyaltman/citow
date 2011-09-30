@@ -1767,9 +1767,6 @@ function drawBoard(blank, local){
             daemons : [],
             noCorruption : ($currentPower.attr("nocorruption") == "true")
         };
-        if ($currentPower.attr("cache") == "true") {
-            newPlayer.cache = [];
-        }
         //Create a display name, with underscores swapped out for spaces
         newPlayer.displayName = newPlayer.name.replace(/_/, " ");
         //Total figure counts
@@ -2045,6 +2042,16 @@ function drawBoard(blank, local){
         });
         ruination[i] = ruinCard;
     }
+    //Set up the card cache
+    var cache = {};
+    map.cache = cache;
+    cache.players = players;
+    cache.ctx = ctx;
+    cache.cards = [];
+    cache.type = "cache";
+    cache.drawMe = drawCache;
+    cache.drag = dragObject;
+    cache.drop = dropObject;
     //Set up the scoreboard
     var score = {};
     map.score = score;
@@ -2107,45 +2114,33 @@ function drawBoard(blank, local){
         currentPlayer.dialValue = dialXML.getElementsByTagName("value")[0].firstChild.data;
         currentPlayer.dacs = dialXML.getElementsByTagName("dac")[0].firstChild ? dialXML.getElementsByTagName("dac")[0].firstChild.data : 0;
         //Find any cards in the cache, if there is one
-        if (currentPlayer.cache) {
-            $tempCardList = $(playersXML[i]).find("card");
-            $tempCardList.each(function () {
-                var tempOwner;
-                var newCard = {
-                    cost : $(this).attr("cost"),
-                    holder : ($(this).attr("holder") === "true"),
-                    skull : ($(this).attr("skull") === "true"),
-                    magic : ($(this).attr("magic") === "true"),
-                    cacheable : ($(this).attr("cacheable") === "true"),
-                    magicIcon : magicIcon,
-                    name : $(this).text(),
-                    type : "chaos"
-                };
-                tempOwner = $(this).attr("owner");
-                //Insert the card into the cache if the owner matches
-                if (tempOwner === currentPlayer.displayName){
-                    newCard.owner = currentPlayer.displayName;
-                    map.idCrd++;
-                    idString = String(map.idCrd);
-                    idString = (idString.length == 1) ? "0" + idString : idString;
-                    newCard.objectID = "crd" + idString + tempOwner.substr(0,3);
-                    newCard.objectID.toUpperCase();
-                    newCard.draw = drawCard;
-                    currentPlayer.cache.push(newCard);
-                }
-            });
-        }
+        $tempCardList = $(playersXML[i]).children("cache").find("card");
+        $tempCardList.each(function () {
+            var tempOwner;
+            var newCard = {
+                cost : $(this).attr("cost"),
+                holder : ($(this).attr("holder") === "true"),
+                skull : ($(this).attr("skull") === "true"),
+                magic : ($(this).attr("magic") === "true"),
+                cacheable : ($(this).attr("cacheable") === "true"),
+                magicIcon : magicIcon,
+                name : $(this).text(),
+                type : "chaos"
+            };
+            tempOwner = $(this).attr("owner");
+            //Insert the card into the cache if the owner matches
+            if (tempOwner === currentPlayer.displayName && newCard.cacheable){
+                newCard.owner = currentPlayer;
+                map.idCrd++;
+                idString = String(map.idCrd);
+                idString = (idString.length == 1) ? "0" + idString : idString;
+                newCard.objectID = "crd" + idString + tempOwner.substr(0,3);
+                newCard.objectID.toUpperCase();
+                newCard.draw = drawCard;
+                cache.push(newCard);
+            }
+        });
     }
-    //Set up the card cache
-    var cache = {};
-    map.cache = cache;
-    cache.players = players;
-    cache.ctx = ctx;
-    cache.cards = [];
-    cache.type = "cache";
-    cache.drawMe = drawCache;
-    cache.drag = dragObject;
-    cache.drop = dropObject;
     //Redraw the cache when redrawing the scoreboard, and v.v.
     score.draw = function () {
         score.drawMe();
