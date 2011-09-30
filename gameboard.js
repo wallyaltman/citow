@@ -2767,6 +2767,7 @@ function saveBoardXML(saveType){
         //Scoreboard
         var scoreBoard = xmlDoc.createElement("scoreboard");
         var players = board.map.players;
+        var cache = board.map.cache;
         for (i = 0; i < players.length; ++i){
             node = xmlDoc.createElement("player");
             node.setAttribute("name", players[i].name);
@@ -2813,6 +2814,34 @@ function saveBoardXML(saveType){
             node3.appendChild(textNode);
             node2.appendChild(node3);
             node.appendChild(node2);
+            //Cached cards
+            if (players[i].cache && players[i].cache.cards.length > 0) {
+                node2 = xmlDoc.createElement("cache");
+                for (j = 0; j < players[i].cache.cards.length; j++) {
+                    node3 = xmlDoc.createElement("card");
+                    node3.setAttribute("cost", players[i].cache.cards[j].cost);
+                    if (players[i].cache.cards[j].owner){
+                        node3.setAttribute("owner", players[i].cache.cards[j].owner.name);
+                    }
+                    if (players[i].cache.cards[j].magic){
+                        node3.setAttribute("magic", true);
+                    }
+                    if (players[i].cache.cards[j].holder){
+                        node3.setAttribute("holder", true);
+                    }
+                    if (players[i].cache.cards[j].skull){
+                        node3.setAttribute("skull", true);
+                    }
+                    if (players[i].cache.cards[j].cacheable){
+                        node3.setAttribute("cacheable", true);
+                    }
+                    textNode = xmlDoc.createTextNode('');
+                    textNode.data = players[i].cache.cards[j].name;
+                    node3.appendChild(textNode);
+                    node2.appendChild(node3);
+                }
+                node.appendChild(node2);
+            }
             scoreBoard.appendChild(node);
         }
         boardState.appendChild(scoreBoard);
