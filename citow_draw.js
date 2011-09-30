@@ -1441,7 +1441,7 @@ function drawCache(){
     }
     cacheSize = cache.cards.length;
     for (i = 0; i < cacheSize; i++) {
-        currentPlayer = cache.cards[i].owner.name;
+        currentPlayer = cache.cards[i].owner;
         if (playerHash[currentPlayer.name]) {
             if (!playerHash[currentPlayer.name].cache) {
                 playerHash[currentPlayer.name].cache = [];
