@@ -2815,28 +2815,28 @@ function saveBoardXML(saveType){
             node2.appendChild(node3);
             node.appendChild(node2);
             //Cached cards
-            if (players[i].cache && players[i].cache.cards.length > 0) {
+            if (players[i].cache && players[i].cache.length > 0) {
                 node2 = xmlDoc.createElement("cache");
-                for (j = 0; j < players[i].cache.cards.length; j++) {
+                for (j = 0; j < players[i].cache.length; j++) {
                     node3 = xmlDoc.createElement("card");
-                    node3.setAttribute("cost", players[i].cache.cards[j].cost);
-                    if (players[i].cache.cards[j].owner){
-                        node3.setAttribute("owner", players[i].cache.cards[j].owner.name);
+                    node3.setAttribute("cost", players[i].cache[j].cost);
+                    if (players[i].cache[j].owner){
+                        node3.setAttribute("owner", players[i].cache[j].owner.name);
                     }
-                    if (players[i].cache.cards[j].magic){
+                    if (players[i].cache[j].magic){
                         node3.setAttribute("magic", true);
                     }
-                    if (players[i].cache.cards[j].holder){
+                    if (players[i].cache[j].holder){
                         node3.setAttribute("holder", true);
                     }
-                    if (players[i].cache.cards[j].skull){
+                    if (players[i].cache[j].skull){
                         node3.setAttribute("skull", true);
                     }
-                    if (players[i].cache.cards[j].cacheable){
+                    if (players[i].cache[j].cacheable){
                         node3.setAttribute("cacheable", true);
                     }
                     textNode = xmlDoc.createTextNode('');
-                    textNode.data = players[i].cache.cards[j].name;
+                    textNode.data = players[i].cache[j].name;
                     node3.appendChild(textNode);
                     node2.appendChild(node3);
                 }
