@@ -1440,12 +1440,10 @@ function drawCache(){
         playerHash[players[i].name] = players[i];
     }
     cacheSize = cache.cards.length;
+    playerHash[currentPlayer.name].cache = [];
     for (i = 0; i < cacheSize; i++) {
         currentPlayer = cache.cards[i].owner;
         if (playerHash[currentPlayer.name]) {
-            if (!playerHash[currentPlayer.name].cache) {
-                playerHash[currentPlayer.name].cache = [];
-            }
             playerHash[currentPlayer.name].cache.push(cache.cards[i]);
         }
     }
