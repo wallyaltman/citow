@@ -2767,7 +2767,6 @@ function saveBoardXML(saveType){
         //Scoreboard
         var scoreBoard = xmlDoc.createElement("scoreboard");
         var players = board.map.players;
-        var cache = board.map.cache;
         for (i = 0; i < players.length; ++i){
             node = xmlDoc.createElement("player");
             node.setAttribute("name", players[i].name);
