@@ -1435,10 +1435,15 @@ function drawCache(){
         cache.cards[i].draw(x1, y1, ctx);
     }
     //Create references to each power's own cached cards
+    for (i = 0; i < players.length; i++) {
+        players[i].cache = null;
+    }
     cacheSize = cache.cards.length;
     for (i = 0; i < cacheSize; i++) {
         currentPlayer = cache.cards[i].owner;
-        currentPlayer.cache = [];
+        if (!currentPlayer.cache) {
+            currentPlayer.cache = [];
+        }
         currentPlayer.cache.push(cache.cards[i]);
     }
     //Set the card cache's bounding box
