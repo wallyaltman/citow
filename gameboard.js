@@ -613,6 +613,7 @@ function getChaosCards(expansion){
                         magic : (chaosCards[i].getAttribute("magic") == "true"),
                         holder : (chaosCards[i].getAttribute("holder") == "true"),
                         skull : (chaosCards[i].getAttribute("skull") == "true"),
+                        cacheable : (chaosCards[i].getAttribute("cacheable") == "true"),
                         magicIcon : {},
                         type : "chaos"
                     };
@@ -1734,7 +1735,7 @@ function drawBoard(blank, local){
     //Set up the players array
     var players = [];
     map.players = players;
-    var currentPlayer, $currentPower, powerName, playerName, newPlayer, figCount, figTypes;
+    var currentPlayer, $currentPower, powerName, playerName, newPlayer, figCount, figTypes, $tempCardList;
     var allPowers = {};
     var numPowers = 0;
     //Dump the XML data for the individual powers into
@@ -1827,7 +1828,7 @@ function drawBoard(blank, local){
         var $borderXML, $tempLinkList;
         var $corruptionXML, corruptPlayerCount, corruptingPlayers, $ruinTemp;
         var $tempFigureList, tempEffects, figure, figureXML, slotID, $figureSlots, tempPlayers;
-        var tempCardList, tempOwner, cards, newCard;
+        var $tempCardList, tempOwner, cards, newCard;
         var $tempTokenList;
         regionXML = $regionsXML[i];
         //Set up basic region information
@@ -1901,6 +1902,7 @@ function drawBoard(blank, local){
                 holder : ($(this).attr("holder") === "true"),
                 skull : ($(this).attr("skull") === "true"),
                 magic : ($(this).attr("magic") === "true"),
+                cacheable : ($(this).attr("cacheable") === "true"),
                 magicIcon : magicIcon,
                 name : $(this).text(),
                 type : "chaos"
@@ -2040,10 +2042,20 @@ function drawBoard(blank, local){
         });
         ruination[i] = ruinCard;
     }
+    //Set up the card cache
+    var cache = {};
+    map.cache = cache;
+    cache.players = players;
+    cache.ctx = ctx;
+    cache.cards = [];
+    cache.type = "cache";
+    cache.drawMe = drawCache;
+    cache.drag = dragObject;
+    cache.drop = dropObject;
     //Set up the scoreboard
     var score = {};
     map.score = score;
-    score.draw = drawScoreBoard;
+    score.drawMe = drawScoreBoard;
     score.ctx = ctx;
     score.players = players;
     score.xmlData = scoreXML;
@@ -2101,6 +2113,42 @@ function drawBoard(blank, local){
         dialXML = playersXML[i].getElementsByTagName("dial")[0];
         currentPlayer.dialValue = dialXML.getElementsByTagName("value")[0].firstChild.data;
         currentPlayer.dacs = dialXML.getElementsByTagName("dac")[0].firstChild ? dialXML.getElementsByTagName("dac")[0].firstChild.data : 0;
+        //Find any cards in the cache, if there is one
+        $tempCardList = $(playersXML[i]).children("cache").find("card");
+        $tempCardList.each(function () {
+            var tempOwner;
+            var newCard = {
+                cost : $(this).attr("cost"),
+                holder : ($(this).attr("holder") === "true"),
+                skull : ($(this).attr("skull") === "true"),
+                magic : ($(this).attr("magic") === "true"),
+                cacheable : ($(this).attr("cacheable") === "true"),
+                magicIcon : magicIcon,
+                name : $(this).text(),
+                type : "chaos"
+            };
+            tempOwner = $(this).attr("owner");
+            //Insert the card into the cache if the owner matches
+            if (tempOwner === currentPlayer.name && newCard.cacheable){
+                newCard.owner = currentPlayer;
+                map.idCrd++;
+                idString = String(map.idCrd);
+                idString = (idString.length == 1) ? "0" + idString : idString;
+                newCard.objectID = "crd" + idString + tempOwner.substr(0,3);
+                newCard.objectID.toUpperCase();
+                newCard.draw = drawCard;
+                cache.cards.push(newCard);
+            }
+        });
+    }
+    //Redraw the cache when redrawing the scoreboard, and v.v.
+    score.draw = function () {
+        score.drawMe();
+        cache.drawMe();
+    }
+    cache.draw = function () {
+        score.drawMe();
+        cache.drawMe();
     }
     //Draw the regions
     $(regions).each(function () {
@@ -2231,6 +2279,7 @@ function drawBoard(blank, local){
             //area under the cursor
             var areas = this.map.regions.concat(this.map.players);
             areas.push(this.map.oldWorld);
+            areas.push(this.map.cache);
             for (l = 0; l < areas.length; l++){
                 if (areas[l].x0 <= x && x < areas[l].x1 && areas[l].y0 <= y && y < areas[l].y1){
                     areas[l].drag(evt, x, y);
@@ -2281,12 +2330,14 @@ function drawBoard(blank, local){
                     var workshop = document.getElementById("workshop");
                     workshop.release(evt);
                 }
-                else if (pen.held.type == "token"){
-                    //Score peasants dropped on the scoreboard
-                    if (pen.held.name == "peasant"){
+                else if (pen.held.type == "token" || pen.held.type == "chaos"){
+                    //Score peasants or cacheable cards dropped on the scoreboard
+                    if (pen.held.name == "peasant" || pen.held.cacheable){
                         var players = this.map.players;
+                        var currentRow;
                         for (i = 0; i < players.length; i++){
-                            if (players[i].playerRow.x0 <= x && x < players[i].playerRow.x1 && players[i].playerRow.y0 <= y && y < players[i].playerRow.y1){
+                            currentRow = players[i].playerRow;
+                            if (currentRow.x0 <= x && x < currentRow.x1 && currentRow.y0 <= y && y < currentRow.y1){
                                 players[i].playerRow.drop();
                                 var fieldName = players[i].name + "_peasants";
                                 var control = document.getElementById(fieldName);
@@ -2295,12 +2346,27 @@ function drawBoard(blank, local){
                             }
                         }
                         if (i == players.length){
-                            pen.held.home.drop();
+                            //Attempt to drop a cacheable card at the rendered cache
+                            if (pen.held.cacheable) {
+                                var cache = this.map.cache;
+                                if (cache.x0 <= x && x < cache.x1 && cache.y0 <= y && y < cache.y1) {
+                                    cache.drop();
+                                }
+                                else {
+                                    pen.held = null;
+                                }
+                            }
+                            else {
+                                pen.held.home.drop();
+                            }
                         }
                     }
-                    else {
+                    else if (pen.held.home) {
                         //Return stray tokens to their pool
                         pen.held.home.drop();
+                    }
+                    else {
+                        pen.held = null;
                     }
                 }
                 //Clear any object other than a figure
@@ -2402,6 +2468,7 @@ function dropObject(){
     var target = this;
     var holder;
     var targetSlot;
+    var cache;
     if (this.type  === "cardslot") {
         holder = this.heldBy.cards[this.index] && this.heldBy.cards[this.index].holder;
         if (type !== "figure") {
@@ -2427,6 +2494,10 @@ function dropObject(){
     }
     if (type == "chaos" && target.type == "region"){
         objects = target.cards;
+    }
+    else if (type == "chaos" && (target.type == "playerrow" || target.type == "cache")) {
+        cache = $("#board")[0].map.cache;
+        objects = cache.cards;
     }
     else if (type == "oldworld" && target.type == "oldworldtrack"){
         objects = target.cards;
@@ -2696,6 +2767,7 @@ function saveBoardXML(saveType){
         //Scoreboard
         var scoreBoard = xmlDoc.createElement("scoreboard");
         var players = board.map.players;
+        var cache = board.map.cache;
         for (i = 0; i < players.length; ++i){
             node = xmlDoc.createElement("player");
             node.setAttribute("name", players[i].name);
@@ -2742,6 +2814,34 @@ function saveBoardXML(saveType){
             node3.appendChild(textNode);
             node2.appendChild(node3);
             node.appendChild(node2);
+            //Cached cards
+            if (players[i].cache && players[i].cache.length > 0) {
+                node2 = xmlDoc.createElement("cache");
+                for (j = 0; j < players[i].cache.length; j++) {
+                    node3 = xmlDoc.createElement("card");
+                    node3.setAttribute("cost", players[i].cache[j].cost);
+                    if (players[i].cache[j].owner){
+                        node3.setAttribute("owner", players[i].cache[j].owner.name);
+                    }
+                    if (players[i].cache[j].magic){
+                        node3.setAttribute("magic", true);
+                    }
+                    if (players[i].cache[j].holder){
+                        node3.setAttribute("holder", true);
+                    }
+                    if (players[i].cache[j].skull){
+                        node3.setAttribute("skull", true);
+                    }
+                    if (players[i].cache[j].cacheable){
+                        node3.setAttribute("cacheable", true);
+                    }
+                    textNode = xmlDoc.createTextNode('');
+                    textNode.data = players[i].cache[j].name;
+                    node3.appendChild(textNode);
+                    node2.appendChild(node3);
+                }
+                node.appendChild(node2);
+            }
             scoreBoard.appendChild(node);
         }
         boardState.appendChild(scoreBoard);
@@ -2776,6 +2876,9 @@ function saveBoardXML(saveType){
                 }
                 if (regions[i].cards[j].skull){
                     node3.setAttribute("skull", true);
+                }
+                if (regions[i].cards[j].cacheable){
+                    node3.setAttribute("cacheable", true);
                 }
                 textNode = xmlDoc.createTextNode('');
                 textNode.data = regions[i].cards[j].name;

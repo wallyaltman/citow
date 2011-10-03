@@ -78,7 +78,7 @@
         <fall srcx="97" srcy="61" />
       </upgrades>
     </power>
-    <power id="4" highlight="#999999" shadow="#282828" nocorruption="true">
+    <power id="4" highlight="#999999" shadow="#282828" nocorruption="true" cache="true">
       <name>Horned_Rat</name>
       <dial cap="8">0,5,9,12,16,20,24,28</dial>
       <figures>

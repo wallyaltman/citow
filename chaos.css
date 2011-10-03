@@ -424,7 +424,7 @@ div.shiftbox img.black{
 }
 #workbox > div {
   display:inline-block;
-	vertical-align:top;
+  vertical-align:top;
 }
 #workbox > div > div:nth-of-type(2n-1){
   clear:both;
@@ -438,27 +438,27 @@ div.shiftbox img.black{
 /** PP controls **/
 #ppbox {
   top:308px;
-  left:45px;
-	width:160px;
+  left:81px;
+  width:160px;
 }
 #ppbox > span {
   margin:4px 0 0 2px;
-	padding-right:6px;
-	text-align:right;
+  padding-right:6px;
+  text-align:right;
   float:right;
-	width:61px;
+  width:61px;
 }
 #ppbox > div {
-	float:right;
-	clear:right;
-	width:88px;
+  float:right;
+  clear:right;
+  width:88px;
 }
 #resetpp > input, #resetpp > div {
-	float:right;
+  float:right;
 }
 #resetpp > div {
-	margin:0 3px;
-	vertical-align:text-top;
+  margin:0 3px;
+  vertical-align:text-top;
 }
 #resetpp img.toggle{
   margin:4px 4px 0 3px;
@@ -466,7 +466,7 @@ div.shiftbox img.black{
 /** Controls for resetting effects / DACs **/
 #resetbox {
   top:489px;
-  left:45px;
+  left:71px;
   padding-bottom:6px;
   width:170px;
 }
