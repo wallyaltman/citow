@@ -1421,7 +1421,6 @@ function drawCache(){
     var currentPlayer;
     var cacheSize;
     var i;
-    var playerHash = {}
     //Clear the drawing area
     ctx.fillStyle = bgcolor;
     ctx.fillRect(x - 5, y - 5, width + 5, height + 5);
@@ -1436,16 +1435,16 @@ function drawCache(){
         cache.cards[i].draw(x1, y1, ctx);
     }
     //Create references to each power's own cached cards
-    for (i = 0; i < numPlayers; i++) {
-        playerHash[players[i].name] = players[i];
+    for (i = 0; i < players.length; i++) {
+        players[i].cache = null;
     }
     cacheSize = cache.cards.length;
     for (i = 0; i < cacheSize; i++) {
         currentPlayer = cache.cards[i].owner;
-        playerHash[currentPlayer.name].cache = [];
-        if (playerHash[currentPlayer.name]) {
-            playerHash[currentPlayer.name].cache.push(cache.cards[i]);
+        if (!currentPlayer.cache) {
+            currentPlayer.cache = [];
         }
+        currentPlayer.cache.push(cache.cards[i]);
     }
     //Set the card cache's bounding box
     this.x0 = x;
