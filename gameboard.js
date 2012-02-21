@@ -2523,7 +2523,7 @@ function dropObject(){
     if (objects){
         //Overwrite the existing object in
         //the targeted slot, if applicable
-        if (!isNaN(targetSlot)) {
+        if (!isNaN(targetSlot) && objects[targetSlot]) {
             objects[targetSlot] = pen.held;
         } else {
             objects.push(pen.held);
