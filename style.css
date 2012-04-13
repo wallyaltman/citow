@@ -1,0 +1,163 @@
+/* General stuff */
+html {
+  font-size:.75em;
+  font-family:verdana, Geneva, arial, sans-serif;
+  background-color:#737980;
+  color:#000000;
+}  
+
+body {
+  margin:20px 0 0 15px;
+}
+
+#contentbox > section {
+  margin:10px 0px 15px 15px;
+  padding:5px 15px;
+  border:6px ridge #303030;
+  background-color:#A1A9B3;
+  width:480px;
+}
+
+p {
+  margin:10px 5px;
+}
+
+h1 {  
+  display:block;
+  font-size:2.4em;
+}
+h2 {  
+  display:inline-block;
+  font-size:1.375em;
+  margin:0;
+  padding:0;
+  width:100%;
+}
+h3 {  
+  clear:none;
+  display:inline-block;
+  font-size:1.125em;
+  margin:0;
+  padding:.675em;
+}
+
+section {
+  margin-top:15px;
+}
+section h1 {
+  text-align:left;
+  font-size:1.6em;
+}
+section h2 {
+  text-align:left;
+  font-size:1.2em;
+}
+section > h1, section > h2 {
+  color:#52565B;
+  text-shadow: #000000 1px 1px 0;
+  display:inline-block;
+  padding:4px;
+}
+strong {
+  text-shadow: #000000 1px 1px 0;
+}
+section strong {
+  text-shadow:#C0C0C0 1px 1px 0;
+  display:inline-block;
+  width:165px;
+}
+
+img.icon {
+  height:1.5em;
+  width:1.5em;
+  border:0;
+  margin:0;
+  padding:0;
+  display:inline-block;
+}
+
+input {
+  font-family:verdana, Geneva, arial, sans-serif;
+  overflow:hidden;
+}
+select {
+  font-family:verdana, Geneva, arial, sans-serif;
+}
+table, th, td {
+  border-style:solid;
+  border-color:#000000;
+}
+table {
+  font-size:1em;
+  border-collapse:collapse;
+  border-width:2px;
+}
+tr, th, td {
+  border-width:1px;
+  padding:3px;
+  margin:0;
+}
+td {
+  color:#000000;
+  background-color:#CFD9E6;
+}
+th {
+  background-color:#A1A9B3;
+}
+
+ul {
+  list-style-type:none;
+}
+
+/* Page header */
+header {
+  background-color:#0D1A3D;
+  color:#3EAFDB;
+  font-family:Tahoma,'Trebuchet MS',Helvetica,sans-serif;
+  line-height:1.2;
+  margin:-20px 0 20px -15px;
+  padding:5px;
+  position:relative;
+}
+div.fullvert {
+  position:absolute;
+  right:5px;
+  top:10px;
+  bottom:5px;
+}
+
+a.nocolor:link, a.nocolor:visited, a.nocolor:hover, a.nocolor:active {
+  color:inherit;
+}
+
+span.header_title {
+  font-size:26px;
+}
+span.header_title a{
+  color:inherit;
+  font-weight:bold;
+  text-decoration:none;
+}
+span.header_status {
+  font-size:18px;
+}
+
+/* Style for font size testing */
+.test {
+  position: absolute;
+  visibility: hidden;
+  line-height:1.0;
+  height: auto;
+  width: auto;
+}
+
+/* Style for error message display */
+p.msg {
+  color:#19FF57;
+  font-weight:bold;
+  text-shadow:#000000 1px 1px 0;
+}
+p.errormsg {
+  color:#D01818;
+  font-weight:bold;
+}
