@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<gameboard>
+  <tokens>
+    <flood>6</flood>
+  </tokens>
+  <ruinouspowers>
+    <power id="" highlight="#17BFB7" shadow="#0F3331">
+      <name>Cthulhu</name>
+      <dial cap="8">0,5,9,12,16,20,24,28</dial>
+      <figures>
+        <cultists>7</cultists>
+        <warriors>3</warriors>
+        <daemons>1</daemons>
+      </figures>
+      <upgrades>
+        <cultist srcx="25" srcy="1" />
+        <warrior srcx="97" srcy="1" />
+        <daemon srcx="49" srcy="1" />
+        <plans srcx="1" srcy="21" />
+        <ascension srcx="73" srcy="21" />
+      </upgrades>
+      <pp>6</pp>
+    </power>
+  </ruinouspowers>
+</gameboard>

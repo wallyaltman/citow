@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chaoscards>
+  <card owner="Cthulhu" cost="0" magic="true">Blessing</card>
+  <card owner="Cthulhu" cost="0" doublewide="true">The Abyss</card>
+  <card owner="Cthulhu" cost="1" magic="true">The Deep</card>
+  <card owner="Cthulhu" cost="1">Strength of the Sea</card>
+  <card owner="Cthulhu" cost="1">Unleash the Sea</card>
+  <card owner="Cthulhu" cost="1">Wrath of the Sea</card>
+  <card owner="Cthulhu" cost="2">Unnerving Presence</card>
+  <card owner="Cthulhu" cost="3" magic="true">R'yleh Rising</card>
+</chaoscards>
