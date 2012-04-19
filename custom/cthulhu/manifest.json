@@ -1,0 +1,10 @@
+{
+  gamedata: {
+    board: "board",
+    chaos: "chaos",
+  },
+  icons: {
+    upgradeSprites: "upgrade_sprites",
+    tokens: ["flood"]
+  }
+}
