@@ -1,4 +1,5 @@
 {
+  pluginName: "cthulhu",
   gamedata: {
     board: "board",
     chaos: "chaos",
