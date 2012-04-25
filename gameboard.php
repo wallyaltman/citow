@@ -30,6 +30,7 @@ echo '  <link rel="stylesheet" href="chaos.css?v='.$v.'" />'."\n";
 echo '  <script src="'.$rooturl.'/library/jquery-1.6.1.min.js" type="text/javascript"></script>'."\n";
 echo '  <script src="'.$rooturl.'/library/myjquery.js" type="text/javascript"></script>'."\n";
 echo '  <script src="utility.js" type="text/javascript"></script>'."\n";
+echo '  <script src="citow_custom.js?v='.$v.'" type="text/javascript"></script>'."\n";
 echo '  <script src="citow_draw.js?v='.$v.'" type="text/javascript"></script>'."\n";
 echo '  <script src="gameboard.js?v='.$v.'" type="text/javascript"></script>'."\n";
 echo '</head>'."\n";
