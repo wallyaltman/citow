@@ -1,11 +1,11 @@
 {
-  pluginName: "cthulhu",
-  gamedata: {
-    board: "board",
-    chaos: "chaos",
+  "pluginName": "cthulhu",
+  "gamedata": {
+    "board": "board",
+    "chaos": "chaos"
   },
-  icons: {
-    upgradeSprites: "upgrade_sprites",
-    tokens: ["flood"]
+  "icons": {
+    "upgradeSprites": "upgrade_sprites",
+    "tokens": ["flood"]
   }
 }
