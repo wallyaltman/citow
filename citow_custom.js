@@ -54,13 +54,13 @@ function PluginLoader(board) {
                     };
                 } else {
                     iconImg = this.plugin[this.name] ||
-                        loadSingletonImage(plugin, this.name)
+                        loadSingletonImage(this.plugin, this.name)
                     this.icon = {
                         "img"  : iconImg,
                         "draw" : drawSingleton
                     };
                 }
-            })(this.iconType);
+            })(this.type);
         }
 
         if (this.icon.img.complete) {
@@ -76,7 +76,7 @@ function PluginLoader(board) {
     };
 
     var dataLoaders = {
-        "gameboardXML" : function (xmlData) {
+        "gameboardXML" : function (plugin, xmlData) {
             var $tokens = $(xmlData).children('tokens').children(),
                 $powers = $(xmlData).children('ruinouspowers').children()
 
@@ -97,12 +97,14 @@ function PluginLoader(board) {
 
                     Token = function () {
                         var idString;
+
                         this.name = tokenName;
                         this.type = "token";
                         this.home = tokenPool[tokenName];
                         this.xmlData = tokenNode;
                         this.width = 19;
                         this.height = 19;
+                        this.plugin = plugin;
 
                         count += 1;
                         idString = String(count);
@@ -122,19 +124,22 @@ function PluginLoader(board) {
             }
         },
 
-        "chaoscardsXML" : function (xmlData) {
+        "chaoscardsXML" : function (plugin, xmlData) {
 
         }
     };
 
     var readManifest = function (manifest) {
         var pluginName = manifest.pluginName,
+            plugin,
             objectKey;
 
         if (!board.plugins) {
             board.plugins = {};
         }
-        board.plugins[pluginName] = { "name" : pluginName };
+
+        plugin = { "name" : pluginName };
+        board.plugins[pluginName] = plugin;
 
         // Load the XML game data via AJAX calls
         if (manifest.gamedata) {
@@ -144,7 +149,7 @@ function PluginLoader(board) {
                            function (responseData) {
                         var fileref = responseData.documentElement.nodeName + "XML";
                         board.plugins[pluginName][fileref] = responseData.documentElement;
-                        dataLoaders[fileref](responseData.documentElement);
+                        dataLoaders[fileref](plugin, responseData.documentElement);
                     });
                 }
             }
