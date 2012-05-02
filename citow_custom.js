@@ -14,7 +14,7 @@ function PluginLoader(board) {
                 if (manifest.gamedata.hasOwnProperty(objectKey)) {
                     $.get("custom/" + pluginName + "/gamedata/" + manifest.gamedata[objectKey] + ".xml",
                            function (responseData) {
-                        var fileref = $(responseData).find('fileref').text()
+                        var fileref = responseData.documentElement.nodeName + "XML";
                         board.plugins[pluginName][fileref] = responseData;
                     });
                 }
@@ -24,7 +24,7 @@ function PluginLoader(board) {
         if (manifest.icons) {
             for (objectKey in manifest.icons) {
                 if (manifest.icons.hasOwnProperty(objectKey)) {
-                    board.plugins[pluginName][objectKey] = manifest.gamedata[objectKey];
+                    board.plugins[pluginName][objectKey] = manifest.icons[objectKey];
                 }
             }
         }
