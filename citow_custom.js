@@ -34,10 +34,10 @@ function PluginLoader(board) {
             object = this;
 
         var finish = function (obj) {
-            obj.constructor.prototype.draw = function (x, y, ctx) {
-                obj.icon.draw(x, y, ctx);
+            obj.constructor.prototype.draw = function (x1, y1, ctx1) {
+                obj.icon.draw(x1, y1, ctx1);
             };
-            obj.icon.draw();
+            obj.icon.draw(x, y, ctx);
         };
 
         if (!this.icon) {
