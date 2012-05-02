@@ -30,7 +30,8 @@ function PluginLoader(board) {
      * backported to the main application.
      */
     var drawIcon = function (x, y, ctx) {
-        var spriteSheet, iconImg, loadTimer, that = this;
+        var spriteSheet, iconImg, loadTimer,
+            object = this;
 
         var finish = function (obj) {
             obj.constructor.prototype.draw = function (x, y, ctx) {
@@ -41,21 +42,21 @@ function PluginLoader(board) {
 
         if (!this.icon) {
             (function (iconType) {
-                if (this.plugin[iconType + "SpritesSrc"]) {
-                    spriteSheet = this.plugin[iconType + "Sprites"] ||
-                        loadSpriteSheet(this.plugin, iconType);
-                    this.icon = {
+                if (object.plugin[iconType + "SpritesSrc"]) {
+                    spriteSheet = object.plugin[iconType + "Sprites"] ||
+                        loadSpriteSheet(object.plugin, iconType);
+                    object.icon = {
                         "img"  : spriteSheet,
-                        "srcX" : this.xmlData.getAttribute("srcx"),
-                        "srcY" : this.xmlData.getAttribute("srcy"),
-                        "dimX" : this.width,
-                        "dimY" : this.height,
+                        "srcX" : object.xmlData.getAttribute("srcx"),
+                        "srcY" : object.xmlData.getAttribute("srcy"),
+                        "dimX" : object.width,
+                        "dimY" : object.height,
                         "draw" : drawFromSheet
                     };
                 } else {
-                    iconImg = this.plugin[this.name] ||
-                        loadSingletonImage(this.plugin, this.name)
-                    this.icon = {
+                    iconImg = object.plugin[object.name] ||
+                        loadSingletonImage(object.plugin, object.name)
+                    object.icon = {
                         "img"  : iconImg,
                         "draw" : drawSingleton
                     };
@@ -67,9 +68,9 @@ function PluginLoader(board) {
             finish(this);
         } else {
             loadTimer = setInterval(function () {
-                if (that.icon.img.complete) {
+                if (object.icon.img.complete) {
                     clearInterval(loadTimer);
-                    finish(that);
+                    finish(object);
                 }
             }, 100);
         }
