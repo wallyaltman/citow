@@ -76,7 +76,7 @@ function PluginLoader(board) {
     };
 
     var dataLoaders = {
-        "boardXML" : function (xmlData) {
+        "gameboardXML" : function (xmlData) {
             var $tokens = $(xmlData).children('tokens').children(),
                 $powers = $(xmlData).children('ruinouspowers').children()
 
@@ -122,7 +122,7 @@ function PluginLoader(board) {
             }
         },
 
-        "chaosXML" : function (xmlData) {
+        "chaoscardsXML" : function (xmlData) {
 
         }
     };
