@@ -12,9 +12,10 @@ function PluginLoader(board) {
         if (manifest.gamedata) {
             for (objectKey in manifest.gamedata) {
                 if (manifest.gamedata.hasOwnProperty(objectKey)) {
-                    $.ajax("custom/" + pluginName + "/gamedata/" + manifest.gamedata[objectKey] + ".xml",
+                    $.get("custom/" + pluginName + "/gamedata/" + manifest.gamedata[objectKey] + ".xml",
                            function (responseData) {
-                        board.plugins[pluginName][objectKey + "XML"] = responseData;
+                        var fileref = $(responseData).find('fileref').text()
+                        board.plugins[pluginName][fileref] = responseData;
                     });
                 }
             }
