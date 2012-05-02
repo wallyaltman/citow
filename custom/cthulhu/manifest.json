@@ -5,7 +5,7 @@
     "chaos": "chaos"
   },
   "icons": {
-    "upgradeSprites": "upgrade_sprites",
-    "tokens": ["flood"]
+    "upgradeSpritesSrc": "upgrade_sprites.png",
+    "oldWorldTokens": ["flood"]
   }
 }
