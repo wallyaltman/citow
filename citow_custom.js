@@ -83,7 +83,7 @@ function PluginLoader(board) {
             if ($tokens.length > 0) {
                 $tokens.each(function (index, tokenNode) {
                     var i, Token, token, count,
-                        supply = Number(tokenNode.text()),
+                        supply = Number(tokenNode.textContent),
                         tokenPool = board.map.tokenPool,
                         tokenName = tokenNode.nodeName;
 
