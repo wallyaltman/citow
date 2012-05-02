@@ -112,7 +112,7 @@ function PluginLoader(board) {
                         this.objectID.toUpperCase();
                     }
 
-                    TokenConstructor.prototype.draw = drawIcon;
+                    Token.prototype.draw = drawIcon;
 
                     for (i = 0; i < supply; i++) {
                         token = new Token();
