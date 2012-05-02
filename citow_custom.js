@@ -33,7 +33,7 @@ function PluginLoader(board) {
         var spriteSheet, iconImg, loadTimer, that = this;
 
         var finish = function (obj) {
-            obj.draw = function (x, y, ctx) {
+            obj.constructor.prototype.draw = function (x, y, ctx) {
                 obj.icon.draw(x, y, ctx);
             };
             obj.icon.draw();
@@ -75,6 +75,58 @@ function PluginLoader(board) {
         }
     };
 
+    var dataLoaders = {
+        "boardXML" : function (xmlData) {
+            var $tokens = $(xmlData).children('tokens').children(),
+                $powers = $(xmlData).children('ruinouspowers').children()
+
+            if ($tokens.length > 0) {
+                $tokens.each(function (index, tokenNode) {
+                    var i, Token, token, count,
+                        supply = Number(tokenNode.text()),
+                        tokenPool = board.map.tokenPool,
+                        tokenName = tokenNode.nodeName;
+
+                    tokenPool[tokenName] = {
+                        "name"   : tokenName,
+                        "type"   : "pool",
+                        "tokens" : []
+                    };
+
+                    count = 0;
+
+                    Token = function () {
+                        var idString;
+                        this.name = tokenName;
+                        this.type = "token";
+                        this.home = tokenPool[tokenName];
+                        this.xmlData = tokenNode;
+                        this.width = 19;
+                        this.height = 19;
+
+                        count += 1;
+                        idString = String(count);
+                        idString = (idString.length === 1) ? "0" + idString : idString;
+
+                        this.objectID = this.name.substr(0,3) + idString;
+                        this.objectID.toUpperCase();
+                    }
+
+                    TokenConstructor.prototype.draw = drawIcon;
+
+                    for (i = 0; i < supply; i++) {
+                        token = new Token();
+                        tokenPool[tokenName].tokens.push(token);
+                    }
+                });
+            }
+        },
+
+        "chaosXML" : function (xmlData) {
+
+        }
+    };
+
     var readManifest = function (manifest) {
         var pluginName = manifest.pluginName,
             objectKey;
@@ -91,7 +143,8 @@ function PluginLoader(board) {
                     $.get("custom/" + pluginName + "/gamedata/" + manifest.gamedata[objectKey] + ".xml",
                            function (responseData) {
                         var fileref = responseData.documentElement.nodeName + "XML";
-                        board.plugins[pluginName][fileref] = responseData;
+                        board.plugins[pluginName][fileref] = responseData.documentElement;
+                        dataLoaders[fileref](responseData.documentElement);
                     });
                 }
             }
