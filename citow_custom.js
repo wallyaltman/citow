@@ -83,7 +83,7 @@ function PluginLoader(board) {
 
             if ($tokens.length > 0) {
                 $tokens.each(function (index, tokenNode) {
-                    var i, Token, token, count,
+                    var i, token, count,
                         supply = Number(tokenNode.textContent),
                         tokenPool = board.map.tokenPool,
                         tokenName = tokenNode.nodeName;
@@ -96,7 +96,7 @@ function PluginLoader(board) {
 
                     count = 0;
 
-                    Token = function () {
+                    function Token () {
                         var idString;
 
                         this.name = tokenName;
