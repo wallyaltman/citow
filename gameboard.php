@@ -43,6 +43,8 @@ echo $headerbar;
 echo '  <time datetime="', date(DATE_ATOM), '">Current server time: ',
      date('g:i A T'), '</time>', "\n";
 
+$dir = realpath(getcwd() . $slash . 'saves');
+
 //Read in the game metadata, generating it first
 //if necessary
 if (!file_exists($dir.'owned_games.json')){
@@ -50,8 +52,6 @@ if (!file_exists($dir.'owned_games.json')){
 }
 $rawdata = file_get_contents($dir.'owned_games.json');
 $jsondata = json_decode($rawdata);
-
-$dir = $docroot.$slash.'chaos'.$slash.'saves';
 
 $matches = array();
 $states = array();
