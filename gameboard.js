@@ -1604,6 +1604,15 @@ function clearEffects(){
     });
 }
 
+/**
+ * Constructor for an individual Old World Token pool.
+ */
+function TokenPool (name) {
+    this.name = name;
+    this.type = "pool";
+    this.tokens = [];
+}
+
 /* Build and draw a new board.  A value of true for
  * the "blank" parameter draws a blank board.
  */
@@ -1678,37 +1687,13 @@ function drawBoard(blank, local){
     var $tokenSetupXML = $(info).find("tokens").children();
     //Set up the old world tokens pool
     map.tokenPool = {};
-    var tokenName, token, supply, tempArray;
-    map.tokenPool.event = {
-        name : "event",
-        type : "pool",
-        tokens : []
-    };
-    map.tokenPool.hero = {
-        name : "hero",
-        type : "pool",
-        tokens : []
-    };
-    map.tokenPool.noble = {
-        name : "noble",
-        type : "pool",
-        tokens : []
-    };
-    map.tokenPool.peasant = {
-        name : "peasant",
-        type : "pool",
-        tokens : []
-    };
-    map.tokenPool.skaven = {
-        name : "skaven",
-        type : "pool",
-        tokens : []
-    };
-    map.tokenPool.warpstone = {
-        name : "warpstone",
-        type : "pool",
-        tokens : []
-    };
+    var tokenName, token, supply, tempArray, tokenTypes;
+
+    tokenTypes = ["event", "hero", "noble", "peasant", "skaven", "warpstone"];
+    $(tokenTypes).each(function (index, tokenType) {
+        map.tokenPool[tokenType] = new TokenPool(tokenType);
+    });
+
     var pool = map.tokenPool;
     var tokenSet = [pool.event, pool.hero, pool.noble, pool.peasant, pool.skaven, pool.warpstone];
     for (i = 0; i < tokenSet.length; i++){
