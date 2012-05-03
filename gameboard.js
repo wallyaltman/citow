@@ -10,7 +10,7 @@
  */
 function getStates(evt, game, state){
     //File location
-    var loc = "../chaos/saves/";
+    var loc = "saves/";
     var file = "save_manifest.json";
     var board = $("#board")[0];
     var localObj = board.json;
