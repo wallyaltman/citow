@@ -4,13 +4,13 @@
  */
 
 /*** need to rewrite getGames, getStates, nextState ***/
+var saveDirectory = "saves/";
 
 /* Read in the list of gamestates for
  * the currently selected game.
  */
 function getStates(evt, game, state){
     //File location
-    var loc = "saves/";
     var file = "save_manifest.json";
     var board = $("#board")[0];
     var localObj = board.json;
@@ -56,7 +56,7 @@ function getStates(evt, game, state){
         responseFunction(null, localObj);
     }
     else {
-        $.getJSON(loc + file, responseFunction);
+        $.getJSON(saveDirectory + file, responseFunction);
     }
 }
 
@@ -66,7 +66,6 @@ function getStates(evt, game, state){
 function nextState(game, callBackFunc, passAlong){
     var xmlhttp = xmlRequest();
     //File location
-    var loc = "../chaos/saves/";
     var file = "save_manifest.json";
     var board = $("#board")[0];
     var localObj = board.json;
@@ -109,7 +108,7 @@ function nextState(game, callBackFunc, passAlong){
                     return false;
                 }
             };
-            xmlhttp.open("GET", loc + file, true);
+            xmlhttp.open("GET", saveDirectory + file, true);
             xmlhttp.send();
         }
         else {
@@ -253,7 +252,7 @@ function getBoardState(blank, expansion){
         url = loc + file;
     }
     else {
-        loc = "../chaos/saves/";
+        loc = saveDirectory;
         url = loc + "game" + game + "state" + state + ".xml";
     }
     xmlhttp.open("POST", url, false);
