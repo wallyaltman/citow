@@ -1715,7 +1715,7 @@ function drawBoard(blank, local){
             tokenNode = this,
             tokenName = this.nodeName;
 
-        supply = Number(this.textContent());
+        supply = Number(this.textContent);
         map.tokenPool[tokenName] = new TokenPool(tokenName);
 
         count = 0;
