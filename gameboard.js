@@ -1741,7 +1741,7 @@ function drawBoard(blank, local){
         Token.prototype.draw = drawToken;
 
         for (j = 0; j < supply; j++){
-            map.tokenPool.addToken(new Token());
+            map.tokenPool[tokenName].addToken(new Token());
         }
     });
 
