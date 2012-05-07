@@ -83,20 +83,16 @@ function PluginLoader(board) {
 
             if ($tokens.length > 0) {
                 $tokens.each(function (index, tokenNode) {
-                    var i, token, count,
+                    var i, count,
                         supply = Number(tokenNode.textContent),
                         tokenPool = board.map.tokenPool,
                         tokenName = tokenNode.nodeName;
 
-                    tokenPool[tokenName] = {
-                        "name"   : tokenName,
-                        "type"   : "pool",
-                        "tokens" : []
-                    };
+                    tokenPool[tokenName] = new TokenPool(tokenName);
 
                     count = 0;
 
-                    function Token () {
+                    function CustomToken () {
                         var idString;
 
                         this.name = tokenName;
@@ -115,11 +111,10 @@ function PluginLoader(board) {
                         this.objectID.toUpperCase();
                     }
 
-                    Token.prototype.draw = drawIcon;
+                    CustomToken.prototype.draw = drawIcon;
 
                     for (i = 0; i < supply; i++) {
-                        token = new Token();
-                        tokenPool[tokenName].tokens.push(token);
+                        tokenPool[tokenName].addToken(new CustomToken());
                     }
                 });
             }

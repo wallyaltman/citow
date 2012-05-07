@@ -800,12 +800,11 @@ function buildTokenPool(){
     var ctx = canvas.getContext('2d');
     var pools = [pool.event, pool.hero, pool.noble, pool.peasant, pool.warpstone, pool.skaven];
     canvas.pools = pools;
-    var endY = [25, 50, 75, 150, 200, 275];
     var x0 = 3;
     var i, j, y0, y1;
     for (i = 0; i < pools.length; i++){
-        y1 = endY[i];
-        y0 = (i == 0) ? 3 : endY[i - 1] + 3;
+        y0 = y1 || 3;
+        y1 = y0 + 25 * pools[i].rows();
         pools[i].ctx = ctx;
         pools[i].x0 = x0;
         pools[i].x1 = 175;
@@ -1607,9 +1606,25 @@ function clearEffects(){
  * Constructor for an individual Old World Token pool.
  */
 function TokenPool (name) {
+    var board = document.getElementById("board");
+
     this.name = name;
     this.type = "pool";
     this.tokens = [];
+    this.maxLength = 0;
+
+    board.map.tokenPool[name] = this;
+}
+
+TokenPool.prototype.addToken = function(token) {
+    this.tokens.push(token);
+    this.maxLength = Math.max(this.maxLength, this.tokens.length);
+
+    return this;
+}
+
+TokenPool.prototype.rows = function() {
+    return Math.ceil(this.maxLength / 7);
 }
 
 /* Build and draw a new board.  A value of true for
@@ -1658,6 +1673,13 @@ function drawBoard(blank, local){
     ctx.fillRect(0, 0, width, height);
     var i, j, k;
     //Create references to the XML gamestate data
+    var $pluginList = $(state).children("customization").children("plugin")
+    if ($pluginList.length > 0) {
+        var pluginLoader = new PluginLoader(board);
+        $pluginList.each(function (index, node) {
+            pluginLoader.addPlugin(node.textContent);
+        });
+    }
     var mapXML = state.getElementsByTagName("map")[0];
     board.map = {};
     var map = board.map;
@@ -1686,36 +1708,44 @@ function drawBoard(blank, local){
     var $tokenSetupXML = $(info).find("tokens").children();
     //Set up the old world tokens pool
     map.tokenPool = {};
-    var tokenName, token, supply, tempArray, tokenTypes;
+    var tempArray, tokenTypes;
 
-    tokenTypes = ["event", "hero", "noble", "peasant", "skaven", "warpstone"];
-    $(tokenTypes).each(function (index, tokenType) {
-        map.tokenPool[tokenType] = new TokenPool(tokenType);
+    $tokenSetupXML.each(function () {
+        var supply, count,
+            tokenNode = this,
+            tokenName = this.nodeName;
+
+        supply = Number(this.textContent());
+        map.tokenPool[tokenName] = new TokenPool(tokenName);
+
+        count = 0;
+
+        function Token () {
+            var idString;
+
+            this.name = tokenName;
+            this.type = "token";
+            this.home = map.tokenPool[tokenName];
+            this.xmlData = tokenNode;
+            this.width = 19;
+            this.height = 19;
+            this.plugin = plugin;
+
+            count += 1;
+            idString = String(count);
+            idString = (idString.length === 1) ? "0" + idString : idString;
+
+            this.objectID = this.name.substr(0,3) + idString;
+            this.objectID.toUpperCase();
+        }
+
+        Token.prototype.draw = drawToken;
+
+        for (j = 0; j < supply; j++){
+            map.tokenPool.addToken(new Token());
+        }
     });
 
-    var pool = map.tokenPool;
-    var tokenSet = [pool.event, pool.hero, pool.noble, pool.peasant, pool.skaven, pool.warpstone];
-    for (i = 0; i < tokenSet.length; i++){
-        tokenName = tokenSet[i].name;
-        $tokenSetupXML.each(function () {
-            if (this.nodeName === tokenName){
-                supply = $(this).text();
-            }
-        });
-        for (j = 0; j < supply; j++){
-            token = {
-                draw : drawToken,
-                name : tokenName,
-                type : "token",
-                home : tokenSet[i]
-            };
-            idString = String(supply + 1);
-            idString = (idString.length == 1) ? "0" + idString : idString;
-            token.objectID = token.name.substr(0,3) + idString;
-            token.objectID.toUpperCase();
-            tokenSet[i].tokens.push(token);
-        }
-    }
     //Set up the players array
     var players = [];
     map.players = players;
