@@ -1673,7 +1673,7 @@ function drawBoard(blank, local){
     ctx.fillRect(0, 0, width, height);
     var i, j, k;
     //Create references to the XML gamestate data
-    var $pluginList = $(state).children("customization").children("plugin")
+    var $pluginList = $(state).find("customization").children("plugin")
     if ($pluginList.length > 0) {
         var pluginLoader = new PluginLoader(board);
         $pluginList.each(function (index, node) {
