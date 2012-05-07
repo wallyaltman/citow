@@ -1729,7 +1729,6 @@ function drawBoard(blank, local){
             this.xmlData = tokenNode;
             this.width = 19;
             this.height = 19;
-            this.plugin = plugin;
 
             count += 1;
             idString = String(count);
