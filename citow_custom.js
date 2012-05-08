@@ -85,12 +85,14 @@ function PluginLoader(board) {
 
             if ($tokens.length > 0) {
                 $tokens.each(function (index, tokenNode) {
-                    var i, count,
+                    var i, count, pool
                         supply = Number(tokenNode.textContent),
                         tokenPool = board.map.tokenPool,
                         tokenName = tokenNode.nodeName;
 
-                    tokenPool[tokenName] = new TokenPool(tokenName);
+                    pool = new TokenPool(tokenName);
+                    tokenPool[tokenName] = pool;
+                    tokenPool._list.push(pool);
 
                     count = 0;
 
@@ -99,7 +101,7 @@ function PluginLoader(board) {
 
                         this.name = tokenName;
                         this.type = "token";
-                        this.home = tokenPool[tokenName];
+                        this.home = pool;
                         this.xmlData = tokenNode;
                         this.width = 19;
                         this.height = 19;
@@ -116,7 +118,7 @@ function PluginLoader(board) {
                     CustomToken.prototype.draw = drawIcon;
 
                     for (i = 0; i < supply; i++) {
-                        tokenPool[tokenName].addToken(new CustomToken());
+                        pool.addToken(new CustomToken());
                     }
                 });
             }
