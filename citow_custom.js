@@ -140,7 +140,7 @@ function PluginLoader(board) {
             "toLoad" : [],
             "loaded" : [],
             "isLoaded" : function () {
-                this.toLoad.length == this.loaded.length;
+                this.toLoad.length === this.loaded.length;
             },
             "checkLoadStatus" : function () {
                 console.log("Checking plugin load status...");
@@ -148,7 +148,8 @@ function PluginLoader(board) {
                     console.log("Firing pluginLoaded event...");
                     $board.trigger('pluginLoaded');
                 } else {
-                    console.log("Plugin " + pluginName + " not yet loaded.");
+                    console.warn("Plugin " + pluginName + " not yet loaded.");
+                    console.warn(this.loaded.length + " / " + this.toLoad.length + " components loaded");
                 }
             }
         };
