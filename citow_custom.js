@@ -142,8 +142,7 @@ function PluginLoader(board) {
             "isLoaded" : function () {
                 var toLoadCount = this.toLoad.length,
                     loadedCount = this.loaded.length;
-                console.log(toLoadCount + " / " + loadedCount + " components loaded");
-                toLoadCount === loadedCount;
+                return toLoadCount === loadedCount;
             },
             "checkLoadStatus" : function () {
                 console.log("Checking plugin load status...");
