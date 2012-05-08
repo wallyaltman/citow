@@ -1677,6 +1677,9 @@ function drawBoard(blank, local){
     var $pluginList = $(state).find("customization").children("plugin")
     if ($pluginList.length > 0) {
         console.log($pluginList.length + " plugins found.");
+        board.plugins = {
+            "_list" : []
+        };
 
         var pluginLoader = new PluginLoader(board);
         $pluginList.each(function (index, node) {

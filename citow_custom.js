@@ -124,7 +124,7 @@ function PluginLoader(board) {
         },
 
         "chaoscardsXML" : function (plugin, xmlData) {
-            plugin.toLoad.splice(plugin.toLoad.indexOf('chaoscards'), 1);
+
         }
     };
 
@@ -135,17 +135,12 @@ function PluginLoader(board) {
 
         console.log("Manifest downloaded for plugin " + pluginName);
 
-        if (!board.plugins) {
-            board.plugins = {
-                "_list" : []
-            };
-        }
-
         plugin = {
             "name" : pluginName,
             "toLoad" : [],
+            "loaded" : [],
             "isLoaded" : function () {
-                this.toLoad.length == 0;
+                this.toLoad.length == this.loaded.length;
             },
             "checkLoadStatus" : function () {
                 console.log("Checking plugin load status...");
@@ -175,8 +170,8 @@ function PluginLoader(board) {
                         // Load the just-downloaded data
                         console.log("Processing " + nodeName + " component of plugin " + pluginName);
                         dataLoaders[fileref](plugin, responseData.documentElement);
-                        // Take this off the list of parts to be loaded
-                        plugin.toLoad.splice(plugin.toLoad.indexOf(nodeName), 1);
+                        // Add this to the list of parts that have been loaded
+                        plugin.loaded.push(nodeName);
                         // Fire a custom event if this was the last bit
                         // to be loaded
                         plugin.checkLoadStatus();
