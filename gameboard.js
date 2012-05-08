@@ -795,10 +795,9 @@ function getChaosCards(expansion){
  */
 function buildTokenPool(){
     var board = document.getElementById("board");
-    var pool = board.map.tokenPool;
+    var pools = board.map.tokenPool._list;
     var canvas = document.getElementById("pool");
     var ctx = canvas.getContext('2d');
-    var pools = [pool.event, pool.hero, pool.noble, pool.peasant, pool.warpstone, pool.skaven];
     canvas.pools = pools;
     var x0 = 3;
     var i, j, y0, y1;
@@ -813,6 +812,7 @@ function buildTokenPool(){
         pools[i].draw = drawOldWorldTokens;
         pools[i].drag = dragObject;
         pools[i].drop = dropObject;
+        console.log("Drawing " + pools[i].name + " pool");
         pools[i].draw();
     }
     canvas.cursorPos = getCursorPosition;
@@ -1676,10 +1676,14 @@ function drawBoard(blank, local){
     //Create references to the XML gamestate data
     var $pluginList = $(state).find("customization").children("plugin")
     if ($pluginList.length > 0) {
+        console.log($pluginList.length + " plugins found.");
+
         var pluginLoader = new PluginLoader(board);
         $pluginList.each(function (index, node) {
             pluginLoader.addPlugin(node.textContent);
         });
+    } else {
+        console.warn("No plugins found.");
     }
     var mapXML = state.getElementsByTagName("map")[0];
     board.map = {};
@@ -1708,16 +1712,18 @@ function drawBoard(blank, local){
     var regionCount = $regionSetupXML.length;
     var $tokenSetupXML = $(info).find("tokens").children();
     //Set up the old world tokens pool
-    map.tokenPool = {};
+    map.tokenPool = { "_list" : [] };
     var tempArray, tokenTypes;
 
     $tokenSetupXML.each(function () {
-        var supply, count,
+        var supply, count, pool
             tokenNode = this,
             tokenName = this.nodeName;
 
         supply = Number(this.textContent);
-        map.tokenPool[tokenName] = new TokenPool(tokenName);
+        pool = new TokenPool(tokenName);
+        map.tokenPool[tokenName] = pool;
+        map.tokenPool._list.push(pool);
 
         count = 0;
 
@@ -1726,7 +1732,7 @@ function drawBoard(blank, local){
 
             this.name = tokenName;
             this.type = "token";
-            this.home = map.tokenPool[tokenName];
+            this.home = pool;
             this.xmlData = tokenNode;
             this.width = 19;
             this.height = 19;
@@ -1742,7 +1748,7 @@ function drawBoard(blank, local){
         Token.prototype.draw = drawToken;
 
         for (j = 0; j < supply; j++){
-            map.tokenPool[tokenName].addToken(new Token());
+            pool.addToken(new Token());
         }
     });
 
@@ -2267,6 +2273,8 @@ function drawBoard(blank, local){
         $board.on("pluginLoaded", function () {
             var allPluginsLoaded = true;
 
+            console.log("Custom event pluginLoaded captured!");
+
             $(board.plugins._list).each(function (index, plugin) {
                 if (!plugin.isLoaded()) {
                     allPluginsLoaded = false;
@@ -2274,10 +2282,14 @@ function drawBoard(blank, local){
             });
 
             if (allPluginsLoaded) {
+                console.log("Building token pool (with plugins)");
                 buildTokenPool();
+            } else {
+                console.log("Not all plugins are loaded yet.");
             }
         });
     } else {
+        console.log("Building token pool (without plugins)");
         buildTokenPool();
     }
     //Associate the draw method with

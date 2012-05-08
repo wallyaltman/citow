@@ -133,6 +133,8 @@ function PluginLoader(board) {
             plugin,
             objectKey;
 
+        console.log("Manifest downloaded for plugin " + pluginName);
+
         if (!board.plugins) {
             board.plugins = {
                 "_list" : []
@@ -146,8 +148,12 @@ function PluginLoader(board) {
                 this.toLoad.length == 0;
             },
             "checkLoadStatus" : function () {
+                console.log("Checking plugin load status...");
                 if (this.isLoaded()) {
+                    console.log("Firing pluginLoaded event...");
                     $board.trigger('pluginLoaded');
+                } else {
+                    console.log("Plugin " + pluginName + " not yet loaded.");
                 }
             }
         };
@@ -160,12 +166,14 @@ function PluginLoader(board) {
             for (objectKey in manifest.gamedata) {
                 if (manifest.gamedata.hasOwnProperty(objectKey)) {
                     plugin.toLoad.push(objectKey);
+                    console.log("Downloading " + objectKey + " component of plugin " + pluginName);
                     $.get("custom/" + pluginName + "/gamedata/" + manifest.gamedata[objectKey] + ".xml",
                            function (responseData) {
                         var nodeName = responseData.documentElement.nodeName,
                             fileref = nodeName + "XML";
                         board.plugins[pluginName][fileref] = responseData.documentElement;
                         // Load the just-downloaded data
+                        console.log("Processing " + nodeName + " component of plugin " + pluginName);
                         dataLoaders[fileref](plugin, responseData.documentElement);
                         // Take this off the list of parts to be loaded
                         plugin.toLoad.splice(plugin.toLoad.indexOf(nodeName), 1);
@@ -188,6 +196,7 @@ function PluginLoader(board) {
     };
 
     this.addPlugin = function (pluginName) {
+        console.log("Downloading manifest for plugin " + pluginName);
         $.getJSON("custom/" + pluginName.toLowerCase() + "/manifest.json",
                   readManifest);
     };
