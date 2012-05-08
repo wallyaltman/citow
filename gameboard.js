@@ -795,26 +795,32 @@ function getChaosCards(expansion){
  */
 function buildTokenPool(){
     var board = document.getElementById("board");
-    var pools = board.map.tokenPool._list;
+    var pools = board.map.tokenPool._list,
+        $pools = $(pools);
     var canvas = document.getElementById("pool");
     var ctx = canvas.getContext('2d');
     canvas.pools = pools;
     var x0 = 3;
     var i, j, y0, y1;
-    for (i = 0; i < pools.length; i++){
+    $pools.each(function (index, pool) {
         y0 = y1 || 3;
-        y1 = y0 + 25 * pools[i].rows();
-        pools[i].ctx = ctx;
-        pools[i].x0 = x0;
-        pools[i].x1 = 175;
-        pools[i].y0 = y0;
-        pools[i].y1 = y1;
-        pools[i].draw = drawOldWorldTokens;
-        pools[i].drag = dragObject;
-        pools[i].drop = dropObject;
-        console.log("Drawing " + pools[i].name + " pool");
-        pools[i].draw();
-    }
+        y1 = y0 + 25 * pool.rows();
+        pool.ctx = ctx;
+        pool.x0 = x0;
+        pool.x1 = 175;
+        pool.y0 = y0;
+        pool.y1 = y1;
+        pool.draw = drawOldWorldTokens;
+        pool.drag = dragObject;
+        pool.drop = dropObject;
+        console.log("Drawing " + pool + " pool");
+    });
+    // Resize the canvas, then draw the pools
+    canvas.height = y1 + 22;
+    $pools.each(function (index, pool) {
+        pool.draw();
+    });
+
     canvas.cursorPos = getCursorPosition;
     var pen = document.getElementById("pen");
     var parentDiv = canvas.parentNode;
