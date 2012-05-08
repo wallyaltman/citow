@@ -140,7 +140,10 @@ function PluginLoader(board) {
             "toLoad" : [],
             "loaded" : [],
             "isLoaded" : function () {
-                this.toLoad.length === this.loaded.length;
+                var toLoadCount = this.toLoad.length,
+                    loadedCount = this.loaded.length;
+                console.log(toLoadCount + " / " + loadedCount + " components loaded");
+                toLoadCount === loadedCount;
             },
             "checkLoadStatus" : function () {
                 console.log("Checking plugin load status...");
@@ -149,7 +152,6 @@ function PluginLoader(board) {
                     $board.trigger('pluginLoaded');
                 } else {
                     console.warn("Plugin " + pluginName + " not yet loaded.");
-                    console.warn(this.loaded.length + " / " + this.toLoad.length + " components loaded");
                 }
             }
         };
