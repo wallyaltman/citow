@@ -1631,11 +1631,12 @@ TokenPool.prototype.rows = function() {
  * the "blank" parameter draws a blank board.
  */
 function drawBoard(blank, local){
-    var board = document.getElementById("board");
-    var ctx = board.getContext('2d');
+    var $board = $("#board"),
+        board = $board[0],
+        ctx = board.getContext('2d');
     //Clear the canvas
-    var width = board.width;
-    var height = board.height;
+    var width = board.width,
+        height = board.height;
     var state, expansion;
     if (local){
         //Check whether the game in local storage
@@ -2262,7 +2263,23 @@ function drawBoard(blank, local){
     owActive.oldWorld = oldWorld;
     oldWorld.draw();
     //Draw the remaining Old World tokens
-    buildTokenPool();
+    if (board.plugins) {
+        $board.on("pluginLoaded", function () {
+            var allPluginsLoaded = true;
+
+            $(board.plugins._list).each(function (index, plugin) {
+                if (!plugin.isLoaded()) {
+                    allPluginsLoaded = false;
+                }
+            });
+
+            if (allPluginsLoaded) {
+                buildTokenPool();
+            }
+        });
+    } else {
+        buildTokenPool();
+    }
     //Associate the draw method with
     //the player, then draw reserves
     for (i = 0; i < playerCount; i++){
@@ -3274,8 +3291,9 @@ function hideMessage(){
 /* Set up the board.
  */
 function initialize(){
-    var board = $("#board")[0];
-    var $body = $("#body");
+    var $board = $("#board"),
+        board = $board[0],
+        $body = $("#body");
     //Set up the various controls and
     //components, and draw the initial board
     if (board.getContext){
@@ -3345,7 +3363,6 @@ function initialize(){
         //Set up the save PNG button
         var $savePNG = $("#savepng");
         $savePNG.click(function(){
-            var $board = $("#board");
             var canvasData = $board[0].toDataURL("image/png");
             $.post('savepng.php', { canvas: canvasData }, function(){
                 var board = $("#board")[0];

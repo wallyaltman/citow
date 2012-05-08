@@ -1,5 +1,7 @@
 
 function PluginLoader(board) {
+    var $board = $(board);
+
     var loadSpriteSheet = function (plugin, iconType) {
         var sheet = iconType + "Sprites";
 
@@ -118,10 +120,11 @@ function PluginLoader(board) {
                     }
                 });
             }
+
         },
 
         "chaoscardsXML" : function (plugin, xmlData) {
-
+            plugin.toLoad.splice(plugin.toLoad.indexOf('chaoscards'), 1);
         }
     };
 
@@ -131,21 +134,44 @@ function PluginLoader(board) {
             objectKey;
 
         if (!board.plugins) {
-            board.plugins = {};
+            board.plugins = {
+                "_list" : []
+            };
         }
 
-        plugin = { "name" : pluginName };
+        plugin = {
+            "name" : pluginName,
+            "toLoad" : [],
+            "isLoaded" : function () {
+                this.toLoad.length == 0;
+            },
+            "checkLoadStatus" : function () {
+                if (this.isLoaded()) {
+                    $board.trigger('pluginLoaded');
+                }
+            }
+        };
         board.plugins[pluginName] = plugin;
+        board.plugins._list.push(plugin);
+        board.plugins._count += 1;
 
         // Load the XML game data via AJAX calls
         if (manifest.gamedata) {
             for (objectKey in manifest.gamedata) {
                 if (manifest.gamedata.hasOwnProperty(objectKey)) {
+                    plugin.toLoad.push(objectKey);
                     $.get("custom/" + pluginName + "/gamedata/" + manifest.gamedata[objectKey] + ".xml",
                            function (responseData) {
-                        var fileref = responseData.documentElement.nodeName + "XML";
+                        var nodeName = responseData.documentElement.nodeName,
+                            fileref = nodeName + "XML";
                         board.plugins[pluginName][fileref] = responseData.documentElement;
+                        // Load the just-downloaded data
                         dataLoaders[fileref](plugin, responseData.documentElement);
+                        // Take this off the list of parts to be loaded
+                        plugin.toLoad.splice(plugin.toLoad.indexOf(nodeName), 1);
+                        // Fire a custom event if this was the last bit
+                        // to be loaded
+                        plugin.checkLoadStatus();
                     });
                 }
             }
