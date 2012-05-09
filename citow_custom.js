@@ -19,6 +19,13 @@ function PluginLoader(board) {
         return plugin[iconName];
     }
 
+    var storeIconLocation = function (x, y) {
+        this.x0 = x;
+        this.y0 = y;
+        this.x1 = x + this.icon.dimX;
+        this.y1 = y + this.icon.dimY;
+    };
+
     var drawFromSheet = function (x, y, ctx) {
         ctx.drawImage(this.img, this.srcX, this.srcY, this.dimX, this.dimY,
                       x, y, this.dimX, this.dimY);
@@ -38,8 +45,10 @@ function PluginLoader(board) {
         var finish = function (obj) {
             obj.constructor.prototype.draw = function (x1, y1, ctx1) {
                 obj.icon.draw(x1, y1, ctx1);
+                obj.storeLocation(x1, y1);
             };
             obj.icon.draw(x, y, ctx);
+            obj.storeLocation(x, y);
         };
 
         if (!this.icon) {
@@ -116,6 +125,7 @@ function PluginLoader(board) {
                     }
 
                     CustomToken.prototype.draw = drawIcon;
+                    CustomToken.prototype.setLocation = storeIconLocation;
 
                     for (i = 0; i < supply; i++) {
                         pool.addToken(new CustomToken());

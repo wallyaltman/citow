@@ -813,7 +813,7 @@ function buildTokenPool(){
         pool.draw = drawOldWorldTokens;
         pool.drag = dragObject;
         pool.drop = dropObject;
-        console.log("Drawing " + pool + " pool");
+        console.log("Drawing " + pool.name + " pool");
     });
     // Resize the canvas, then draw the pools
     canvas.height = y1 + 22;
