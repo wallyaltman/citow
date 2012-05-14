@@ -44,11 +44,11 @@ function PluginLoader(board) {
 
         var finish = function (obj) {
             obj.constructor.prototype.draw = function (x1, y1, ctx1) {
-                obj.icon.draw(x1, y1, ctx1);
-                obj.storeLocation(x1, y1);
+                this.icon.draw(x1, y1, ctx1);
+                this.setLocation(x1, y1);
             };
             obj.icon.draw(x, y, ctx);
-            obj.storeLocation(x, y);
+            obj.setLocation(x, y);
         };
 
         if (!this.icon) {
@@ -56,7 +56,7 @@ function PluginLoader(board) {
                 if (object.plugin[iconType + "SpritesSrc"]) {
                     spriteSheet = object.plugin[iconType + "Sprites"] ||
                         loadSpriteSheet(object.plugin, iconType);
-                    object.icon = {
+                    object.constructor.prototype.icon = {
                         "img"  : spriteSheet,
                         "srcX" : object.xmlData.getAttribute("srcx"),
                         "srcY" : object.xmlData.getAttribute("srcy"),
@@ -67,8 +67,10 @@ function PluginLoader(board) {
                 } else {
                     iconImg = object.plugin[object.name] ||
                         loadSingletonImage(object.plugin, object.name)
-                    object.icon = {
+                    object.constructor.prototype.icon = {
                         "img"  : iconImg,
+                        "dimX" : object.width,
+                        "dimY" : object.height,
                         "draw" : drawSingleton
                     };
                 }
