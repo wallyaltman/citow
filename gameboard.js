@@ -255,7 +255,7 @@ function getBoardState(blank, expansion){
         loc = saveDirectory;
         url = loc + "game" + game + "state" + state + ".xml";
     }
-    xmlhttp.open("POST", url, false);
+    xmlhttp.open("GET", url, false);
     xmlhttp.send();
     var xmlDoc = xmlhttp.responseXML;
     board.game = Number(game);
@@ -287,7 +287,7 @@ function getGameSetup(expansion){
     //Get the board setup document
     var loc = "gamedata/";
     var url = expansion == "morrslieb" ? loc + "board_hr.xml" : loc + "board.xml";
-    xmlhttp.open("POST", url, false);
+    xmlhttp.open("GET", url, false);
     xmlhttp.send();
     var xmlDoc = xmlhttp.responseXML;
     return xmlDoc;
@@ -574,7 +574,7 @@ function getOldWorldCards(cardSet){
                 //var owchead = document.getElementById("owchead");
             }
         }
-        xmlhttp.open("POST", url, true);
+        xmlhttp.open("GET", url, true);
         xmlhttp.send();
     }
     return false;
@@ -785,7 +785,7 @@ function getChaosCards(expansion){
                 $cc0.css({ marginTop: colOffset });
             }
         }
-        xmlhttp.open("POST", url, true);
+        xmlhttp.open("GET", url, true);
         xmlhttp.send();
     }
     return false;
