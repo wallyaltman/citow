@@ -6,9 +6,8 @@
  */
 
 $slash = strpos(getcwd(), '/') === false ? '\\' : '/';
-$docroot = realpath(getcwd() . $slash . '..');
 
-$dir = realpath($docroot . '/chaos/saves/') . '/';
+$dir = realpath(getcwd() . '/saves/') . '/';
 
 $quiet = ($_GET['quiet'] == 'true');
 
