@@ -1633,6 +1633,24 @@ TokenPool.prototype.rows = function() {
     return Math.ceil(this.maxLength / 7);
 }
 
+function ChaosCard ($cardXML) {
+    var board = $("#board")[0];
+    this.objectId = board.newChaosID();
+
+    this.owner = board.allPowers[$cardXML.attr("owner")];
+    this.name = $cardXML.text();
+    this.type = "chaos";
+    this.cost = $cardXML.attr("cost");
+    this.cacheable = ($cardXML.attr("cacheable") === "true");
+
+    this.holder = ($cardXML.attr("holder") === "true");
+    this.skull = ($cardXML.attr("skull") === "true");
+    this.magic = ($cardXML.attr("magic") === "true");
+
+    this.magicIcon = magicIcon;
+    this.draw = drawCard;
+}
+
 /* Build and draw a new board.  A value of true for
  * the "blank" parameter draws a blank board.
  */
@@ -1695,9 +1713,28 @@ function drawBoard(blank, local){
         console.warn("No plugins found.");
     }
     var mapXML = state.getElementsByTagName("map")[0];
-    board.map = {};
+    board.map = {
+        idCrd : 0,
+        idOWC : 0
+    };
     var map = board.map;
-    map.xmlData = mapXML;
+    board.newChaosID = function () {
+        var map = this.map,
+            idString;
+        map.idCrd++;
+        idString = String(map.idCrd);
+        idString = (idString.length == 1) ? "0" + idString : idString;
+        return idString;
+    };
+    board.newOldWorldID = function () {
+        var map = this.map,
+            idString;
+        map.idOWC++;
+        idString = String(map.idOWC);
+        idString = (idString.length == 1) ? "0" + idString : idString;
+        return idString;
+    };
+    map.$xmlData = $(mapXML);
     var $regionsXML = $(mapXML).find("region");
     var scoreXML = state.getElementsByTagName("scoreboard")[0];
     var playersXML = scoreXML.getElementsByTagName("player");
@@ -1766,6 +1803,7 @@ function drawBoard(blank, local){
     map.players = players;
     var currentPlayer, $currentPower, powerName, playerName, newPlayer, figCount, figTypes, $tempCardList;
     var allPowers = {};
+    board.allPowers = allPowers;
     var numPowers = 0;
     //Dump the XML data for the individual powers into
     //an object, as jQuery objects keyed by name
@@ -1840,8 +1878,6 @@ function drawBoard(blank, local){
     //Set up the regions array
     var regions = [];
     map.regions = regions;
-    map.idCrd = 0;
-    map.idOWC = 0;
     var magicIcon, skullIcon;
     magicIcon = {
         draw : drawToken,
@@ -1851,196 +1887,187 @@ function drawBoard(blank, local){
         draw: drawToken,
         name : "skull"
     }
-    $regionSetupXML.each(function (i) {
-        var newRegion, regionXML, playerName;
-        var idString;
-        var $borderXML, $tempLinkList;
-        var $corruptionXML, corruptPlayerCount, corruptingPlayers, $ruinTemp;
-        var $tempFigureList, tempEffects, figure, figureXML, slotID, $figureSlots, tempPlayers;
-        var $tempCardList, tempOwner, cards, newCard;
-        var $tempTokenList;
-        regionXML = $regionsXML[i];
-        //Set up basic region information
-        //and region methods
-        newRegion = {
-            name : $(this).find("name").text(),
-            shortName : $(this).attr("short"),
-            idNum : i,
-            draw : drawRegion,
-            drag : dragObject,
-            drop : dropObject,
-            ctx : ctx,
-            players : players,
-            xmlData : regionXML,
-            populated : ($(this).attr("populated") === "true"),
-            resistance : $(this).find("resistance").text(),
-            type : "region",
-            map : map
+
+    function CorruptionPile (region, player, $corruptionXML) {
+        var amount = Number($corruptionXML.find("*[owner=" + player.name + "]").text());
+
+        this.owner = player;
+        this.value = amount || 0;
+        this.min = 0;
+        this.max = 20;
+        this.region = region;
+        this.draw = function () {
+            this.region.draw();
         };
-        regions.push(newRegion);
+    }
+
+    function ChaosCardSlot (region, index) {
+        this.figures = [];
+        this.type = "cardslot";
+        this.drop = dropObject;
+        this.heldBy = region;
+        this.index = index;
+
+        this.toString = function () {
+            return "Chaos Card Slot: " + region.name + " " + index;
+        };
+    }
+
+    function Region ($regionSetupXML) {
+        this.name = $regionSetupXML.find("name").text();
+        this.shortName = $regionSetupXML.attr("short");
+        this.$regionXML = map.$xmlData.find("region[name='" + this.name + "']")
+
+        this.draw = drawRegion;
+        this.drag = dragObject;
+        this.drop = dropObject;
+        this.ctx = ctx;
+
+        this.players = players;
+        this.populated = ($regionSetupXML.attr("populated") === "true");
+        this.resistance = $regionSetupXML.find("resistance").text();
+        this.type = "region";
+        this.map = map;
+
+        this.toString = function () {
+            return "Region: " + region.name;
+        };
+    }
+
+    Region.prototype.setupBorders = function () {
+        var $borderXML = this.$regionXML.find("border"),
+            $allLinkXML,
+            region = this;
+
         //Set up the region's border and links
         //to adjacent regions
-        $borderXML = $(this).find("border");
-        newRegion.border = {
+        region.border = {
             row : Number($borderXML.attr("row")),
             col : Number($borderXML.attr("col"))
         };
-        $tempLinkList = $borderXML.find("link");
-        newRegion.links = [];
-        $tempLinkList.each(function () {
-            newRegion.links.push($(this).text());
+
+        $allLinkXML = $borderXML.find("link");
+        region.links = [];
+        $allLinkXML.each(function () {
+            region.links.push($(this).text());
         });
-        //Set up the region's corruption
-        $corruptionXML = $(regionXML).find("corruption");
-        newRegion.corruption = [];
-        corruptPlayerCount = 0;
-        for (j = 0; j < playerCount; j++){
-            if (players[j].noCorruption){
+    };
+
+    Region.prototype.setupCorruption = function () {
+        var $corruptionXML = this.$regionXML.find("corruption");
+        this.corruption = [];
+
+        for (var j = 0; j < playerCount; j++) {
+            if (players[j].noCorruption) {
                 break;
             }
-            corruptPlayerCount += 1;
-            newRegion.corruption.push({});
-            newRegion.corruption[corruptPlayerCount - 1].owner = players[j];
-            newRegion.corruption[corruptPlayerCount - 1].value = 0;
-            newRegion.corruption[corruptPlayerCount - 1].min = 0;
-            newRegion.corruption[corruptPlayerCount - 1].max = 20;
-            newRegion.corruption[corruptPlayerCount - 1].region = newRegion;
-            newRegion.corruption[corruptPlayerCount - 1].draw = function(){
-                this.region.draw();
-            };
-            $corruptionXML.each(function () {
-                if (newRegion.corruption[corruptPlayerCount - 1].owner.name === $(this).attr("owner")){
-                    newRegion.corruption[corruptPlayerCount - 1].value = Number($(this).text());
-                }
-            });
+            this.corruption.push(new CorruptionPile(this, players[j], $corruptionXML));
         }
+    };
+
+    Region.prototype.setupRuination = function () {
+        var region = this,
+            $ruinTemp;
+
         //Set up the region's ruination values
-        newRegion.ruination = [];
-        $(this).find("ruination").children().each(function (j) {
-            newRegion.ruination[j] = $(this).text();
+        region.ruination = [];
+        this.$regionXML.find("ruination").children().each(function (j) {
+            region.ruination[j] = $(this).text();
         });
+
         //Set the region's ruination rank, if ruined
-        $ruinTemp = $(regionXML).find("ruined");
-        newRegion.ruined = $ruinTemp ? $ruinTemp.text() : 0;
-        //Set up the region's chaos cards
-        newRegion.cards = [];
-        $tempCardList = $(regionXML).find("card");
-        $tempCardList.each(function () {
-            var newCard = {
-                cost : $(this).attr("cost"),
-                holder : ($(this).attr("holder") === "true"),
-                skull : ($(this).attr("skull") === "true"),
-                magic : ($(this).attr("magic") === "true"),
-                cacheable : ($(this).attr("cacheable") === "true"),
-                magicIcon : magicIcon,
-                name : $(this).text(),
-                type : "chaos"
-            };
-            newRegion.cards.push(newCard);
-            tempOwner = $(this).attr("owner");
-            for (k = 0; k < playerCount; k++){
-                if (tempOwner === players[k].name){
-                    newCard.owner = players[k];
-                    map.idCrd++;
-                    idString = String(map.idCrd);
-                    idString = (idString.length == 1) ? "0" + idString : idString;
-                    newCard.objectID = "crd" + idString + tempOwner.substr(0,3);
-                    newCard.objectID.toUpperCase();
-                    newCard.draw = drawCard;
-                }
-            }
-            if (!newCard.owner){
-                newCard.owner = null;
-                map.idCrd++;
-                idString = String(map.idCrd);
-                idString = (idString.length == 1) ? "0" + idString : idString;
-                newCard.objectID = "crd" + idString + "old";
-                newCard.objectID.toUpperCase();
-                newCard.draw = drawCard;
+        $ruinTemp = this.$regionXML.find("ruined");
+        region.ruined = this.$ruinTemp ? $ruinTemp.text() : 0;
+
+    };
+
+    Region.prototype.setupChaosCards = function () {
+        var $allCardsXML = this.$regionXML.find("card"),
+            region = this;
+        region.cards = [];
+
+        $allCardsXML.each(function () {
+            var $cardXML = $(this);
+            var newCard = new ChaosCard($cardXML);
+            var ownerName = $cardXML.attr("owner");
+            var owner = allPowers[ownerName];
+            region.cards.push(newCard);
+        });
+    };
+
+    Region.prototype.setupTokens = function () {
+        var $allTokenXML = this.$regionXML.find("tokens").children(),
+            region = this;
+        region.tokens = [];
+
+        $allTokenXML.each(function () {
+            var token = region.map.tokenPool[this.nodeName].tokens.shift();
+            if (token) {
+                region.tokens.push(token);
+                token.heldBy = region;
             }
         });
-        //Assign the old world tokens
-        $tempTokenList = $(regionXML).find("tokens").children();
-        newRegion.tokens = [];
-        $tempTokenList.each(function () {
-            tokenName = this.nodeName;
-            switch (tokenName){
-            case "event":
-                token = map.tokenPool.event.tokens.shift();
-                break;
-            case "hero":
-                token = map.tokenPool.hero.tokens.shift();
-                break;
-            case "noble":
-                token = map.tokenPool.noble.tokens.shift();
-                break;
-            case "peasant":
-                token = map.tokenPool.peasant.tokens.shift();
-                break;
-            case "skaven":
-                token = map.tokenPool.skaven.tokens.shift();
-                break;
-            case "warpstone":
-                token = map.tokenPool.warpstone.tokens.shift();
-                break;
-            }
-            if (token){
-                newRegion.tokens.push(token);
-                token.heldBy = newRegion;
-            }
-        });
-        /***Set up the region's figures***/
-        $tempFigureList = $(regionXML).find("figures").children();
-        $figureSlots = $(regionXML).find("slot");
-        newRegion.figures = [];
-        newRegion.slots = [];
-        for (j = 0; j < 3; j++) {
-            newRegion.slots[j] = {
-                figures : [],
-                type : "cardslot",
-                drop : dropObject,
-                heldBy : newRegion,
-                index : j
-            }
-        }
-        //Set up name-keyed references
-        //to the players
-        tempPlayers = {};
-        for (j = 0; j < playerCount; j++){
-            tempPlayers[players[j].name] = players[j];
-        }
-        //Handle figures in the region base
-        $tempFigureList.each(function () {
-            playerName = $(this).attr("owner");
-            figTypes = this.nodeName + "s";
-            figure = tempPlayers[playerName][figTypes].shift();
+    };
+
+    Region.prototype.setupFigures = function () {
+        var $regionFigureXML = this.$regionXML.find("figures").children(),
+            $figureSlots = this.$regionXML.find("slot"),
+            region = this;
+
+        function addFigureToHolder ($figureXML, holder) {
+            var playerName = $figureXML.attr("owner"),
+                figTypes = $figureXML[0].nodeName + "s",
+                figure = board.allPowers[playerName][figTypes].shift();
             if (figure){
-                figure.shield = ($(this).attr("shield") === "true");
-                figure.musk = ($(this).attr("musk") === "true");
-                figure.marker = ($(this).attr("marker") === "true");
-                figure.skull = ($(this).attr("skull") === "true");
+                figure.shield = ($figureXML.attr("shield") === "true");
+                figure.musk = ($figureXML.attr("musk") === "true");
+                figure.marker = ($figureXML.attr("marker") === "true");
+                figure.skull = ($figureXML.attr("skull") === "true");
             }
-            newRegion.figures.push(figure);
-            figure.heldBy = newRegion;
+            holder.figures.push(figure);
+            figure.heldBy = holder;
+        }
+
+        // Create base region and card slot figure holders
+        region.figures = [];
+        region.slots = [];
+        for (var j = 0; j < 3; j++) {
+            region.slots[j] = new ChaosCardSlot(region, j);
+        }
+
+        //Handle figures in the region base
+        $regionFigureXML.each(function () {
+            addFigureToHolder($(this), region);
         });
+
         //Handle figures in the slots
         $figureSlots.each(function () {
-            $tempFigureList = $(this).children();
-            slotID = $(this).attr("slotid");
-            $tempFigureList.each(function () {
-                playerName = $(this).attr("owner");
-                figTypes = this.nodeName + "s";
-                figure = tempPlayers[playerName][figTypes].shift();
-                if (figure){
-                    figure.shield = ($(this).attr("shield") === "true");
-                    figure.musk = ($(this).attr("musk") === "true");
-                    figure.marker = ($(this).attr("marker") === "true");
-                    figure.skull = ($(this).attr("skull") === "true");
-                }
-                newRegion.slots[slotID].figures.push(figure);
-                figure.heldBy = newRegion.slots[slotID];
+            var $slotXML = $(this),
+                $slotFigureXML = $slotXML.children(),
+                slotID = $slotXML.attr("slotid");
+
+            $slotFigureXML.each(function () {
+                addFigureToHolder($(this), region.slots[slotID]);
             });
         });
+    };
+
+    Region.prototype.setup = function () {
+        var region = this;
+
+        region.setupBorders();
+        region.setupCorruption();
+        region.setupRuination();
+        region.setupChaosCards();
+        region.setupTokens();
+        region.setupFigures();
+    };
+
+    $regionSetupXML.each(function () {
+        var newRegion = new Region($(this));
+        newRegion.setup();
+
+        regions.push(newRegion);
     });
     //Create a method to count ruined regions
     board.numRuined = function () {
