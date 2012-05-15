@@ -147,7 +147,7 @@ function PluginLoader(board) {
             plugin,
             objectKey;
 
-        console.log("Manifest downloaded for plugin " + pluginName);
+        //console.log("Manifest downloaded for plugin " + pluginName);
 
         plugin = {
             "name" : pluginName,
@@ -159,12 +159,12 @@ function PluginLoader(board) {
                 return toLoadCount === loadedCount;
             },
             "checkLoadStatus" : function () {
-                console.log("Checking plugin load status...");
+                //console.log("Checking plugin load status...");
                 if (this.isLoaded()) {
                     console.log("Firing pluginLoaded event...");
                     $board.trigger('pluginLoaded');
                 } else {
-                    console.warn("Plugin " + pluginName + " not yet loaded.");
+                    //console.warn("Plugin " + pluginName + " not yet loaded.");
                 }
             }
         };
@@ -177,14 +177,14 @@ function PluginLoader(board) {
             for (objectKey in manifest.gamedata) {
                 if (manifest.gamedata.hasOwnProperty(objectKey)) {
                     plugin.toLoad.push(objectKey);
-                    console.log("Downloading " + objectKey + " component of plugin " + pluginName);
+                    //console.log("Downloading " + objectKey + " component of plugin " + pluginName);
                     $.get("custom/" + pluginName + "/gamedata/" + manifest.gamedata[objectKey] + ".xml",
                            function (responseData) {
                         var nodeName = responseData.documentElement.nodeName,
                             fileref = nodeName + "XML";
                         board.plugins[pluginName][fileref] = responseData.documentElement;
                         // Load the just-downloaded data
-                        console.log("Processing " + nodeName + " component of plugin " + pluginName);
+                        //console.log("Processing " + nodeName + " component of plugin " + pluginName);
                         dataLoaders[fileref](plugin, responseData.documentElement);
                         // Add this to the list of parts that have been loaded
                         plugin.loaded.push(nodeName);

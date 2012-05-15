@@ -813,7 +813,7 @@ function buildTokenPool(){
         pool.draw = drawOldWorldTokens;
         pool.drag = dragObject;
         pool.drop = dropObject;
-        console.log("Drawing " + pool.name + " pool");
+        //console.log("Drawing " + pool.name + " pool");
     });
     // Resize the canvas, then draw the pools
     canvas.height = y1 + 22;
@@ -1700,7 +1700,7 @@ function drawBoard(blank, local){
     //Create references to the XML gamestate data
     var $pluginList = $(state).find("customization").children("plugin")
     if ($pluginList.length > 0) {
-        console.log($pluginList.length + " plugins found.");
+        console.log($pluginList.length + " plugin(s) found.");
         board.plugins = {
             "_list" : []
         };
@@ -1734,6 +1734,8 @@ function drawBoard(blank, local){
         idString = (idString.length == 1) ? "0" + idString : idString;
         return idString;
     };
+    // Set up a jQuery object to hook a task queue to
+    board.$afterPlugins = $({});
     map.$xmlData = $(mapXML);
     var $regionsXML = $(mapXML).find("region");
     var scoreXML = state.getElementsByTagName("scoreboard")[0];
@@ -1797,6 +1799,8 @@ function drawBoard(blank, local){
             pool.addToken(new Token());
         }
     });
+
+
 
     //Set up the players array
     var players = [];
@@ -1876,8 +1880,7 @@ function drawBoard(blank, local){
     //Load the Chaos Cards
     getChaosCards(board.expansion);
     //Set up the regions array
-    var regions = [];
-    map.regions = regions;
+    map.regions = [];
     var magicIcon, skullIcon;
     magicIcon = {
         draw : drawToken,
@@ -1886,7 +1889,7 @@ function drawBoard(blank, local){
     board.skullIcon = {
         draw: drawToken,
         name : "skull"
-    }
+    };
 
     function CorruptionPile (region, player, $corruptionXML) {
         var amount = Number($corruptionXML.find("*[owner=" + player.name + "]").text());
@@ -1916,6 +1919,7 @@ function drawBoard(blank, local){
     function Region ($regionSetupXML) {
         this.name = $regionSetupXML.find("name").text();
         this.shortName = $regionSetupXML.attr("short");
+        this.$regionSetupXML = $regionSetupXML;
         this.$regionXML = map.$xmlData.find("region[name='" + this.name + "']")
 
         this.draw = drawRegion;
@@ -1935,7 +1939,7 @@ function drawBoard(blank, local){
     }
 
     Region.prototype.setupBorders = function () {
-        var $borderXML = this.$regionXML.find("border"),
+        var $borderXML = this.$regionSetupXML.find("border"),
             $allLinkXML,
             region = this;
 
@@ -1971,7 +1975,7 @@ function drawBoard(blank, local){
 
         //Set up the region's ruination values
         region.ruination = [];
-        this.$regionXML.find("ruination").children().each(function (j) {
+        this.$regionSetupXML.find("ruination").children().each(function (j) {
             region.ruination[j] = $(this).text();
         });
 
@@ -2059,20 +2063,25 @@ function drawBoard(blank, local){
         region.setupCorruption();
         region.setupRuination();
         region.setupChaosCards();
-        region.setupTokens();
         region.setupFigures();
+        board.$afterPlugins.queue("toDo", function (next) {
+            //console.log("Setting up tokens for " + region.name);
+            region.setupTokens();
+            next();
+        });
     };
 
     $regionSetupXML.each(function () {
         var newRegion = new Region($(this));
         newRegion.setup();
 
-        regions.push(newRegion);
+        board.map.regions.push(newRegion);
     });
+
     //Create a method to count ruined regions
     board.numRuined = function () {
         var count = 0;
-        $(regions).each(function (j) {
+        $(this.map.regions).each(function (j) {
             if (this.ruined) {
                 count += 1;
             }
@@ -2093,7 +2102,7 @@ function drawBoard(blank, local){
             ctx : ctx,
             index : i
         };
-        $(regions).each(function (j) {
+        $(board.map.regions).each(function (j) {
             ruinCard.regions[j] = this.ruination[i];
         });
         ruination[i] = ruinCard;
@@ -2207,13 +2216,20 @@ function drawBoard(blank, local){
         cache.drawMe();
     }
     //Draw the regions
-    $(regions).each(function () {
-        this.draw();
+    board.$afterPlugins.queue("toDo", function (next) {
+        //console.log("Drawing regions");
+        $(board.map.regions).each(function () {
+            this.draw();
+        });
+        next();
     });
     //Identify the current ruination card and draw it
-    var numRuined = Math.min(board.numRuined(), 4);
-    map.ruinCard = board.ruination[numRuined];
-    map.ruinCard.draw();
+    board.$afterPlugins.queue("toDo", function (next) {
+        var numRuined = Math.min(board.numRuined(), 4);
+        map.ruinCard = board.ruination[numRuined];
+        map.ruinCard.draw();
+        next();
+    });
     //Draw the scoreboard
     score.draw();
     //Set up the scoreboard controls
@@ -2305,6 +2321,12 @@ function drawBoard(blank, local){
     owActive.oldWorld = oldWorld;
     oldWorld.draw();
     //Draw the remaining Old World tokens
+    board.$afterPlugins.queue("toDo", function (next) {
+        buildTokenPool();
+        next();
+    });
+
+    // Set up the callback to execute the queued tasks
     if (board.plugins) {
         $board.on("pluginLoaded", function () {
             var allPluginsLoaded = true;
@@ -2318,15 +2340,15 @@ function drawBoard(blank, local){
             });
 
             if (allPluginsLoaded) {
-                console.log("Building token pool (with plugins)");
-                buildTokenPool();
+                console.log("Deferred board setup (with plugins)");
+                board.$afterPlugins.dequeue("toDo");
             } else {
                 console.log("Not all plugins are loaded yet.");
             }
         });
     } else {
-        console.log("Building token pool (without plugins)");
-        buildTokenPool();
+        console.log("Deferred board setup (without plugins)");
+        board.$afterPlugins.dequeue("toDo");
     }
     //Associate the draw method with
     //the player, then draw reserves
