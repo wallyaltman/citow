@@ -1800,8 +1800,6 @@ function drawBoard(blank, local){
         }
     });
 
-
-
     //Set up the players array
     var players = [];
     map.players = players;
@@ -2231,7 +2229,10 @@ function drawBoard(blank, local){
         next();
     });
     //Draw the scoreboard
-    score.draw();
+    board.$afterPlugins.queue("toDo", function (next) {
+        score.draw();
+        next();
+    });
     //Set up the scoreboard controls
     buildScoreBoardControls();
     //Draw the Old World track
@@ -2319,7 +2320,11 @@ function drawBoard(blank, local){
     owActive.draw = drawOldWorldActive;
     oldWorld.slider = owActive;
     owActive.oldWorld = oldWorld;
-    oldWorld.draw();
+
+    board.$afterPlugins.queue("toDo", function (next) {
+        oldWorld.draw();
+        next();
+    });
     //Draw the remaining Old World tokens
     board.$afterPlugins.queue("toDo", function (next) {
         buildTokenPool();
