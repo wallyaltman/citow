@@ -503,74 +503,78 @@ function getOldWorldCards(cardSet){
         xmlhttp.onreadystatechange = function(){
             if (this.readyState == 4 && this.status == 200){
                 var xmlDoc = this.responseXML;
-                var board = document.getElementById("board");
-                var players = board.map.score.players;
-                var oldWorldCards = xmlDoc.getElementsByTagName("card");
-                var $owc = $("#owc");
-                $owc.children().remove();
-                var card;
-                for (var i = 0; i < oldWorldCards.length; i++){
-                    card = {
-                        xmlData : oldWorldCards[i],
-                        name : oldWorldCards[i].firstChild.data,
-                        event : (oldWorldCards[i].getAttribute("event") == "true"),
-                        holder : (oldWorldCards[i].getAttribute("holder") == "true"),
-                        skull : (oldWorldCards[i].getAttribute("skull") == "true"),
-                        active : true,
-                        draw : drawCard,
-                        symbol : {},
-                        symbol2 : {},
-                        type : "oldworld",
-                        dataid : oldWorldCards[i].getAttribute("dataid")
-                    };
-                    card.symbol.name = "smallcomet";
-                    card.symbol.draw = drawToken;
-                    card.symbol2.name = "darkcomet";
-                    card.symbol2.draw = drawToken;
-                    //If the Horned Rat is a player, make The Horned One's Due
-                    //an event card
-                    if (card.dataid == "owc011"){
-                        for (j = 0; j < players.length; j++){
-                            if (players[j].idNum == 4){
-                                card.event = true;
-                                break;
+                var $board = $("#board"),
+                    board = $board[0];
+                console.log("Setting OWC listener for 'scoreboardLoaded'");
+                $board.on("scoreboardLoaded", function () {
+                    var players = board.map.players;
+                    var oldWorldCards = xmlDoc.getElementsByTagName("card");
+                    var $owc = $("#owc");
+                    $owc.children().remove();
+                    var card;
+                    for (var i = 0; i < oldWorldCards.length; i++){
+                        card = {
+                            xmlData : oldWorldCards[i],
+                            name : oldWorldCards[i].firstChild.data,
+                            event : (oldWorldCards[i].getAttribute("event") == "true"),
+                            holder : (oldWorldCards[i].getAttribute("holder") == "true"),
+                            skull : (oldWorldCards[i].getAttribute("skull") == "true"),
+                            active : true,
+                            draw : drawCard,
+                            symbol : {},
+                            symbol2 : {},
+                            type : "oldworld",
+                            dataid : oldWorldCards[i].getAttribute("dataid")
+                        };
+                        card.symbol.name = "smallcomet";
+                        card.symbol.draw = drawToken;
+                        card.symbol2.name = "darkcomet";
+                        card.symbol2.draw = drawToken;
+                        //If the Horned Rat is a player, make The Horned One's Due
+                        //an event card
+                        if (card.dataid == "owc011"){
+                            for (j = 0; j < players.length; j++){
+                                if (players[j].idNum == 4){
+                                    card.event = true;
+                                    break;
+                                }
                             }
                         }
-                    }
-                    card.canvas = document.createElement("canvas");
-                    card.canvas.className = "card";
-                    card.canvas.width = 180;
-                    card.canvas.height = 17;
-                    card.canvas.card = card;
-                    var ctx = card.canvas.getContext('2d');
-                    $owc.append(card.canvas);
-                    card.draw(1, 0, ctx);
-                    card.canvas.cursorPos = getCursorPosition;
-                    card.canvas.onmousedown = function(evt){
-                        var pen = document.getElementById("pen");
-                        var card = this.card;
-                        //Check to be sure no object is held
-                        if (!pen.held){
-                            pen.held = copyObject(card);
-                            var coord = this.cursorPos(evt);
-                            xOffset = coord.x;
-                            yOffset = coord.y;
-                            //Assign a new object ID
-                            var map = document.getElementById("board").map;
-                            map.idOWC++;
-                            var idString = String(map.idOWC);
-                            idString = (idString.length == 1) ? "0" + idString : idString;
-                            pen.held.objectID = "owc" + idString;
-                            //Begin moving the card
-                            pen.move(evt, xOffset, yOffset);
+                        card.canvas = document.createElement("canvas");
+                        card.canvas.className = "card";
+                        card.canvas.width = 180;
+                        card.canvas.height = 17;
+                        card.canvas.card = card;
+                        var ctx = card.canvas.getContext('2d');
+                        $owc.append(card.canvas);
+                        card.draw(1, 0, ctx);
+                        card.canvas.cursorPos = getCursorPosition;
+                        card.canvas.onmousedown = function(evt){
+                            var pen = document.getElementById("pen");
+                            var card = this.card;
+                            //Check to be sure no object is held
+                            if (!pen.held){
+                                pen.held = copyObject(card);
+                                var coord = this.cursorPos(evt);
+                                xOffset = coord.x;
+                                yOffset = coord.y;
+                                //Assign a new object ID
+                                var map = document.getElementById("board").map;
+                                map.idOWC++;
+                                var idString = String(map.idOWC);
+                                idString = (idString.length == 1) ? "0" + idString : idString;
+                                pen.held.objectID = "owc" + idString;
+                                //Begin moving the card
+                                pen.move(evt, xOffset, yOffset);
+                            }
+                            var board = document.getElementById("board");
+                            document.onmouseup = function(evt){
+                                board.release(evt);
+                            };
+                            return false;
                         }
-                        var board = document.getElementById("board");
-                        document.onmouseup = function(evt){
-                            board.release(evt);
-                        };
-                        return false;
                     }
-                }
+                });
                 //var owchead = document.getElementById("owchead");
             }
         }
@@ -594,195 +598,199 @@ function getChaosCards(expansion){
                 var i, j, $cc0, $cc1;
                 var xmlDoc = this.responseXML;
                 var chaosCards = xmlDoc.getElementsByTagName("card");
-                var board = document.getElementById("board");
-                var players = board.map.score.players;
-                $cc0 = $("#cc0");
-                $cc0.children().remove();
-                $cc1 = $("#cc1");
-                $cc1.children().remove();
-                var cardSets = [];
-                var card;
-                for (i = 0; i < chaosCards.length; i++){
-                    card = {
-                        xmlData : chaosCards[i],
-                        name : chaosCards[i].firstChild.data,
-                        cost : chaosCards[i].getAttribute("cost"),
-                        power : chaosCards[i].getAttribute("owner"),
-                        draw : drawCard,
-                        magic : (chaosCards[i].getAttribute("magic") == "true"),
-                        holder : (chaosCards[i].getAttribute("holder") == "true"),
-                        skull : (chaosCards[i].getAttribute("skull") == "true"),
-                        cacheable : (chaosCards[i].getAttribute("cacheable") == "true"),
-                        magicIcon : {},
-                        type : "chaos"
-                    };
-                    //Check the player list for the card's owner, and
-                    //link them.  Skip the rest if the card's owner
-                    //isn't a player in the game (or the Old World).
-                    if (card.power == "Old_World"){
-                        card.owner = {};
-                        card.owner.name = "Old_World";
-                        card.owner.idNum = board.maxPowers;  //Greater than all idNums
-                        card.owner.highlight = "#CCA477";
-                        card.owner.shadow = "#3D3322";
+                var $board = $("#board"),
+                    board = $board[0];
+                console.log("Setting CC listener for 'scoreboardLoaded'");
+                $board.on("scoreboardLoaded", function () {
+                    var players = board.map.players;
+                    $cc0 = $("#cc0");
+                    $cc0.children().remove();
+                    $cc1 = $("#cc1");
+                    $cc1.children().remove();
+                    var cardSets = [];
+                    var card;
+                    for (i = 0; i < chaosCards.length; i++){
+                        card = {
+                            xmlData : chaosCards[i],
+                            name : chaosCards[i].firstChild.data,
+                            cost : chaosCards[i].getAttribute("cost"),
+                            power : chaosCards[i].getAttribute("owner"),
+                            draw : drawCard,
+                            magic : (chaosCards[i].getAttribute("magic") == "true"),
+                            holder : (chaosCards[i].getAttribute("holder") == "true"),
+                            skull : (chaosCards[i].getAttribute("skull") == "true"),
+                            cacheable : (chaosCards[i].getAttribute("cacheable") == "true"),
+                            magicIcon : {},
+                            type : "chaos"
+                        };
+                        //Check the player list for the card's owner, and
+                        //link them.  Skip the rest if the card's owner
+                        //isn't a player in the game (or the Old World).
+                        if (card.power == "Old_World"){
+                            card.owner = {};
+                            card.owner.name = "Old_World";
+                            card.owner.idNum = board.maxPowers;  //Greater than all idNums
+                            card.owner.highlight = "#CCA477";
+                            card.owner.shadow = "#3D3322";
+                        }
+                        else {
+                            for (j = 0; j < players.length; j++){
+                                if (card.power == players[j].name){
+                                    card.owner = players[j];
+                                    break;
+                                }
+                            }
+                        }
+                        if (card.owner){
+                            card.magicIcon.name = "magic";
+                            card.magicIcon.draw = drawToken;
+                            card.canvas = document.createElement("canvas");
+                            card.canvas.className = "card";
+                            card.canvas.width = 180;
+                            card.canvas.height = 17;
+                            card.canvas.card = card;
+                            card.homeCtx = card.canvas.getContext('2d');
+                            /*if (card.column == 2){
+                                $cc2.append(card.canvas);
+                            }
+                            else {
+                                $cc.append(card.canvas);
+                            }*/
+                            //Add the card's canvas to the appropriate
+                            //card set, creating it if needed
+                            if (!cardSets[card.owner.idNum]){
+                                cardSets[card.owner.idNum] = [];
+                            }
+                            cardSets[card.owner.idNum].push(card);
+                            /*card.draw(1, 0, ctx);*/
+                            card.canvas.cursorPos = getCursorPosition;
+                            card.canvas.onmousedown = function(evt){
+                                var pen = document.getElementById("pen");
+                                var card = this.card;
+                                //Check to be sure no object is held
+                                if (!pen.held){
+                                    pen.held = copyObject(card);
+                                    var coord = this.cursorPos(evt);
+                                    xOffset = coord.x;
+                                    yOffset = coord.y;
+                                    //Assign a new object ID
+                                    var map = document.getElementById("board").map;
+                                    map.idCrd++;
+                                    var idString = String(map.idCrd);
+                                    idString = (idString.length == 1) ? "0" + idString : idString;
+                                    pen.held.objectID = "crd" + idString;
+                                    //Begin moving the card
+                                    pen.move(evt, xOffset, yOffset);
+                                }
+                                var board = document.getElementById("board");
+                                document.onmouseup = function(evt){
+                                    board.release(evt);
+                                };
+                                return false;
+                            }
+                        }
                     }
-                    else {
-                        for (j = 0; j < players.length; j++){
-                            if (card.power == players[j].name){
-                                card.owner = players[j];
+                    //Determine a suitable distribution of card sets
+                    //between the columns, so that column 1 will have
+                    //the most cards
+                    var setLengths = [];
+                    for (i = 0; i <= board.maxPowers; i++){
+                        if (cardSets[i]){
+                            setLengths.push(cardSets[i].length);
+                        }
+                    }
+                    setLengths.sort();
+                    var thisLength, match;
+                    var columns = [ [], [] ];
+                    var currentCol = 0;
+                    while (cardSets.length > 0){
+                        match = false;
+                        //Pop off the last (i.e. largest) value
+                        thisLength = setLengths.pop();
+                        for (i = 0; i < board.maxPowers; i++){
+                            //Find the first matching cardset
+                            if (cardSets[i] && cardSets[i].length == thisLength){
+                                //Snip it out, and add its cards to a column
+                                columns[currentCol] = columns[currentCol].concat(cardSets.splice(i, 1)[0]);
+                                match = true;
                                 break;
                             }
                         }
-                    }
-                    if (card.owner){
-                        card.magicIcon.name = "magic";
-                        card.magicIcon.draw = drawToken;
-                        card.canvas = document.createElement("canvas");
-                        card.canvas.className = "card";
-                        card.canvas.width = 180;
-                        card.canvas.height = 17;
-                        card.canvas.card = card;
-                        card.homeCtx = card.canvas.getContext('2d');
-                        /*if (card.column == 2){
-                            $cc2.append(card.canvas);
-                        }
-                        else {
-                            $cc.append(card.canvas);
-                        }*/
-                        //Add the card's canvas to the appropriate
-                        //card set, creating it if needed
-                        if (!cardSets[card.owner.idNum]){
-                            cardSets[card.owner.idNum] = [];
-                        }
-                        cardSets[card.owner.idNum].push(card);
-                        /*card.draw(1, 0, ctx);*/
-                        card.canvas.cursorPos = getCursorPosition;
-                        card.canvas.onmousedown = function(evt){
-                            var pen = document.getElementById("pen");
-                            var card = this.card;
-                            //Check to be sure no object is held
-                            if (!pen.held){
-                                pen.held = copyObject(card);
-                                var coord = this.cursorPos(evt);
-                                xOffset = coord.x;
-                                yOffset = coord.y;
-                                //Assign a new object ID
-                                var map = document.getElementById("board").map;
-                                map.idCrd++;
-                                var idString = String(map.idCrd);
-                                idString = (idString.length == 1) ? "0" + idString : idString;
-                                pen.held.objectID = "crd" + idString;
-                                //Begin moving the card
-                                pen.move(evt, xOffset, yOffset);
+                        //If we somehow failed to find a match, just
+                        //take the first cardset
+                        if (!match){
+                            if (cardSets[0]){
+                                columns[currentCol] = columns[currentCol].concat(cardSets.shift());
                             }
-                            var board = document.getElementById("board");
-                            document.onmouseup = function(evt){
-                                board.release(evt);
-                            };
-                            return false;
+                            else {
+                                break;
+                            }
                         }
+                        //Alternate columns
+                        currentCol = (currentCol + 1) % 2;
                     }
-                }
-                //Determine a suitable distribution of card sets
-                //between the columns, so that column 1 will have
-                //the most cards
-                var setLengths = [];
-                for (i = 0; i <= board.maxPowers; i++){
-                    if (cardSets[i]){
-                        setLengths.push(cardSets[i].length);
-                    }
-                }
-                setLengths.sort();
-                var thisLength, match;
-                var columns = [ [], [] ];
-                var currentCol = 0;
-                while (cardSets.length > 0){
-                    match = false;
-                    //Pop off the last (i.e. largest) value
-                    thisLength = setLengths.pop();
-                    for (i = 0; i < board.maxPowers; i++){
-                        //Find the first matching cardset
-                        if (cardSets[i] && cardSets[i].length == thisLength){
-                            //Snip it out, and add its cards to a column
-                            columns[currentCol] = columns[currentCol].concat(cardSets.splice(i, 1)[0]);
-                            match = true;
-                            break;
+                    //Define a card comparison function for use in sorting
+                    //the cards in each column
+                    var compareCards = function(a, b){
+                        var id_a, id_b, cost_a, cost_b, name_a, name_b;
+                        //Compare owner IDs
+                        id_a = a.owner.idNum;
+                        id_b = b.owner.idNum;
+                        if (id_a != id_b){
+                            return id_a - id_b;
                         }
-                    }
-                    //If we somehow failed to find a match, just
-                    //take the first cardset
-                    if (!match){
-                        if (cardSets[0]){
-                            columns[currentCol] = columns[currentCol].concat(cardSets.shift());
+                        //Compare card cost (NaN goes last)
+                        cost_a = a.cost;
+                        cost_b = b.cost;
+                        if (cost_a != cost_b){
+                            if (isNaN(cost_b)){
+                                return -1;           //NaN is "biggest"
+                            }
+                            else if (isNaN(cost_a)){
+                                return 1;
+                            }
+                            else {
+                                return cost_a - cost_b;
+                            }
                         }
-                        else {
-                            break;
+                        //Compare card name (after making lower-case and
+                        //stripping leading "the")
+                        name_a = a.name.toLowerCase().replace(/^\s*the\s*/, "");
+                        name_b = b.name.toLowerCase().replace(/^\s*the\s*/, "");
+                        if (name_a != name_b){
+                            if (!name_b.substr(0, 1).match(/[A-Za-z0-9]/)){
+                                return -1;          //Non-alphanumeric is "biggest"
+                            }
+                            else if (!name_a.substr(0, 1).match(/[A-Za-z0-9]/)){
+                                return 1;
+                            }
+                            else if (name_a < name_b){
+                                return -1;
+                            }
+                            else {
+                                return 1;
+                            }
                         }
-                    }
-                    //Alternate columns
-                    currentCol = (currentCol + 1) % 2;
-                }
-                //Define a card comparison function for use in sorting
-                //the cards in each column
-                var compareCards = function(a, b){
-                    var id_a, id_b, cost_a, cost_b, name_a, name_b;
-                    //Compare owner IDs
-                    id_a = a.owner.idNum;
-                    id_b = b.owner.idNum;
-                    if (id_a != id_b){
-                        return id_a - id_b;
-                    }
-                    //Compare card cost (NaN goes last)
-                    cost_a = a.cost;
-                    cost_b = b.cost;
-                    if (cost_a != cost_b){
-                        if (isNaN(cost_b)){
-                            return -1;           //NaN is "biggest"
-                        }
-                        else if (isNaN(cost_a)){
-                            return 1;
-                        }
-                        else {
-                            return cost_a - cost_b;
-                        }
-                    }
-                    //Compare card name (after making lower-case and
-                    //stripping leading "the")
-                    name_a = a.name.toLowerCase().replace(/^\s*the\s*/, "");
-                    name_b = b.name.toLowerCase().replace(/^\s*the\s*/, "");
-                    if (name_a != name_b){
-                        if (!name_b.substr(0, 1).match(/[A-Za-z0-9]/)){
-                            return -1;          //Non-alphanumeric is "biggest"
-                        }
-                        else if (!name_a.substr(0, 1).match(/[A-Za-z0-9]/)){
-                            return 1;
-                        }
-                        else if (name_a < name_b){
-                            return -1;
-                        }
-                        else {
-                            return 1;
-                        }
-                    }
-                    //Give up
-                    return 0;
-                };
-                //Sort each column
-                columns[0].sort(compareCards);
-                columns[1].sort(compareCards);
-                //Stuff the cards into their containers and draw them
-                $.each(columns[0], function(index, obj){
-                    $cc0.append(obj.canvas);
-                    obj.draw(1, 0, obj.homeCtx);
+                        //Give up
+                        return 0;
+                    };
+                    //Sort each column
+                    columns[0].sort(compareCards);
+                    columns[1].sort(compareCards);
+                    //Stuff the cards into their containers and draw them
+                    $.each(columns[0], function(index, obj){
+                        $cc0.append(obj.canvas);
+                        obj.draw(1, 0, obj.homeCtx);
+                    });
+                    $.each(columns[1], function(index, obj){
+                        $cc1.append(obj.canvas);
+                        obj.draw(1, 0, obj.homeCtx);
+                    });
+                    //Shift column 0 (which appears second in the markup)
+                    //upwards to line up with column 1
+                    var colOffset = -1 * $cc1.height() - 4;
+                    $cc0.css({ marginTop: colOffset });
                 });
-                $.each(columns[1], function(index, obj){
-                    $cc1.append(obj.canvas);
-                    obj.draw(1, 0, obj.homeCtx);
-                });
-                //Shift column 0 (which appears second in the markup)
-                //upwards to line up with column 1
-                var colOffset = -1 * $cc1.height() - 4;
-                $cc0.css({ marginTop: colOffset });
             }
         }
         xmlhttp.open("GET", url, true);
@@ -1608,6 +1616,77 @@ function clearEffects(){
     });
 }
 
+function Figure (player, type, index) {
+    var figCount = (index < 10) ? "0" + String(index) : String(index);
+
+    this.model = type;
+    this.type = "figure";
+    this.owner = player;
+    this.heldBy = player;
+
+    this.marker = false;
+    this.musk = false;
+    this.shield = false;
+
+    this.draw = drawFigure;
+
+    this.objectID = type.substr(0,3) + figCount + player.name.substr(0,3);
+    this.objectID.toUpperCase();
+}
+
+Figure.prototype.clearAll = function () {
+    this.marker = false;
+    this.musk = false;
+    this.shield = false;
+    this.skull = false;
+};
+
+function Player ($powerSetupXML, $powerXML, index) {
+    var modelTypes = ["cultist", "warrior", "daemon"],
+        board = $("#board")[0],
+        player = this;
+
+    this.name = $powerXML.attr("name");
+    this.playerName = $powerXML.attr("playername");
+    this.displayName = this.name.replace(/_/, " ");
+
+    this.type = "player";
+    this.idNum = index;
+    this.$xmlData = $powerXML;
+
+    this.highlight = $powerSetupXML.attr("highlight");
+    this.shadow = $powerSetupXML.attr("shadow");
+    this.ctx = board.ctx;
+    this.map = board.map;
+
+    this.cultists = [];
+    this.warriors = [];
+    this.daemons = [];
+    this.noCorruption = ($powerSetupXML.attr("nocorruption") == "true");
+
+    //Total figure counts
+    this.figureCounts = {
+        cultists : $powerSetupXML.find("cultists").text(),
+        warriors : $powerSetupXML.find("warriors").text(),
+        daemons : $powerSetupXML.find("daemons").text()
+    };
+
+    // For some reason, jQuery converts my string literals into String objects
+    $(modelTypes).each(function () {
+        var type = this.valueOf(),
+            types = this + "s",
+            figure;
+        for (var k = 0; k < player.figureCounts[types]; k++) {
+            figure = new Figure(player, type, k);
+            player[types].push(figure);
+        }
+    });
+}
+
+Player.prototype.draw = drawReserves;
+Player.prototype.drag = dragObject;
+Player.prototype.drop = dropObject;
+
 /**
  * Constructor for an individual Old World Token pool.
  */
@@ -1651,6 +1730,23 @@ function ChaosCard ($cardXML) {
     this.draw = drawCard;
 }
 
+function OldWorldCard ($cardXML, symbols) {
+    var board = $("#board")[0];
+    this.objectId = board.newOldWorldID();
+
+    this.name = $cardXML.text();
+    this.type = "oldworld";
+    this.event = ($cardXML.attr("event") === "true");
+    this.active = ($cardXML.attr("active") === "true");
+
+    this.holder = ($cardXML.attr("holder") === "true");
+    this.skull = ($cardXML.attr("skull") === "true");
+
+    this.symbol = symbols[0];
+    this.symbol2 = symbols[1];
+    this.draw = drawCard;
+}
+
 /* Build and draw a new board.  A value of true for
  * the "blank" parameter draws a blank board.
  */
@@ -1662,6 +1758,7 @@ function drawBoard(blank, local){
     var width = board.width,
         height = board.height;
     var state, expansion;
+    board.ctx = ctx;
     if (local){
         //Check whether the game in local storage
         //has a matching game number
@@ -1739,8 +1836,8 @@ function drawBoard(blank, local){
     map.$xmlData = $(mapXML);
     var $regionsXML = $(mapXML).find("region");
     var scoreXML = state.getElementsByTagName("scoreboard")[0];
-    var playersXML = scoreXML.getElementsByTagName("player");
-    var playerCount = playersXML.length;
+    var $playerXMLArray = $(scoreXML).find("player");
+    var playerCount = $playerXMLArray.length;
     var oldWorldXML = state.getElementsByTagName("oldworld")[0];
     //Check for the game type (for Chaos cards)
     board.expansion = state.documentElement.getAttribute("expansion");
@@ -1755,10 +1852,11 @@ function drawBoard(blank, local){
     //Load the Old World cards
     getOldWorldCards(board.owcset);
     //Create references to the XML setup data
-    var $powerSetupXML = $(info).find("ruinouspowers").children();
-    var $regionSetupXML = $(info).find("region");
-    var regionCount = $regionSetupXML.length;
-    var $tokenSetupXML = $(info).find("tokens").children();
+    var $info = $(info);
+    var $powerSetupXMLArray = $info.find("ruinouspowers").children();
+    var $regionSetupXMLArray = $info.find("region");
+    var regionCount = $regionSetupXMLArray.length;
+    var $tokenSetupXML = $info.find("tokens").children();
     //Set up the old world tokens pool
     map.tokenPool = { "_list" : [] };
     var tempArray, tokenTypes;
@@ -1800,81 +1898,34 @@ function drawBoard(blank, local){
         }
     });
 
-    //Set up the players array
     var players = [];
     map.players = players;
-    var currentPlayer, $currentPower, powerName, playerName, newPlayer, figCount, figTypes, $tempCardList;
-    var allPowers = {};
-    board.allPowers = allPowers;
+    board.allPowers = {};
     var numPowers = 0;
     //Dump the XML data for the individual powers into
     //an object, as jQuery objects keyed by name
-    $powerSetupXML.each(function () {
+    $powerSetupXMLArray.each(function () {
         var name = $(this).find("name").text();
-        allPowers[name] = $(this);
+        board.allPowers[name] = $(this);
         numPowers += 1;
     });
     board.maxPowers = numPowers;
-    var modelTypes = ["cultist", "warrior", "daemon"];
-    for (i = 0; i < playerCount; i++){
-        currentPlayer = playersXML[i];
-        powerName = $(currentPlayer).attr("name");
-        playerName = $(currentPlayer).attr("playername");
-        $currentPower = allPowers[powerName];
-        newPlayer = {
-            name : powerName,
-            playerName : playerName,
-            idNum : i,
-            highlight : $currentPower.attr("highlight"),
-            shadow : $currentPower.attr("shadow"),
-            ctx : ctx,
-            xmlData : playersXML[i],
-            map : map,
-            type : "player",
-            cultists : [],
-            warriors : [],
-            daemons : [],
-            noCorruption : ($currentPower.attr("nocorruption") == "true")
-        };
-        //Create a display name, with underscores swapped out for spaces
-        newPlayer.displayName = newPlayer.name.replace(/_/, " ");
-        //Total figure counts
-        newPlayer.figures = {
-            cultists : $currentPower.find("cultists").text(),
-            warriors : $currentPower.find("warriors").text(),
-            daemons : $currentPower.find("daemons").text()
-        };
-        //Create figures of each type
-        //and put them in reserves
-        for (j = 0; j < modelTypes.length; j++){
-            figTypes = modelTypes[j] + "s";
-            for (k = 0; k < newPlayer.figures[figTypes]; k++){
-                figure = {
-                    draw : drawFigure,
-                    model : modelTypes[j],
-                    owner : newPlayer,
-                    type : "figure",
-                    marker : false,
-                    musk : false,
-                    shield : false,
-                    heldBy : newPlayer
-                };
-                figCount = (k < 10) ? "0" + String(k) : String(k);
-                figure.objectID = modelTypes[j].substr(0,3) + figCount + newPlayer.name.substr(0,3);
-                figure.objectID.toUpperCase();
-                //Create a method to clear all markers
-                //from a figure
-                figure.clearAll = function(){
-                    this.marker = false;
-                    this.musk = false;
-                    this.shield = false;
-                    this.skull = false;
-                };
-                newPlayer[figTypes].push(figure);
-            }
-        }
-        players.push(newPlayer);
-    }
+
+    board.$afterPlugins.queue("toDo", function (next) {
+        board.allPlayers = {};
+
+        $playerXMLArray.each(function (i) {
+            var $currentPlayer = $(this),
+                powerName = $currentPlayer.attr("name"),
+                $powerSetupXML = board.allPowers[powerName],
+                newPlayer = new Player($powerSetupXML, $currentPlayer, i);
+            map.players.push(newPlayer);
+            board.allPlayers[newPlayer.name] = newPlayer;
+        });
+
+        next();
+    });
+
     //Load the Chaos Cards
     getChaosCards(board.expansion);
     //Set up the regions array
@@ -1902,16 +1953,34 @@ function drawBoard(blank, local){
         };
     }
 
+    function CardSlot (holder, index) {
+        this.type = "cardslot";
+        this.longType = "Card Slot";
+        this.drop = dropObject;
+    }
+
+    CardSlot.prototype.toString = function () {
+        return this.longType + " " + this.index;
+    }
+
+    CardSlot.prototype.drop = dropObject;
+
+    ChaosCardSlot.prototype = new CardSlot();
+    ChaosCardSlot.prototype.constructor = ChaosCardSlot;
     function ChaosCardSlot (region, index) {
         this.figures = [];
-        this.type = "cardslot";
-        this.drop = dropObject;
+        this.longType = "Chaos Card Slot: " + region.name;
         this.heldBy = region;
         this.index = index;
+    }
 
-        this.toString = function () {
-            return "Chaos Card Slot: " + region.name + " " + index;
-        };
+    OldWorldCardSlot.prototype = new CardSlot();
+    OldWorldCardSlot.prototype.constructor = OldWorldCardSlot;
+    function OldWorldCardSlot (holder, index) {
+        this.figures = [];
+        this.longType = "Old World Card Slot"
+        this.heldBy = holder;
+        this.index = index;
     }
 
     function Region ($regionSetupXML) {
@@ -1992,7 +2061,7 @@ function drawBoard(blank, local){
             var $cardXML = $(this);
             var newCard = new ChaosCard($cardXML);
             var ownerName = $cardXML.attr("owner");
-            var owner = allPowers[ownerName];
+            var owner = board.allPowers[ownerName];
             region.cards.push(newCard);
         });
     };
@@ -2057,19 +2126,19 @@ function drawBoard(blank, local){
     Region.prototype.setup = function () {
         var region = this;
 
-        region.setupBorders();
-        region.setupCorruption();
-        region.setupRuination();
-        region.setupChaosCards();
-        region.setupFigures();
         board.$afterPlugins.queue("toDo", function (next) {
-            //console.log("Setting up tokens for " + region.name);
+            //console.log("Setting up " + region.name);
+            region.setupBorders();
+            region.setupCorruption();
+            region.setupRuination();
+            region.setupChaosCards();
+            region.setupFigures();
             region.setupTokens();
             next();
         });
     };
 
-    $regionSetupXML.each(function () {
+    $regionSetupXMLArray.each(function () {
         var newRegion = new Region($(this));
         newRegion.setup();
 
@@ -2087,133 +2156,131 @@ function drawBoard(blank, local){
         return count;
     };
     //Construct the stack of ruination cards
-    var ruination = [];
-    board.ruination = ruination;
-    var ruinCard;
-    var ruinersArray = [3, 4, 4, 5, 5];  //VP for ruiners
-    for (i = 0; i < 5; i++) {
-        ruinCard = {
-            ruiners : ruinersArray[i],
-            regions : [],
-            draw : drawRuination,
-            map : map,
-            ctx : ctx,
-            index : i
-        };
-        $(board.map.regions).each(function (j) {
-            ruinCard.regions[j] = this.ruination[i];
-        });
-        ruination[i] = ruinCard;
-    }
-    //Set up the card cache
-    var cache = {};
-    map.cache = cache;
-    cache.players = players;
-    cache.ctx = ctx;
-    cache.cards = [];
-    cache.type = "cache";
-    cache.drawMe = drawCache;
-    cache.drag = dragObject;
-    cache.drop = dropObject;
-    //Set up the scoreboard
-    var score = {};
-    map.score = score;
-    score.drawMe = drawScoreBoard;
-    score.ctx = ctx;
-    score.players = players;
-    score.xmlData = scoreXML;
-    var currentPower, tempPeasants, $allUpgrades, $heldUpgrades, obj, currentObj;
-    var dialSetupXML, dialXML, threat, tempDACs;
-    for (i = 0; i < playerCount; i++){
-        currentPlayer = players[i];
-        currentPower = allPowers[currentPlayer.name];
-        //Set up peasants
-        tempPeasants = players[i].xmlData.getElementsByTagName("peasant");
-        players[i].peasants = [];
-        for (j = 0; j < tempPeasants.length; j++){
-            token = map.tokenPool.peasant.tokens.shift();
-            if (token){
-                players[i].peasants.push(token);
-            }
-            else {
-                break;
-            }
+    board.$afterPlugins.queue("toDo", function (next) {
+        board.ruination = [];
+        var ruinCard;
+        var ruinersArray = [3, 4, 4, 5, 5];  //VP for ruiners
+        for (var i = 0; i < 5; i++) {
+            ruinCard = {
+                ruiners : ruinersArray[i],
+                regions : [],
+                draw : drawRuination,
+                map : map,
+                ctx : ctx,
+                index : i
+            };
+            $(board.map.regions).each(function (j) {
+                ruinCard.regions[j] = this.ruination[i];
+            });
+            board.ruination[i] = ruinCard;
         }
-        //Set up upgrades
-        $allUpgrades = $("upgrades", currentPower).children();
-        $heldUpgrades = $("upgrades", currentPlayer.xmlData).children();
-        currentPlayer.upgrades = [];
-        //Create an array of all upgrades, flagging
-        //those that are currently held
-        $allUpgrades.each(function(){
-            var isActive = $heldUpgrades.is(this.nodeName);
-            obj = {
-                draw : drawToken,
-                name : this.nodeName,
-                pp : Number($(this).attr("pp")) || 0,
-                active : isActive,
-                srcX : Number($(this).attr("srcx")),
-                srcY : Number($(this).attr("srcy")),
-            };
-            //Upgrade allowing a third card to be placed in a region
-            if ($(this).attr("extracard") == "true"){
-                obj.extraCard = true;
-            }
-            //Upgrade allowing a chaos card to be placed on another card
-            if ($(this).attr("covercard") == "true"){
-                obj.coverCard = true;
-            }
-            currentPlayer.upgrades.push(obj);
+
+        next();
+    });
+
+    function CardCache () {
+        this.players = players;
+        this.ctx = ctx;
+        this.cards = [];
+        this.type = "cache";
+
+        this.drag = dragObject;
+        this.drop = dropObject;
+        this.drawMe = drawCache;
+        this.draw = function () {
+            map.score.drawMe();
+            map.cache.drawMe();
+        }
+    }
+
+    map.cache = new CardCache();
+
+    function Upgrade ($upgradeXML, isActive) {
+        this.draw = drawToken;
+        this.name = $upgradeXML[0].nodeName;
+        this.pp = Number($upgradeXML.attr("pp")) || 0;
+        this.active = isActive;
+        this.srcX = Number($upgradeXML.attr("srcx"));
+        this.srcY = Number($upgradeXML.attr("srcy"));
+        this.extraCard = ($upgradeXML.attr("extracard") === "true");
+        this.coverCard = ($upgradeXML.attr("covercard") === "true");
+    }
+
+    function Scoreboard () {
+        this.ctx = ctx;
+        this.players = map.players;
+
+        this.drawMe = drawScoreBoard;
+        this.draw = function () {
+            map.score.drawMe();
+            map.cache.drawMe();
+        }
+
+        // Set up each player's data
+        $(this.players).each(function (i) {
+            var player = this,
+                $powerSetupXML = $(board.allPowers[player.name]),
+                $peasantsXMLArray,
+                $allUpgrades,
+                $heldUpgrades,
+                $cardXMLArray;
+
+            // Peasant tokens
+            player.peasants = [];
+            $peasantsXMLArray = player.$xmlData.find("peasant"),
+            $peasantsXMLArray.each(function () {
+                var token = map.tokenPool.peasant.tokens.shift();
+                if (token){
+                    player.peasants.push(token);
+                }
+            });
+
+            // Upgrades
+            player.upgrades = [];
+            $allUpgrades = $powerSetupXML.find("upgrades").children(),
+            $heldUpgrades = player.$xmlData.find("upgrades").children();
+            $allUpgrades.each(function(){
+                var isActive = $heldUpgrades.is(this.nodeName),
+                    $upgradeXML = $(this),
+                    upgrade = new Upgrade($upgradeXML, isActive);
+                player.upgrades.push(upgrade);
+            });
+
+            // PP and VP
+            player.pp = player.$xmlData.find("pp").text();
+            player.vp = player.$xmlData.find("vp").text();
+
+            // Threat Dial
+            player.$dialSetupXML = board.allPowers[player.name].find("dial");
+            player.dialCap = Number(player.$dialSetupXML.attr("cap"));
+            player.threat = player.$dialSetupXML.text().split(',');
+            player.$dialXML = player.$xmlData.find("dial");
+            player.dialValue = Number(player.$dialXML.find("value").text());
+            player.dacs = Number(player.$dialXML.find("dac").text()) || 0;
+
+            // Load the card cache
+            $cardXMLArray = $playerXMLArray.eq(i).children("cache").find("card");
+            $cardXMLArray.each(function () {
+                var $cardXML = $(this),
+                    newCard = new ChaosCard($cardXML);
+                //Insert the card into the cache if the owner matches
+                if (newCard.owner.name === player.name && newCard.cacheable) {
+                    map.cache.cards.push(newCard);
+                }
+            });
         });
-        //Set up scores
-        currentPlayer.pp = $("pp", currentPlayer.xmlData).text();
-        currentPlayer.vp = $("vp", currentPlayer.xmlData).text();
-        //Set up the dial
-        dialSetupXML = allPowers[currentPlayer.name].find("dial")[0];
-        currentPlayer.dialCap = dialSetupXML.getAttribute("cap");
-        threat = dialSetupXML.firstChild.data;
-        currentPlayer.threat = threat.split(',');
-        dialXML = playersXML[i].getElementsByTagName("dial")[0];
-        currentPlayer.dialValue = dialXML.getElementsByTagName("value")[0].firstChild.data;
-        currentPlayer.dacs = dialXML.getElementsByTagName("dac")[0].firstChild ? dialXML.getElementsByTagName("dac")[0].firstChild.data : 0;
-        //Find any cards in the cache, if there is one
-        $tempCardList = $(playersXML[i]).children("cache").find("card");
-        $tempCardList.each(function () {
-            var tempOwner;
-            var newCard = {
-                cost : $(this).attr("cost"),
-                holder : ($(this).attr("holder") === "true"),
-                skull : ($(this).attr("skull") === "true"),
-                magic : ($(this).attr("magic") === "true"),
-                cacheable : ($(this).attr("cacheable") === "true"),
-                magicIcon : magicIcon,
-                name : $(this).text(),
-                type : "chaos"
-            };
-            tempOwner = $(this).attr("owner");
-            //Insert the card into the cache if the owner matches
-            if (tempOwner === currentPlayer.name && newCard.cacheable){
-                newCard.owner = currentPlayer;
-                map.idCrd++;
-                idString = String(map.idCrd);
-                idString = (idString.length == 1) ? "0" + idString : idString;
-                newCard.objectID = "crd" + idString + tempOwner.substr(0,3);
-                newCard.objectID.toUpperCase();
-                newCard.draw = drawCard;
-                cache.cards.push(newCard);
-            }
-        });
+
+        // Fire the "scoreboard loaded" notice
+        console.log("Firing 'scoreboardLoaded' event");
+        $("#board").trigger('scoreboardLoaded');
     }
-    //Redraw the cache when redrawing the scoreboard, and v.v.
-    score.draw = function () {
-        score.drawMe();
-        cache.drawMe();
-    }
-    cache.draw = function () {
-        score.drawMe();
-        cache.drawMe();
-    }
-    //Draw the regions
+
+    // Set up the scoreboard
+    board.$afterPlugins.queue("toDo", function (next) {
+        board.map.score = new Scoreboard();
+        next();
+    });
+    // Draw the regions
     board.$afterPlugins.queue("toDo", function (next) {
         //console.log("Drawing regions");
         $(board.map.regions).each(function () {
@@ -2221,113 +2288,122 @@ function drawBoard(blank, local){
         });
         next();
     });
-    //Identify the current ruination card and draw it
+    // Identify the current ruination card and draw it
     board.$afterPlugins.queue("toDo", function (next) {
         var numRuined = Math.min(board.numRuined(), 4);
         map.ruinCard = board.ruination[numRuined];
         map.ruinCard.draw();
         next();
     });
-    //Draw the scoreboard
+    // Draw the scoreboard
     board.$afterPlugins.queue("toDo", function (next) {
-        score.draw();
+        board.map.score.draw();
         next();
     });
-    //Set up the scoreboard controls
-    buildScoreBoardControls();
-    //Draw the Old World track
-    var oldWorld = {};
-    map.oldWorld = oldWorld;
-    oldWorld.type = "oldworldtrack";
-    oldWorld.draw = drawOldWorld;
-    oldWorld.drag = dragObject;
-    oldWorld.drop = dropObject;
-    oldWorld.ctx = ctx;
-    oldWorld.xmlData = oldWorldXML;
-    var oldWorldCards = oldWorldXML.getElementsByTagName("card");
-    oldWorld.cards = [];
-    var symbol = {
-        name : "smallcomet",
-        draw : drawToken
-    };
-    var symbol2 = {
-        name : "darkcomet",
-        draw : drawToken
-    };
-    var newCard;
-    for (i = 0; i < oldWorldCards.length; i++){
-        newCard = {
-            name : oldWorldCards[i].firstChild.data,
-            event : (oldWorldCards[i].getAttribute("event") == "true"),
-            active : (oldWorldCards[i].getAttribute("active") == "true"),
-            holder : (oldWorldCards[i].getAttribute("holder") == "true"),
-            skull : (oldWorldCards[i].getAttribute("skull") == "true"),
-            ctx : ctx,
-            draw : drawCard,
-            symbol : symbol,
-            symbol2 : symbol2,
-            type : "oldworld"
-        };
-        map.idOWC++
-        idString = String(map.idOWC);
-        idString = (idString.length == 1) ? "0" + idString : idString;
-        newCard.objectID = "owc" + idString;
-        oldWorld.cards.push(newCard);
-    }
-    //Set up figure slots for the Old World track
-    oldWorld.slots = [];
-    for (i = 0; i < 7; i++) {
-        oldWorld.slots[i] = {
-            figures : [],
-            type : "cardslot",
-            drop : dropObject,
-            heldBy : oldWorld,
-            index : i
-        }
-    }
-    figureSlots = oldWorldXML.getElementsByTagName("slot");
-    //Set up name-keyed references
-    //to the players
-    var tempPlayers = {};
-    for (j = 0; j < playerCount; j++){
-        tempPlayers[players[j].name] = players[j];
-    }
-    //Handle figures in the slots
-    for (i = 0; i < figureSlots.length; i++) {
-        slotID = figureSlots[i].getAttribute("slotid");
-        tempFigureList = figureSlots[i].childNodes;
-        for (j = 0; j < tempFigureList.length; j++){
-            figureXML = tempFigureList[j];
-            if (figureXML.nodeType == 1){
-                playerName = figureXML.getAttribute("owner");
-                figTypes = figureXML.nodeName + "s";
-                figure = tempPlayers[playerName][figTypes].shift();
-                if (figure){
-                    figure.shield = (figureXML.getAttribute("shield") == "true");
-                    figure.musk = (figureXML.getAttribute("musk") == "true");
-                    figure.marker = (figureXML.getAttribute("marker") == "true");
-                    figure.skull = (figureXML.getAttribute("skull") == "true");
-                }
-                oldWorld.slots[slotID].figures.push(figure);
-                figure.heldBy = oldWorld.slots[slotID];
-            }
-        }
-    }
-    //Set up the Old World active card
-    //selection slider
-    var owActive = document.getElementById("activate");
-    owActive.cards = oldWorld.cards;
-    owActive.draw = drawOldWorldActive;
-    oldWorld.slider = owActive;
-    owActive.oldWorld = oldWorld;
+    // Set up the scoreboard controls
+    board.$afterPlugins.queue("toDo", function (next) {
+        buildScoreBoardControls();
+        next();
+    });
 
+    function OldWorldTrack ($oldWorldXML) {
+        var $oldWorldCardXMLArray = $oldWorldXML.find("card"),
+            $figureSlotXMLArray = $oldWorldXML.find("slot");
+        var symbol = {
+            name : "smallcomet",
+            draw : drawToken
+        };
+        var symbol2 = {
+            name : "darkcomet",
+            draw : drawToken
+        };
+        var symbols = [symbol, symbol2];
+        var oldWorld = this;
+
+        this.type = "oldworldtrack";
+        this.$oldWorldXML = $oldWorldXML;
+        this.ctx = ctx;
+
+        this.draw = drawOldWorld;
+        this.drag = dragObject;
+        this.drop = dropObject;
+
+        this.cards = [];
+        this.slider = $("#activate")[0];
+
+        // Set up Old World Cards
+        $oldWorldCardXMLArray.each(function () {
+            var $cardXML = $(this),
+                newCard = new OldWorldCard($cardXML, symbols);
+            oldWorld.cards.push(newCard);
+        });
+
+        // Set up figure slots
+        oldWorld.slots = [];
+        for (var i = 0; i < 7; i++) {
+            oldWorld.slots.push(new OldWorldCardSlot(oldWorld, i));
+        }
+
+        // Put figures in slots
+        $figureSlotXMLArray.each(function () {
+            var $figureSlotXML = $(this),
+                slotID = Number($figureSlotXML.attr("slotid")),
+                $figureXMLArray = $figureSlotXML.children();
+            $figureXMLArray.each(function () {
+                var $figureXML = $(this),
+                    playerName = $figureXML.attr("owner"),
+                    figTypes = $figureXML[0].nodeName + "s",
+                    figure = board.allPlayers[playerName][figTypes].shift();
+                if (figure) {
+                    figure.shield = ($figureXML.attr("shield") === "true");
+                    figure.musk = ($figureXML.attr("musk") === "true");
+                    figure.marker = ($figureXML.attr("marker") === "true");
+                    figure.skull = ($figureXML.attr("skull") === "true");
+
+                    oldWorld.slots[slotID].figures.push(figure);
+                    figure.heldBy = oldWorld.slots[slotID];
+                }
+            });
+        });
+
+        // Set up the active card selection slider
+        this.slider.cards = oldWorld.cards;
+        this.slider.draw = drawOldWorldActive;
+    }
+
+    // Set up the Old World track
     board.$afterPlugins.queue("toDo", function (next) {
-        oldWorld.draw();
+        map.oldWorld = new OldWorldTrack($(oldWorldXML));
         next();
     });
-    //Draw the remaining Old World tokens
+
+    // Draw the Old World track
+    board.$afterPlugins.queue("toDo", function (next) {
+        map.oldWorld.draw();
+        next();
+    });
+    // Draw the remaining Old World tokens
     board.$afterPlugins.queue("toDo", function (next) {
         buildTokenPool();
+        next();
+    });
+
+    // Draw figure reserves
+    board.$afterPlugins.queue("toDo", function (next) {
+        $(players).each(function () {
+            this.draw();
+        });
+        next();
+    });
+
+    // Set up the figure workshop
+    board.$afterPlugins.queue("toDo", function (next) {
+        board.workshop = buildWorkshop();
+        next();
+    });
+    // Set up the corruption controls;
+    board.$afterPlugins.queue("toDo", function (next) {
+        board.corruption = buildCorruption();
         next();
     });
 
@@ -2355,18 +2431,6 @@ function drawBoard(blank, local){
         console.log("Deferred board setup (without plugins)");
         board.$afterPlugins.dequeue("toDo");
     }
-    //Associate the draw method with
-    //the player, then draw reserves
-    for (i = 0; i < playerCount; i++){
-         players[i].draw = drawReserves;
-         players[i].draw();
-         players[i].drag = dragObject;
-         players[i].drop = dropObject;
-    }
-    //Set up the figure workshop
-    board.workshop = buildWorkshop();
-    //Set up the corruption controls;
-    board.corruption = buildCorruption();
     //Set event handlers on the canvas and
     //on the holding pen
     board.cursorPos = getCursorPosition;

@@ -135,6 +135,14 @@ function PluginLoader(board) {
                 });
             }
 
+            if ($powers.length > 0) {
+                $powers.each(function (index, powerNode) {
+                    var $powerSetupXML = $(powerNode),
+                        name = $powerSetupXML.find("name").text();
+                    board.allPowers[name] = $powerSetupXML;
+                });
+            }
+
         },
 
         "chaoscardsXML" : function (plugin, xmlData) {

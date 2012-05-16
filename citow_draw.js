@@ -524,6 +524,7 @@ function drawOldWorldTokens(){
  */
 function drawOldWorldActive(noRedraw){
     var slider = this;
+    var oldWorld = $("#board")[0].map.oldWorld;
     var i, toggle;
     //Clear the previous controls
     while (slider.childNodes.length > 0){
@@ -531,13 +532,13 @@ function drawOldWorldActive(noRedraw){
     }
     //Draw controls for each card
     for (i = 0; i < this.cards.length; i++){
-        toggle = createToggleSwitch(this.cards[i], this.oldWorld, true);
+        toggle = createToggleSwitch(this.cards[i], oldWorld, true);
         slider.appendChild(toggle);
     }
     //Redraw the Old World track, unless that
     //function called this one
     if (!noRedraw){
-        this.oldWorld.draw(true);
+        oldWorld.draw(true);
     }
 }
 
