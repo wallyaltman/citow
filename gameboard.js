@@ -490,313 +490,209 @@ function createUpDownButtons(target){
 /* Generate the list of Old World cards.
  */
 function getOldWorldCards(cardSet){
-    var xmlhttp = xmlRequest();
-    if (xmlhttp){
-        //Get the document
-        var loc = "gamedata/";
-        var file = (cardSet == "all")
-                        ? "oldworld_all.xml"
-                        : ((cardSet == "morrslieb")
-                                ? "oldworld_hard.xml"
-                                : "oldworld.xml");
-        var url = loc + file;
-        xmlhttp.onreadystatechange = function(){
-            if (this.readyState == 4 && this.status == 200){
-                var xmlDoc = this.responseXML;
-                var $board = $("#board"),
-                    board = $board[0];
-                console.log("Setting OWC listener for 'scoreboardLoaded'");
-                $board.on("scoreboardLoaded", function () {
-                    var players = board.map.players;
-                    var oldWorldCards = xmlDoc.getElementsByTagName("card");
-                    var $owc = $("#owc");
-                    $owc.children().remove();
-                    var card;
-                    for (var i = 0; i < oldWorldCards.length; i++){
-                        card = {
-                            xmlData : oldWorldCards[i],
-                            name : oldWorldCards[i].firstChild.data,
-                            event : (oldWorldCards[i].getAttribute("event") == "true"),
-                            holder : (oldWorldCards[i].getAttribute("holder") == "true"),
-                            skull : (oldWorldCards[i].getAttribute("skull") == "true"),
-                            active : true,
-                            draw : drawCard,
-                            symbol : {},
-                            symbol2 : {},
-                            type : "oldworld",
-                            dataid : oldWorldCards[i].getAttribute("dataid")
-                        };
-                        card.symbol.name = "smallcomet";
-                        card.symbol.draw = drawToken;
-                        card.symbol2.name = "darkcomet";
-                        card.symbol2.draw = drawToken;
-                        //If the Horned Rat is a player, make The Horned One's Due
-                        //an event card
-                        if (card.dataid == "owc011"){
-                            for (j = 0; j < players.length; j++){
-                                if (players[j].idNum == 4){
-                                    card.event = true;
-                                    break;
-                                }
-                            }
-                        }
-                        card.canvas = document.createElement("canvas");
-                        card.canvas.className = "card";
-                        card.canvas.width = 180;
-                        card.canvas.height = 17;
-                        card.canvas.card = card;
-                        var ctx = card.canvas.getContext('2d');
-                        $owc.append(card.canvas);
-                        card.draw(1, 0, ctx);
-                        card.canvas.cursorPos = getCursorPosition;
-                        card.canvas.onmousedown = function(evt){
-                            var pen = document.getElementById("pen");
-                            var card = this.card;
-                            //Check to be sure no object is held
-                            if (!pen.held){
-                                pen.held = copyObject(card);
-                                var coord = this.cursorPos(evt);
-                                xOffset = coord.x;
-                                yOffset = coord.y;
-                                //Assign a new object ID
-                                var map = document.getElementById("board").map;
-                                map.idOWC++;
-                                var idString = String(map.idOWC);
-                                idString = (idString.length == 1) ? "0" + idString : idString;
-                                pen.held.objectID = "owc" + idString;
-                                //Begin moving the card
-                                pen.move(evt, xOffset, yOffset);
-                            }
-                            var board = document.getElementById("board");
-                            document.onmouseup = function(evt){
-                                board.release(evt);
-                            };
-                            return false;
-                        }
-                    }
-                });
-                //var owchead = document.getElementById("owchead");
-            }
-        }
-        xmlhttp.open("GET", url, true);
-        xmlhttp.send();
+    var loc = "gamedata/";
+    var url;
+    switch (cardSet) {
+        case "all":
+            url = loc + "oldworld_all.xml";
+            break;
+        case "morrslieb":
+            url = loc + "oldworld_hard.xml";
+            break;
+        default:
+            url = loc + "oldworld.xml";
     }
-    return false;
+    $.get(url, function(xmlDoc) {
+        var $xmlDoc = $(xmlDoc);
+        var $board = $("#board");
+        var board = $board[0];
+
+        console.log("Setting OWC listener for 'scoreboardLoaded'");
+        $board.on("scoreboardLoaded", function () {
+            var players = board.map.players;
+            var $oldWorldCardXMLArray = $xmlDoc.find("card");
+            //var oldWorldCards = xmlDoc.getElementsByTagName("card");
+            var $owc = $("#owc");
+            $owc.children().remove();
+
+            var symbol = {
+                name : "smallcomet",
+                draw : drawToken
+            };
+            var symbol2 = {
+                name : "darkcomet",
+                draw : drawToken
+            };
+            var symbols = [symbol, symbol2];
+            $oldWorldCardXMLArray.each(function () {
+                var $cardXML = $(this);
+                var card = new OldWorldCard($cardXML, symbols);
+                card.active = true;
+
+                //If the Horned Rat is a player, make The Horned One's Due
+                //an event card
+                if (card.dataid === "owc011" && board.allPlayers["Horned_Rat"]) {
+                    card.event = true;
+                }
+
+                card.createCanvas();
+                $owc.append(card.canvas);
+                card.draw(1, 0, card.canvasCtx);
+            });
+        });
+    });
 }
 
 /* Generate the list of Chaos cards.
  */
 function getChaosCards(expansion){
-    var xmlhttp = xmlRequest();
-    if (xmlhttp){
-        //Get the document
-        var loc = "gamedata/";
-        var file = (expansion == "morrslieb") ? "chaos_hr.xml" : "chaos.xml";
-        var url = loc + file;
-        xmlhttp.onreadystatechange = function(){
-            if (this.readyState == 4 && this.status == 200){
-                var i, j, $cc0, $cc1;
-                var xmlDoc = this.responseXML;
-                var chaosCards = xmlDoc.getElementsByTagName("card");
-                var $board = $("#board"),
-                    board = $board[0];
-                console.log("Setting CC listener for 'scoreboardLoaded'");
-                $board.on("scoreboardLoaded", function () {
-                    var players = board.map.players;
-                    $cc0 = $("#cc0");
-                    $cc0.children().remove();
-                    $cc1 = $("#cc1");
-                    $cc1.children().remove();
-                    var cardSets = [];
-                    var card;
-                    for (i = 0; i < chaosCards.length; i++){
-                        card = {
-                            xmlData : chaosCards[i],
-                            name : chaosCards[i].firstChild.data,
-                            cost : chaosCards[i].getAttribute("cost"),
-                            power : chaosCards[i].getAttribute("owner"),
-                            draw : drawCard,
-                            magic : (chaosCards[i].getAttribute("magic") == "true"),
-                            holder : (chaosCards[i].getAttribute("holder") == "true"),
-                            skull : (chaosCards[i].getAttribute("skull") == "true"),
-                            cacheable : (chaosCards[i].getAttribute("cacheable") == "true"),
-                            magicIcon : {},
-                            type : "chaos"
-                        };
-                        //Check the player list for the card's owner, and
-                        //link them.  Skip the rest if the card's owner
-                        //isn't a player in the game (or the Old World).
-                        if (card.power == "Old_World"){
-                            card.owner = {};
-                            card.owner.name = "Old_World";
-                            card.owner.idNum = board.maxPowers;  //Greater than all idNums
-                            card.owner.highlight = "#CCA477";
-                            card.owner.shadow = "#3D3322";
-                        }
-                        else {
-                            for (j = 0; j < players.length; j++){
-                                if (card.power == players[j].name){
-                                    card.owner = players[j];
-                                    break;
-                                }
-                            }
-                        }
-                        if (card.owner){
-                            card.magicIcon.name = "magic";
-                            card.magicIcon.draw = drawToken;
-                            card.canvas = document.createElement("canvas");
-                            card.canvas.className = "card";
-                            card.canvas.width = 180;
-                            card.canvas.height = 17;
-                            card.canvas.card = card;
-                            card.homeCtx = card.canvas.getContext('2d');
-                            /*if (card.column == 2){
-                                $cc2.append(card.canvas);
-                            }
-                            else {
-                                $cc.append(card.canvas);
-                            }*/
-                            //Add the card's canvas to the appropriate
-                            //card set, creating it if needed
-                            if (!cardSets[card.owner.idNum]){
-                                cardSets[card.owner.idNum] = [];
-                            }
-                            cardSets[card.owner.idNum].push(card);
-                            /*card.draw(1, 0, ctx);*/
-                            card.canvas.cursorPos = getCursorPosition;
-                            card.canvas.onmousedown = function(evt){
-                                var pen = document.getElementById("pen");
-                                var card = this.card;
-                                //Check to be sure no object is held
-                                if (!pen.held){
-                                    pen.held = copyObject(card);
-                                    var coord = this.cursorPos(evt);
-                                    xOffset = coord.x;
-                                    yOffset = coord.y;
-                                    //Assign a new object ID
-                                    var map = document.getElementById("board").map;
-                                    map.idCrd++;
-                                    var idString = String(map.idCrd);
-                                    idString = (idString.length == 1) ? "0" + idString : idString;
-                                    pen.held.objectID = "crd" + idString;
-                                    //Begin moving the card
-                                    pen.move(evt, xOffset, yOffset);
-                                }
-                                var board = document.getElementById("board");
-                                document.onmouseup = function(evt){
-                                    board.release(evt);
-                                };
-                                return false;
-                            }
-                        }
+    var loc = "gamedata/";
+    var url = loc + ((expansion == "morrslieb") ? "chaos_hr.xml" : "chaos.xml");
+    $.get(url, function(xmlDoc) {
+        var $xmlDoc = $(xmlDoc);
+        var $board = $("#board");
+        var board = $board[0];
+        var i, j, $cc0, $cc1;
+        var chaosCards = xmlDoc.getElementsByTagName("card");
+        var $chaosCardXMLArray = $xmlDoc.find("card");
+        console.log("Setting CC listener for 'scoreboardLoaded'");
+        $board.on("scoreboardLoaded", function () {
+            var players = board.map.players;
+            var cardSets = [];
+            var $cardSets;
+            var setLengths;
+            var columns;
+            var currentCol;
+            $cc0 = $("#cc0");
+            $cc0.children().remove();
+            $cc1 = $("#cc1");
+            $cc1.children().remove();
+
+            $chaosCardXMLArray.each(function () {
+                var card = new ChaosCard($(this)),
+                    currentId;
+
+                //Check the player list for the card's owner, and
+                //link them.  Skip the rest if the card's owner
+                //isn't a player in the game (or the Old World).
+                if (!card.owner) {
+                    card.owner = {
+                        name      : "Old_World",
+                        idNum     : board.maxPowers,
+                        highlight : "#CCA477",
+                        shadow    : "#3D3322"
                     }
-                    //Determine a suitable distribution of card sets
-                    //between the columns, so that column 1 will have
-                    //the most cards
-                    var setLengths = [];
-                    for (i = 0; i <= board.maxPowers; i++){
-                        if (cardSets[i]){
-                            setLengths.push(cardSets[i].length);
-                        }
+                } else {
+                    card.createCanvas();
+
+                    currentId = card.owner.idNum;
+                    // Add the card's canvas to the appropriate
+                    // card set, creating it if needed
+                    if (!cardSets[currentId]) {
+                        cardSets[currentId] = [];
                     }
-                    setLengths.sort();
-                    var thisLength, match;
-                    var columns = [ [], [] ];
-                    var currentCol = 0;
-                    while (cardSets.length > 0){
-                        match = false;
-                        //Pop off the last (i.e. largest) value
-                        thisLength = setLengths.pop();
-                        for (i = 0; i < board.maxPowers; i++){
-                            //Find the first matching cardset
-                            if (cardSets[i] && cardSets[i].length == thisLength){
-                                //Snip it out, and add its cards to a column
-                                columns[currentCol] = columns[currentCol].concat(cardSets.splice(i, 1)[0]);
-                                match = true;
-                                break;
-                            }
-                        }
-                        //If we somehow failed to find a match, just
-                        //take the first cardset
-                        if (!match){
-                            if (cardSets[0]){
-                                columns[currentCol] = columns[currentCol].concat(cardSets.shift());
-                            }
-                            else {
-                                break;
-                            }
-                        }
-                        //Alternate columns
-                        currentCol = (currentCol + 1) % 2;
+                    cardSets[currentId].push(card);
+                }
+            });
+            $cardSets = $(cardSets);
+
+            console.log("Loading card drawer");
+            // Determine a suitable distribution of card sets between the
+            // columns, so that column 1 will have the most cards.
+            setLengths = [];
+            $cardSets.each(function () {
+                setLengths.push(this.length);
+            });
+
+            // Sort in descending order, and assign columns
+            setLengths.sort(function (a, b) { return b - a });
+            columns = [ [], [] ];
+            currentCol = 0;
+            $(setLengths).each(function () {
+                var match,
+                    currentLength = this.valueOf();
+
+                for (var i = 0; i < cardSets.length; i++) {
+                    if (cardSets[i].length === currentLength) {
+                        match = cardSets.splice(i, 1)[0];
+                        break;
                     }
-                    //Define a card comparison function for use in sorting
-                    //the cards in each column
-                    var compareCards = function(a, b){
-                        var id_a, id_b, cost_a, cost_b, name_a, name_b;
-                        //Compare owner IDs
-                        id_a = a.owner.idNum;
-                        id_b = b.owner.idNum;
-                        if (id_a != id_b){
-                            return id_a - id_b;
-                        }
-                        //Compare card cost (NaN goes last)
-                        cost_a = a.cost;
-                        cost_b = b.cost;
-                        if (cost_a != cost_b){
-                            if (isNaN(cost_b)){
-                                return -1;           //NaN is "biggest"
-                            }
-                            else if (isNaN(cost_a)){
-                                return 1;
-                            }
-                            else {
-                                return cost_a - cost_b;
-                            }
-                        }
-                        //Compare card name (after making lower-case and
-                        //stripping leading "the")
-                        name_a = a.name.toLowerCase().replace(/^\s*the\s*/, "");
-                        name_b = b.name.toLowerCase().replace(/^\s*the\s*/, "");
-                        if (name_a != name_b){
-                            if (!name_b.substr(0, 1).match(/[A-Za-z0-9]/)){
-                                return -1;          //Non-alphanumeric is "biggest"
-                            }
-                            else if (!name_a.substr(0, 1).match(/[A-Za-z0-9]/)){
-                                return 1;
-                            }
-                            else if (name_a < name_b){
-                                return -1;
-                            }
-                            else {
-                                return 1;
-                            }
-                        }
-                        //Give up
-                        return 0;
-                    };
-                    //Sort each column
-                    columns[0].sort(compareCards);
-                    columns[1].sort(compareCards);
-                    //Stuff the cards into their containers and draw them
-                    $.each(columns[0], function(index, obj){
-                        $cc0.append(obj.canvas);
-                        obj.draw(1, 0, obj.homeCtx);
-                    });
-                    $.each(columns[1], function(index, obj){
-                        $cc1.append(obj.canvas);
-                        obj.draw(1, 0, obj.homeCtx);
-                    });
-                    //Shift column 0 (which appears second in the markup)
-                    //upwards to line up with column 1
-                    var colOffset = -1 * $cc1.height() - 4;
-                    $cc0.css({ marginTop: colOffset });
-                });
-            }
-        }
-        xmlhttp.open("GET", url, true);
-        xmlhttp.send();
-    }
-    return false;
+
+                }
+
+                // If we somehow failed to find a match, take the first cardset
+                if (!match) {
+                    match = cardSets.splice(0, 1)[0];
+                }
+
+                columns[currentCol] = columns[currentCol].concat(match);
+
+                // Alternate columns
+                currentCol = (currentCol + 1) % 2;
+            });
+            // Define a card comparison function for use in sorting the columns
+            var compareCards = function(a, b) {
+                var id_a, id_b, name_a, name_b;
+                // 1. Compare owner IDs
+                id_a = a.owner.idNum;
+                id_b = b.owner.idNum;
+                if (id_a !== id_b) {
+                    return id_a - id_b;
+                }
+
+                // 2. Compare card costs (NaN goes last)
+                if (a.cost !== b.cost) {
+                    if (isNaN(b.cost)) {
+                        return -1;
+                    } else if (isNaN(a.cost)) {
+                        return 1;
+                    } else {
+                        return a.cost - b.cost;
+                    }
+                }
+
+                // 3. Compare "normalized" card names
+                name_a = a.normalizedName;
+                name_b = b.normalizedName;
+                if (name_a !== name_b) {
+                    if (!name_b.substr(0, 1).match(/[A-Za-z0-9]/)) {
+                        return -1;          // Non-alphanumeric is "biggest"
+                    }
+                    else if (!name_a.substr(0, 1).match(/[A-Za-z0-9]/)) {
+                        return 1;
+                    }
+                    else if (name_a < name_b) {
+                        return -1;
+                    }
+                    else {
+                        return 1;
+                    }
+                }
+                // 4. Give up
+                return 0;
+            };
+
+            // Sort each column
+            columns[0].sort(compareCards);
+            columns[1].sort(compareCards);
+
+            // Stuff the cards into their containers and draw them
+            $(columns[0]).each(function() {
+                $cc0.append(this.canvas);
+                this.draw(1, 0, this.canvasCtx);
+            });
+            $(columns[1]).each(function() {
+                $cc1.append(this.canvas);
+                this.draw(1, 0, this.canvasCtx);
+            });
+
+            // Shift column 0 (which appears second in the markup)
+            // upwards to line up with column 1
+            $cc0.css({
+                marginTop: -1 * $cc1.height() - 4
+            });
+        });
+    });
 }
 
 /* Set up the Old World token pool.
@@ -1712,27 +1608,76 @@ TokenPool.prototype.rows = function() {
     return Math.ceil(this.maxLength / 7);
 }
 
+function grabCardCanvas (evt) {
+    var pen = $("#pen")[0];
+    var board = $("#board")[0];
+    var coord;
+    var xOffset;
+    var yOffset;
+    //Check to be sure no object is held
+    if (!pen.held){
+        pen.held = copyObject(this.card);
+        coord = this.cursorPos(evt);
+        xOffset = coord.x;
+        yOffset = coord.y;
+        this.objectId = board.newOldWorldID();
+        //Begin moving the card
+        pen.move(evt, xOffset, yOffset);
+    }
+
+    document.onmouseup = function(evt){
+        board.release(evt);
+    };
+
+    return false;
+};
+
+function Card () {}
+
+Card.prototype.draw = drawCard;
+
+Card.prototype.createCanvas = function () {
+    var canvas = document.createElement("canvas");
+
+    canvas.className = "card";
+    canvas.width = 180;
+    canvas.height = 17;
+    canvas.card = this;
+
+    canvas.cursorPos = getCursorPosition;
+    $(canvas).on("mousedown", grabCardCanvas);
+
+    this.canvasCtx = canvas.getContext('2d');
+    return this.canvas = canvas;
+};
+
+ChaosCard.prototype = new Card();
+ChaosCard.prototype.constructor = ChaosCard;
 function ChaosCard ($cardXML) {
     var board = $("#board")[0];
     this.objectId = board.newChaosID();
 
-    this.owner = board.allPowers[$cardXML.attr("owner")];
+    this.owner = board.allPlayers[$cardXML.attr("owner")];
     this.name = $cardXML.text();
+    this.normalizedName = this.name.toLowerCase().replace(/^\s*the\s*/, "");
     this.type = "chaos";
     this.cost = $cardXML.attr("cost");
-    this.cacheable = ($cardXML.attr("cacheable") === "true");
 
+    this.cacheable = ($cardXML.attr("cacheable") === "true");
     this.holder = ($cardXML.attr("holder") === "true");
     this.skull = ($cardXML.attr("skull") === "true");
     this.magic = ($cardXML.attr("magic") === "true");
 
-    this.magicIcon = magicIcon;
+    this.magicIcon = board.magicIcon;
     this.draw = drawCard;
 }
 
+OldWorldCard.prototype = new Card();
+OldWorldCard.prototype.constructor = OldWorldCard;
 function OldWorldCard ($cardXML, symbols) {
     var board = $("#board")[0];
     this.objectId = board.newOldWorldID();
+    this.dataid = $cardXML.attr("dataid");
 
     this.name = $cardXML.text();
     this.type = "oldworld";
@@ -1930,8 +1875,7 @@ function drawBoard(blank, local){
     getChaosCards(board.expansion);
     //Set up the regions array
     map.regions = [];
-    var magicIcon, skullIcon;
-    magicIcon = {
+    board.magicIcon = {
         draw : drawToken,
         name : "magic"
     };
