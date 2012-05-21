@@ -568,6 +568,12 @@ function getChaosCards(expansion){
             $cc1 = $("#cc1");
             $cc1.children().remove();
 
+            $(board.plugins._list).each(function () {
+                if (this.chaoscardsXML) {
+                    $chaosCardXMLArray = $chaosCardXMLArray.add($(this.chaoscardsXML).find("card"));
+                }
+            });
+
             $chaosCardXMLArray.each(function () {
                 var card = new ChaosCard($(this)),
                     currentId;

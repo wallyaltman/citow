@@ -143,10 +143,6 @@ function PluginLoader(board) {
                 });
             }
 
-        },
-
-        "chaoscardsXML" : function (plugin, xmlData) {
-
         }
     };
 
@@ -191,9 +187,11 @@ function PluginLoader(board) {
                         var nodeName = responseData.documentElement.nodeName,
                             fileref = nodeName + "XML";
                         board.plugins[pluginName][fileref] = responseData.documentElement;
-                        // Load the just-downloaded data
+                        // Handle the just-downloaded data, if needed
                         //console.log("Processing " + nodeName + " component of plugin " + pluginName);
-                        dataLoaders[fileref](plugin, responseData.documentElement);
+                        if (dataLoaders[fileref]) {
+                            dataLoaders[fileref](plugin, responseData.documentElement);
+                        }
                         // Add this to the list of parts that have been loaded
                         plugin.loaded.push(nodeName);
                         // Fire a custom event if this was the last bit
