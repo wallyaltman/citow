@@ -157,6 +157,7 @@ function PluginLoader(board) {
             "name" : pluginName,
             "toLoad" : [],
             "loaded" : [],
+            "isPlugin" : true,
             "isLoaded" : function () {
                 var toLoadCount = this.toLoad.length,
                     loadedCount = this.loaded.length;

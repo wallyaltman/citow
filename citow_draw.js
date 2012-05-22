@@ -275,7 +275,7 @@ function drawFigure(x0, y0, ctx, transform){
     if (this.skull) {
         x4 = Math.floor(x1 - ((r1 + 0.5)/ 2) - 4);
         y4 = Math.floor(y0 - 8);
-        board.skullIcon.draw(x4, y4, ctx);
+        this.skullIcon.draw(x4, y4, ctx);
     }
     //Store the figure's bounding box, accounting for
     //any transformations
@@ -295,6 +295,124 @@ function drawFigure(x0, y0, ctx, transform){
     //drawing the next figure
     return x2 + 2;
 }
+
+/**
+ * The argument 'base' should either be a plugin or the board.
+ */
+var loadSpriteSheet = function (base, iconType) {
+    var sheet = iconType + "Sprites";
+
+    base[sheet] = document.createElement('img');
+    if (base.isPlugin) {
+        base[sheet].src = "custom/" + base.name + "/icons/" + base[sheet + "Src"];
+    } else {
+        base[sheet].src = "icons/" + iconType + "_sprites.png";
+    }
+
+    return base[sheet];
+};
+
+var loadSingletonImage = function (plugin, iconName) {
+    plugin[iconName] = document.createElement('img');
+    plugin[iconName].src = "custom/" + plugin.name + "/icons/" +
+        iconName + ".png";
+
+    return plugin[iconName];
+}
+
+var storeIconLocation = function (x, y) {
+    this.x0 = x;
+    this.y0 = y;
+    this.x1 = x + this.icon.dimX;
+    this.y1 = y + this.icon.dimY;
+};
+
+var drawFromSheet = function (x, y, ctx) {
+    if (this.alpha) {
+        ctx.globalAlpha = this.alpha;
+    }
+
+    ctx.drawImage(this.img, this.srcX, this.srcY, this.dimX, this.dimY,
+                  x, y, this.dimX, this.dimY);
+
+    ctx.globalAlpha = 1;
+};
+
+var drawSingleton = function (x, y, ctx) {
+    ctx.drawImage(this.img, x, y);
+};
+
+/* The new and improved lazy drawing function! This really ought to be
+ * backported to the main application.
+ */
+var drawIcon = function (x, y, ctx) {
+    var loadTimer,
+        board = $("#board")[0];
+        object = this;
+
+    var finish = function (obj) {
+        obj.constructor.prototype.draw = function (x1, y1, ctx1) {
+            this.icon.draw(x1, y1, ctx1);
+            this.setLocation(x1, y1);
+        };
+        obj.icon.draw(x, y, ctx);
+        obj.setLocation(x, y);
+    };
+
+    if (!this.icon) {
+        (function (iconType) {
+            var spriteSheet, iconImg, isSingleton, sourceX, sourceY;
+
+            if (object.plugin ) {
+                if (object.plugin[iconType + "SpritesSrc"]) {
+                    spriteSheet = object.plugin[iconType + "Sprites"] ||
+                        loadSpriteSheet(object.plugin, iconType);
+                    sourceX = object.xmlData.getAttribute("srcx");
+                    sourceY = object.xmlData.getAttribute("srcy");
+                } else {
+                    iconImg = object.plugin[object.name] ||
+                        loadSingletonImage(object.plugin, object.name);
+                    isSingleton = true;
+                }
+            } else {
+                spriteSheet = board[iconType + "Sprites"] ||
+                    loadSpriteSheet(board, iconType);
+                sourceX = object.srcX;
+                sourceY = object.srcY;
+            }
+
+            if (isSingleton) {
+                object.constructor.prototype.icon = {
+                    "img"  : iconImg,
+                    "dimX" : object.width,
+                    "dimY" : object.height,
+                    "draw" : drawSingleton
+                };
+            } else {
+                object.constructor.prototype.icon = {
+                    "img"  : spriteSheet,
+                    "srcX" : sourceX,
+                    "srcY" : sourceY,
+                    "dimX" : object.width,
+                    "dimY" : object.height,
+                    "draw" : drawFromSheet,
+                    "alpha" : object.alpha
+                };
+            }
+        })(this.type);
+    }
+
+    if (this.icon.img.complete) {
+        finish(this);
+    } else {
+        loadTimer = setInterval(function () {
+            if (object.icon.img.complete) {
+                clearInterval(loadTimer);
+                finish(object);
+            }
+        }, 100);
+    }
+};
 
 /* Draw a token at the specified coordinates.
  */
@@ -371,6 +489,8 @@ function drawToken(x, y, ctx){
             if (!board.iconSprites){
                 board.iconSprites = document.createElement('img');
                 board.iconSprites.src = "icons/icon_sprites.png";
+            }
+            if (!board.iconList) {
                 board.iconList = {};
             }
             //If this is the first instance of this

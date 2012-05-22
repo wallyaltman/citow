@@ -515,18 +515,9 @@ function getOldWorldCards(cardSet){
             var $owc = $("#owc");
             $owc.children().remove();
 
-            var symbol = {
-                name : "smallcomet",
-                draw : drawToken
-            };
-            var symbol2 = {
-                name : "darkcomet",
-                draw : drawToken
-            };
-            var symbols = [symbol, symbol2];
             $oldWorldCardXMLArray.each(function () {
                 var $cardXML = $(this);
-                var card = new OldWorldCard($cardXML, symbols);
+                var card = new OldWorldCard($cardXML);
                 card.active = true;
 
                 //If the Horned Rat is a player, make The Horned One's Due
@@ -1518,6 +1509,64 @@ function clearEffects(){
     });
 }
 
+var Icons = (function () {
+    var setups = [
+        {
+            name : "magic",
+            width : 9,
+            height : 9,
+            source : {x: 61, y: 31}
+        },
+
+        {
+            name : "skull",
+            width : 7,
+            height : 7,
+            source : {x: 93, y: 33}
+        },
+
+        {
+            name : "smallcomet",
+            width : 11,
+            height : 11,
+            source : {x: 61, y: 19}
+        },
+
+        {
+            name : "darkcomet",
+            width : 11,
+            height : 11,
+            source : {x: 61, y: 19},
+            alpha : 0.4
+        }
+    ];
+    var icons = {};
+
+    $(setups).each(function () {
+        var setup = this;
+
+        function Icon () {
+            this.name = setup.name;
+            this.type = "icon"
+            this.width = setup.width;
+            this.height = setup.height;
+            this.srcX = setup.source.x;
+            this.srcY = setup.source.y;
+
+            if (setup.alpha) {
+                this.alpha = setup.alpha;
+            }
+        }
+
+        Icon.prototype.draw = drawIcon;
+        Icon.prototype.setLocation = function () { };
+
+        icons[setup.name] = new Icon();
+    });
+
+    return icons;
+})();
+
 function Figure (player, type, index) {
     var figCount = (index < 10) ? "0" + String(index) : String(index);
 
@@ -1530,6 +1579,7 @@ function Figure (player, type, index) {
     this.musk = false;
     this.shield = false;
 
+    this.skullIcon = Icons.skull
     this.draw = drawFigure;
 
     this.objectID = type.substr(0,3) + figCount + player.name.substr(0,3);
@@ -1543,18 +1593,19 @@ Figure.prototype.clearAll = function () {
     this.skull = false;
 };
 
-function Player ($powerSetupXML, $powerXML, index) {
+function Player ($powerSetupXML, $playerXML, index) {
     var modelTypes = ["cultist", "warrior", "daemon"],
         board = $("#board")[0],
         player = this;
 
-    this.name = $powerXML.attr("name");
-    this.playerName = $powerXML.attr("playername");
+    this.name = $playerXML.attr("name");
+    this.playerName = $playerXML.attr("playername");
     this.displayName = this.name.replace(/_/, " ");
 
     this.type = "player";
     this.idNum = index;
-    this.$xmlData = $powerXML;
+    this.$powerSetupXML = $powerSetupXML;
+    this.$playerXML = $playerXML;
 
     this.highlight = $powerSetupXML.attr("highlight");
     this.shadow = $powerSetupXML.attr("shadow");
@@ -1581,6 +1632,76 @@ function Player ($powerSetupXML, $powerXML, index) {
         for (var k = 0; k < player.figureCounts[types]; k++) {
             figure = new Figure(player, type, k);
             player[types].push(figure);
+        }
+    });
+}
+
+Player.prototype.loadScoreboardData = function () {
+    var player = this,
+        $powerSetupXML = player.$powerSetupXML,
+        $playerXML = player.$playerXML,
+        $peasantsXMLArray,
+        $allUpgrades,
+        $heldUpgrades,
+        $dialSetupXML,
+        $dialXML,
+        $cardXMLArray;
+
+    // Peasant tokens
+    player.peasants = [];
+    $peasantsXMLArray = $playerXML.find("peasant"),
+    $peasantsXMLArray.each(function () {
+        var token = map.tokenPool.peasant.tokens.shift();
+        if (token){
+            player.peasants.push(token);
+        }
+    });
+
+    // Upgrades
+    player.upgrades = [];
+    $allUpgrades = $powerSetupXML.find("upgrades").children(),
+    $heldUpgrades = $playerXML.find("upgrades").children();
+    $allUpgrades.each(function(){
+        var isActive = $heldUpgrades.is(this.nodeName),
+            $upgradeXML = $(this);
+
+        function Upgrade (isActive) {
+            this.name = $upgradeXML[0].nodeName;
+            this.pp = Number($upgradeXML.attr("pp")) || 0;
+            this.active = isActive;
+            this.srcX = Number($upgradeXML.attr("srcx"));
+            this.srcY = Number($upgradeXML.attr("srcy"));
+            this.extraCard = ($upgradeXML.attr("extracard") === "true");
+            this.coverCard = ($upgradeXML.attr("covercard") === "true");
+
+            this.width = 23;
+            this.height = 19;
+            this.draw = drawToken;
+        }
+
+        player.upgrades.push(new Upgrade(isActive));
+    });
+
+    // PP and VP
+    player.pp = $playerXML.find("pp").text();
+    player.vp = $playerXML.find("vp").text();
+
+    // Threat Dial
+    $dialSetupXML = $powerSetupXML.find("dial");
+    player.dialCap = Number($dialSetupXML.attr("cap"));
+    player.threat = $dialSetupXML.text().split(',');
+    $dialXML = $playerXML.find("dial");
+    player.dialValue = Number($dialXML.find("value").text());
+    player.dacs = Number($dialXML.find("dac").text()) || 0;
+
+    // Load the card cache
+    $cardXMLArray = $playerXML.children("cache").find("card");
+    $cardXMLArray.each(function () {
+        var $cardXML = $(this),
+            newCard = new ChaosCard($cardXML);
+        //Insert the card into the cache if the owner matches
+        if (newCard.owner.name === player.name && newCard.cacheable) {
+            map.cache.cards.push(newCard);
         }
     });
 }
@@ -1674,13 +1795,13 @@ function ChaosCard ($cardXML) {
     this.skull = ($cardXML.attr("skull") === "true");
     this.magic = ($cardXML.attr("magic") === "true");
 
-    this.magicIcon = board.magicIcon;
+    this.magicIcon = Icons.magic;
     this.draw = drawCard;
 }
 
 OldWorldCard.prototype = new Card();
 OldWorldCard.prototype.constructor = OldWorldCard;
-function OldWorldCard ($cardXML, symbols) {
+function OldWorldCard ($cardXML) {
     var board = $("#board")[0];
     this.objectId = board.newOldWorldID();
     this.dataid = $cardXML.attr("dataid");
@@ -1693,8 +1814,8 @@ function OldWorldCard ($cardXML, symbols) {
     this.holder = ($cardXML.attr("holder") === "true");
     this.skull = ($cardXML.attr("skull") === "true");
 
-    this.symbol = symbols[0];
-    this.symbol2 = symbols[1];
+    this.symbol = Icons.smallcomet;
+    this.symbol2 = Icons.darkcomet;
     this.draw = drawCard;
 }
 
@@ -1881,14 +2002,6 @@ function drawBoard(blank, local){
     getChaosCards(board.expansion);
     //Set up the regions array
     map.regions = [];
-    board.magicIcon = {
-        draw : drawToken,
-        name : "magic"
-    };
-    board.skullIcon = {
-        draw: drawToken,
-        name : "skull"
-    };
 
     function CorruptionPile (region, player, $corruptionXML) {
         var amount = Number($corruptionXML.find("*[owner=" + player.name + "]").text());
@@ -2145,17 +2258,6 @@ function drawBoard(blank, local){
 
     map.cache = new CardCache();
 
-    function Upgrade ($upgradeXML, isActive) {
-        this.draw = drawToken;
-        this.name = $upgradeXML[0].nodeName;
-        this.pp = Number($upgradeXML.attr("pp")) || 0;
-        this.active = isActive;
-        this.srcX = Number($upgradeXML.attr("srcx"));
-        this.srcY = Number($upgradeXML.attr("srcy"));
-        this.extraCard = ($upgradeXML.attr("extracard") === "true");
-        this.coverCard = ($upgradeXML.attr("covercard") === "true");
-    }
-
     function Scoreboard () {
         this.ctx = ctx;
         this.players = map.players;
@@ -2168,56 +2270,7 @@ function drawBoard(blank, local){
 
         // Set up each player's data
         $(this.players).each(function (i) {
-            var player = this,
-                $powerSetupXML = $(board.allPowers[player.name]),
-                $peasantsXMLArray,
-                $allUpgrades,
-                $heldUpgrades,
-                $cardXMLArray;
-
-            // Peasant tokens
-            player.peasants = [];
-            $peasantsXMLArray = player.$xmlData.find("peasant"),
-            $peasantsXMLArray.each(function () {
-                var token = map.tokenPool.peasant.tokens.shift();
-                if (token){
-                    player.peasants.push(token);
-                }
-            });
-
-            // Upgrades
-            player.upgrades = [];
-            $allUpgrades = $powerSetupXML.find("upgrades").children(),
-            $heldUpgrades = player.$xmlData.find("upgrades").children();
-            $allUpgrades.each(function(){
-                var isActive = $heldUpgrades.is(this.nodeName),
-                    $upgradeXML = $(this),
-                    upgrade = new Upgrade($upgradeXML, isActive);
-                player.upgrades.push(upgrade);
-            });
-
-            // PP and VP
-            player.pp = player.$xmlData.find("pp").text();
-            player.vp = player.$xmlData.find("vp").text();
-
-            // Threat Dial
-            player.$dialSetupXML = board.allPowers[player.name].find("dial");
-            player.dialCap = Number(player.$dialSetupXML.attr("cap"));
-            player.threat = player.$dialSetupXML.text().split(',');
-            player.$dialXML = player.$xmlData.find("dial");
-            player.dialValue = Number(player.$dialXML.find("value").text());
-            player.dacs = Number(player.$dialXML.find("dac").text()) || 0;
-
-            // Load the card cache
-            $cardXMLArray = $playerXMLArray.eq(i).children("cache").find("card");
-            $cardXMLArray.each(function () {
-                var $cardXML = $(this),
-                    newCard = new ChaosCard($cardXML);
-                //Insert the card into the cache if the owner matches
-                if (newCard.owner.name === player.name && newCard.cacheable) {
-                    map.cache.cards.push(newCard);
-                }
-            });
+            this.loadScoreboardData();
         });
 
         // Fire the "scoreboard loaded" notice
@@ -2259,15 +2312,6 @@ function drawBoard(blank, local){
     function OldWorldTrack ($oldWorldXML) {
         var $oldWorldCardXMLArray = $oldWorldXML.find("card"),
             $figureSlotXMLArray = $oldWorldXML.find("slot");
-        var symbol = {
-            name : "smallcomet",
-            draw : drawToken
-        };
-        var symbol2 = {
-            name : "darkcomet",
-            draw : drawToken
-        };
-        var symbols = [symbol, symbol2];
         var oldWorld = this;
 
         this.type = "oldworldtrack";
@@ -2284,7 +2328,7 @@ function drawBoard(blank, local){
         // Set up Old World Cards
         $oldWorldCardXMLArray.each(function () {
             var $cardXML = $(this),
-                newCard = new OldWorldCard($cardXML, symbols);
+                newCard = new OldWorldCard($cardXML);
             oldWorld.cards.push(newCard);
         });
 
