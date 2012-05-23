@@ -15,7 +15,7 @@ $headerurl = realpath($docroot.'/header.php');
 include $headerurl;
 
 //Set the save directory
-$dir = realpath($docroot.'/chaos/saves/').'/';
+$dir = realpath(getcwd() . $slash . 'saves');
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -12,7 +12,7 @@ $docroot = realpath(getcwd() . $slash . '..');
 $rooturl = 'http://'.$_SERVER['HTTP_HOST'];
 
 //Set the save directory
-$dir = realpath($docroot . '/chaos/saves/') . '/';
+$dir = realpath(getcwd() . $slash . 'saves');
 
 //Set the session path
 session_save_path(realpath(dirname($_SERVER['DOCUMENT_ROOT']) . '/../var/php_sessions'));
