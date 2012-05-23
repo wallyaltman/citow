@@ -2929,6 +2929,17 @@ function saveBoardXML(saveType){
         boardState.setAttribute("expansion", board.expansion);
         //Set the game thread number
         boardState.setAttribute("thread", board.threadNum);
+        if (board.plugins._count > 0) {
+            var $customization = $(xmlDoc.createElement("customization"));
+            $(board.plugins._list).each(function () {
+                var $node = $(xmlDoc.createElement("plugin"));
+                $node.text(this.name);
+
+                $customization.append($node);
+            });
+
+            boardState.appendChild($customization[0]);
+        }
         //Old World cards
         var oldWorld = xmlDoc.createElement("oldworld");
         oldWorld.setAttribute("set", board.owcset);
