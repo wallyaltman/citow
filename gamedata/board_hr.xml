@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <gameboard expansion="morrslieb">
   <upgrades sheet="upgrade_sprites_hr.png" />
-  <tokens>
-    <event>6</event>
-    <hero>4</hero>
-    <noble>6</noble>
-    <peasant>20</peasant>
-    <skaven>16</skaven>
-    <warpstone>14</warpstone>
+  <tokens sheet="token_sprites.png">
+    <event srcx="1" srcy="1">6</event>
+    <hero srcx="21" srcy="1">4</hero>
+    <noble srcx="41" srcy="1">6</noble>
+    <dac srcx="61" srcy="1">0</dac>
+    <peasant srcx="1" srcy="21">20</peasant>
+    <skaven srcx="21" srcy="21">16</skaven>
+    <warpstone srcx="41" srcy="21">14</warpstone>
   </tokens>
   <ruinouspowers>
     <power id="0" highlight="#DD1111" shadow="#3A0A0A">

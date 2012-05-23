@@ -6,6 +6,6 @@
   },
   "icons": {
     "upgradeSpritesSrc": "upgrade_sprites.png",
-    "oldWorldTokens": ["flood"]
+    "tokenSpritesSrc": "token_sprites.png"
   }
 }

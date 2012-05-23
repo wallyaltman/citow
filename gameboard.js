@@ -1512,35 +1512,43 @@ function clearEffects(){
 var Icons = (function () {
     var setups = [
         {
+            name : "dac",
+            width : 19,
+            height : 19,
+            source : {x: 33, y: 1}
+        },
+
+        {
             name : "magic",
             width : 9,
             height : 9,
-            source : {x: 61, y: 31}
+            source : {x: 13, y: 17}
         },
 
         {
             name : "skull",
             width : 7,
             height : 7,
-            source : {x: 93, y: 33}
+            source : {x: 23, y: 17}
         },
 
         {
             name : "smallcomet",
             width : 11,
             height : 11,
-            source : {x: 61, y: 19}
+            source : {x: 1, y: 17}
         },
 
         {
             name : "darkcomet",
             width : 11,
             height : 11,
-            source : {x: 61, y: 19},
+            source : {x: 1, y: 17},
             alpha : 0.4
         }
     ];
     var icons = {};
+    var board = $("#board")[0];
 
     $(setups).each(function () {
         var setup = this;
@@ -1548,6 +1556,8 @@ var Icons = (function () {
         function Icon () {
             this.name = setup.name;
             this.type = "icon"
+            this.sheet = "icons/icon_sprites.png";
+
             this.width = setup.width;
             this.height = setup.height;
             this.srcX = setup.source.x;
@@ -1596,7 +1606,8 @@ Figure.prototype.clearAll = function () {
 function Player ($powerSetupXML, $playerXML, index) {
     var modelTypes = ["cultist", "warrior", "daemon"],
         board = $("#board")[0],
-        player = this;
+        player = this,
+        pluginName = $powerSetupXML.attr("plugin");
 
     this.name = $playerXML.attr("name");
     this.playerName = $playerXML.attr("playername");
@@ -1606,6 +1617,10 @@ function Player ($powerSetupXML, $playerXML, index) {
     this.idNum = index;
     this.$powerSetupXML = $powerSetupXML;
     this.$playerXML = $playerXML;
+
+    if (pluginName) {
+        this.plugin = board.plugins[pluginName];
+    }
 
     this.highlight = $powerSetupXML.attr("highlight");
     this.shadow = $powerSetupXML.attr("shadow");
@@ -1663,10 +1678,20 @@ Player.prototype.loadScoreboardData = function () {
     $heldUpgrades = $playerXML.find("upgrades").children();
     $allUpgrades.each(function(){
         var isActive = $heldUpgrades.is(this.nodeName),
-            $upgradeXML = $(this);
+            $upgradeXML = $(this),
+            plugin = player.plugin;
 
         function Upgrade (isActive) {
             this.name = $upgradeXML[0].nodeName;
+            this.type = "upgrade";
+
+            if (plugin) {
+                this.sheet = "custom/" + plugin.name + "/icons/" +
+                    plugin["upgradeSpritesSrc"];
+            } else {
+                this.sheet = board.upgradeSheet;
+            }
+
             this.pp = Number($upgradeXML.attr("pp")) || 0;
             this.active = isActive;
             this.srcX = Number($upgradeXML.attr("srcx"));
@@ -1676,8 +1701,10 @@ Player.prototype.loadScoreboardData = function () {
 
             this.width = 23;
             this.height = 19;
-            this.draw = drawToken;
         }
+
+        Upgrade.prototype.draw = drawIcon;
+        Upgrade.prototype.setLocation = function () { };
 
         player.upgrades.push(new Upgrade(isActive));
     });
@@ -1867,12 +1894,13 @@ function drawBoard(blank, local){
     ctx.fillRect(0, 0, width, height);
     var i, j, k;
     //Create references to the XML gamestate data
+    board.plugins = {
+        "_list" : [],
+        "_count" : 0
+    };
     var $pluginList = $(state).find("customization").children("plugin")
     if ($pluginList.length > 0) {
         console.log($pluginList.length + " plugin(s) found.");
-        board.plugins = {
-            "_list" : []
-        };
 
         var pluginLoader = new PluginLoader(board);
         $pluginList.each(function (index, node) {
@@ -1918,7 +1946,8 @@ function drawBoard(blank, local){
     //Get the board setup
     var info = getGameSetup(board.expansion);
     board.info = info;
-    board.upgradeSheet = info.getElementsByTagName("upgrades")[0].getAttribute("sheet");
+    board.tokenSheet = "icons/" + info.getElementsByTagName("tokens")[0].getAttribute("sheet");
+    board.upgradeSheet = "icons/" + info.getElementsByTagName("upgrades")[0].getAttribute("sheet");
     //Check for the Old World card set
     board.owcset = oldWorldXML.getAttribute("set");
     //Load the Old World cards
@@ -1933,41 +1962,63 @@ function drawBoard(blank, local){
     map.tokenPool = { "_list" : [] };
     var tempArray, tokenTypes;
 
+    board.allTokens = [];
     $tokenSetupXML.each(function () {
-        var supply, count, pool
-            tokenNode = this,
-            tokenName = this.nodeName;
+        board.allTokens.push($(this));
+    });
 
-        supply = Number(this.textContent);
-        pool = new TokenPool(tokenName);
-        map.tokenPool[tokenName] = pool;
-        map.tokenPool._list.push(pool);
+    board.$afterPlugins.queue("toDo", function (next) {
+        $(board.allTokens).each(function () {
+            var supply, count, pool
+                $tokenXML = this,
+                tokenName = $tokenXML[0].nodeName,
+                plugin = board.plugins[$tokenXML.attr("plugin")];
 
-        count = 0;
+            supply = Number($tokenXML.text());
+            pool = new TokenPool(tokenName);
+            map.tokenPool[tokenName] = pool;
+            map.tokenPool._list.push(pool);
 
-        function Token () {
-            var idString;
+            count = 0;
 
-            this.name = tokenName;
-            this.type = "token";
-            this.home = pool;
-            this.xmlData = tokenNode;
-            this.width = 19;
-            this.height = 19;
+            function Token () {
+                var idString;
 
-            count += 1;
-            idString = String(count);
-            idString = (idString.length === 1) ? "0" + idString : idString;
+                this.name = tokenName;
+                this.type = "token";
+                this.home = pool;
 
-            this.objectID = this.name.substr(0,3) + idString;
-            this.objectID.toUpperCase();
-        }
+                this.srcX = Number($tokenXML.attr("srcx"));
+                this.srcY = Number($tokenXML.attr("srcy"));
+                this.width = 19;
+                this.height = 19;
 
-        Token.prototype.draw = drawToken;
+                count += 1;
+                idString = String(count);
+                idString = (idString.length === 1) ? "0" + idString : idString;
 
-        for (j = 0; j < supply; j++){
-            pool.addToken(new Token());
-        }
+                this.objectID = this.name.substr(0,3) + idString;
+                this.objectID.toUpperCase();
+            }
+
+            if (plugin) {
+                Token.prototype.plugin = plugin;
+                Token.prototype.sheet = "custom/" + plugin.name + "/icons/" +
+                    "token_sprites.png";
+            } else {
+                Token.prototype.sheet = board.tokenSheet;
+            }
+
+            Token.prototype.draw = drawIcon;
+            Token.prototype.setLocation = storeIconLocation;
+
+            for (j = 0; j < supply; j++){
+                pool.addToken(new Token());
+            }
+        });
+
+        console.log("Token Pools are set up");
+        next();
     });
 
     var players = [];

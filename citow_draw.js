@@ -299,17 +299,11 @@ function drawFigure(x0, y0, ctx, transform){
 /**
  * The argument 'base' should either be a plugin or the board.
  */
-var loadSpriteSheet = function (base, iconType) {
-    var sheet = iconType + "Sprites";
+var loadSpriteSheet = function (base, sheetRef, sheetSrc) {
+    base[sheetRef] = document.createElement('img');
+    base[sheetRef].src = sheetSrc;
 
-    base[sheet] = document.createElement('img');
-    if (base.isPlugin) {
-        base[sheet].src = "custom/" + base.name + "/icons/" + base[sheet + "Src"];
-    } else {
-        base[sheet].src = "icons/" + iconType + "_sprites.png";
-    }
-
-    return base[sheet];
+    return base[sheetRef];
 };
 
 var loadSingletonImage = function (plugin, iconName) {
@@ -361,44 +355,30 @@ var drawIcon = function (x, y, ctx) {
 
     if (!this.icon) {
         (function (iconType) {
-            var spriteSheet, iconImg, isSingleton, sourceX, sourceY;
-
-            if (object.plugin ) {
-                if (object.plugin[iconType + "SpritesSrc"]) {
-                    spriteSheet = object.plugin[iconType + "Sprites"] ||
-                        loadSpriteSheet(object.plugin, iconType);
-                    sourceX = object.xmlData.getAttribute("srcx");
-                    sourceY = object.xmlData.getAttribute("srcy");
-                } else {
-                    iconImg = object.plugin[object.name] ||
-                        loadSingletonImage(object.plugin, object.name);
-                    isSingleton = true;
-                }
-            } else {
-                spriteSheet = board[iconType + "Sprites"] ||
-                    loadSpriteSheet(board, iconType);
-                sourceX = object.srcX;
+            var spriteSheet,
+                pluginName,
+                sheetRef = iconType + "Sprites",
+                sheetSrc = object.sheet,
+                sourceX = object.srcX,
                 sourceY = object.srcY;
+
+            if (object.plugin) {
+                spriteSheet = object.plugin[sheetRef] ||
+                    loadSpriteSheet(object.plugin, sheetRef, sheetSrc);
+            } else {
+                spriteSheet = board[sheetRef] ||
+                    loadSpriteSheet(board, sheetRef, sheetSrc);
             }
 
-            if (isSingleton) {
-                object.constructor.prototype.icon = {
-                    "img"  : iconImg,
-                    "dimX" : object.width,
-                    "dimY" : object.height,
-                    "draw" : drawSingleton
-                };
-            } else {
-                object.constructor.prototype.icon = {
-                    "img"  : spriteSheet,
-                    "srcX" : sourceX,
-                    "srcY" : sourceY,
-                    "dimX" : object.width,
-                    "dimY" : object.height,
-                    "draw" : drawFromSheet,
-                    "alpha" : object.alpha
-                };
-            }
+            object.constructor.prototype.icon = {
+                "img"  : spriteSheet,
+                "srcX" : sourceX,
+                "srcY" : sourceY,
+                "dimX" : object.width,
+                "dimY" : object.height,
+                "draw" : drawFromSheet,
+                "alpha" : object.alpha
+            };
         })(this.type);
     }
 
@@ -1439,19 +1419,11 @@ function drawScoreBoard(){
         dacs = currentPlayer.dacs;
         if (dacs < 6){
             for (j = 0; j < dacs; j++){
-                obj = {
-                    name : "dac",
-                    draw : drawToken
-                };
-                obj.draw(x1 + (7 * j) + 2, y1 + 4, ctx);
+                Icons.dac.draw(x1 + (7 * j) + 2, y1 + 4, ctx);
             }
         }
         else {
-            obj = {
-                name : "dac",
-                draw : drawToken
-            };
-            obj.draw(x1 + 2, y1 + 4, ctx);
+            Icons.dac.draw(x1 + 2, y1 + 4, ctx);
             ctx.fillStyle = highlight;
             ctx.fillText("\u00D7 " + dacs, x1 + 23, y1 + 25);
         }

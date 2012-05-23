@@ -95,50 +95,19 @@ function PluginLoader(board) {
                 $powers = $(xmlData).children('ruinouspowers').children()
 
             if ($tokens.length > 0) {
-                $tokens.each(function (index, tokenNode) {
-                    var i, count, pool
-                        supply = Number(tokenNode.textContent),
-                        tokenPool = board.map.tokenPool,
-                        tokenName = tokenNode.nodeName;
-
-                    pool = new TokenPool(tokenName);
-                    tokenPool[tokenName] = pool;
-                    tokenPool._list.push(pool);
-
-                    count = 0;
-
-                    function CustomToken () {
-                        var idString;
-
-                        this.name = tokenName;
-                        this.type = "token";
-                        this.home = pool;
-                        this.xmlData = tokenNode;
-                        this.width = 19;
-                        this.height = 19;
-                        this.plugin = plugin;
-
-                        count += 1;
-                        idString = String(count);
-                        idString = (idString.length === 1) ? "0" + idString : idString;
-
-                        this.objectID = this.name.substr(0,3) + idString;
-                        this.objectID.toUpperCase();
-                    }
-
-                    CustomToken.prototype.draw = drawIcon;
-                    CustomToken.prototype.setLocation = storeIconLocation;
-
-                    for (i = 0; i < supply; i++) {
-                        pool.addToken(new CustomToken());
-                    }
+                $tokens.each(function () {
+                    var $tokenXML = $(this),
+                        name = this.nodeName;
+                    $tokenXML.attr("plugin", plugin.name);
+                    board.allTokens.push($tokenXML);
                 });
             }
 
             if ($powers.length > 0) {
-                $powers.each(function (index, powerNode) {
-                    var $powerSetupXML = $(powerNode),
+                $powers.each(function () {
+                    var $powerSetupXML = $(this),
                         name = $powerSetupXML.find("name").text();
+                    $powerSetupXML.attr("plugin", plugin.name);
                     board.allPowers[name] = $powerSetupXML;
                 });
             }
