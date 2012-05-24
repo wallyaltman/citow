@@ -348,9 +348,13 @@ var drawIcon = function (x, y, ctx) {
         obj.constructor.prototype.draw = function (x1, y1, ctx1) {
             this.icon.draw(x1, y1, ctx1);
             this.setLocation(x1, y1);
+            console.info("Drawing", this.name, this.type, "at x=" + x1 + ", y=" + y1);
+            //console.groupCollapsed("Drawing", this.name, this.type, "at x=" + x1 + ", y=" + y1);
+            //console.info(this);
+            //console.trace();
+            //console.groupEnd();
         };
-        obj.icon.draw(x, y, ctx);
-        obj.setLocation(x, y);
+        obj.draw(x, y, ctx);
     };
 
     if (!this.icon) {
