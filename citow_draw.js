@@ -345,15 +345,18 @@ var drawIcon = function (x, y, ctx) {
         object = this;
 
     var finish = function (obj) {
-        obj.constructor.prototype.draw = function (x1, y1, ctx1) {
+        var master;
+
+        master = Object.getPrototypeOf(object);
+        master.draw = function (x1, y1, ctx1) {
             this.icon.draw(x1, y1, ctx1);
             this.setLocation(x1, y1);
-            CHAOS.logger.log("Drawing", this.name, this.type, "at x=" + x1 + ", y=" + y1);
-            //CHAOS.logger.groupCollapsed("Drawing", this.name, this.type, "at x=" + x1 + ", y=" + y1);
-            //CHAOS.logger.info(this);
+            CHAOS.logger.groupCollapsed("Drawing", this.name, this.type, "at x=" + x1 + ", y=" + y1);
+            CHAOS.logger.info(this);
             //CHAOS.logger.trace();
-            //CHAOS.logger.groupEnd();
+            CHAOS.logger.groupEnd();
         };
+
         obj.draw(x, y, ctx);
     };
 
@@ -364,7 +367,8 @@ var drawIcon = function (x, y, ctx) {
                 sheetRef = iconType + "Sprites",
                 sheetSrc = object.sheet,
                 sourceX = object.srcX,
-                sourceY = object.srcY;
+                sourceY = object.srcY,
+                master;
 
             if (object.plugin) {
                 spriteSheet = object.plugin[sheetRef] ||
@@ -374,7 +378,8 @@ var drawIcon = function (x, y, ctx) {
                     loadSpriteSheet(board, sheetRef, sheetSrc);
             }
 
-            object.constructor.prototype.icon = {
+            master = Object.getPrototypeOf(object);
+            master.icon = {
                 "img"  : spriteSheet,
                 "srcX" : sourceX,
                 "srcY" : sourceY,

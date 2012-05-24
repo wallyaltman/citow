@@ -1509,6 +1509,24 @@ function clearEffects(){
     });
 }
 
+function Icon (setup) {
+    this.name = setup.name;
+    this.type = "icon"
+    this.sheet = "icons/icon_sprites.png";
+
+    this.width = setup.width;
+    this.height = setup.height;
+    this.srcX = setup.source.x;
+    this.srcY = setup.source.y;
+
+    if (setup.alpha) {
+        this.alpha = setup.alpha;
+    }
+}
+
+Icon.prototype.draw = drawIcon;
+Icon.prototype.setLocation = function () { };
+
 var Icons = (function () {
     var setups = [
         {
@@ -1551,27 +1569,10 @@ var Icons = (function () {
     var board = $("#board")[0];
 
     $(setups).each(function () {
-        var setup = this;
+        var setup = this,
+            masterIcon = new Icon(setup);
 
-        function Icon () {
-            this.name = setup.name;
-            this.type = "icon"
-            this.sheet = "icons/icon_sprites.png";
-
-            this.width = setup.width;
-            this.height = setup.height;
-            this.srcX = setup.source.x;
-            this.srcY = setup.source.y;
-
-            if (setup.alpha) {
-                this.alpha = setup.alpha;
-            }
-        }
-
-        Icon.prototype.draw = drawIcon;
-        Icon.prototype.setLocation = function () { };
-
-        icons[setup.name] = new Icon();
+        icons[setup.name] = Object.create(masterIcon);
     });
 
     return icons;
@@ -1602,6 +1603,24 @@ Figure.prototype.clearAll = function () {
     this.shield = false;
     this.skull = false;
 };
+
+function Upgrade ($upgradeXML, isActive) {
+    this.name = $upgradeXML[0].nodeName;
+    this.type = "upgrade";
+
+    this.pp = Number($upgradeXML.attr("pp")) || 0;
+    this.active = isActive;
+    this.srcX = Number($upgradeXML.attr("srcx"));
+    this.srcY = Number($upgradeXML.attr("srcy"));
+    this.extraCard = ($upgradeXML.attr("extracard") === "true");
+    this.coverCard = ($upgradeXML.attr("covercard") === "true");
+
+    this.width = 23;
+    this.height = 19;
+}
+
+Upgrade.prototype.draw = drawIcon;
+Upgrade.prototype.setLocation = function () { };
 
 function Player ($powerSetupXML, $playerXML, index) {
     var modelTypes = ["cultist", "warrior", "daemon"],
@@ -1680,34 +1699,18 @@ Player.prototype.loadScoreboardData = function () {
         var isActive = $heldUpgrades.is(this.nodeName),
             $upgradeXML = $(this),
             plugin = player.plugin,
-            board = $("#board")[0];
-
-        function Upgrade (isActive) {
-            this.name = $upgradeXML[0].nodeName;
-            this.type = "upgrade";
+            board = $("#board")[0],
+            masterUpgrade = new Upgrade($upgradeXML, isActive)
 
             if (plugin) {
-                this.sheet = "custom/" + plugin.name + "/icons/" +
+                masterUpgrade.sheet = "custom/" + plugin.name + "/icons/" +
                     plugin["upgradeSpritesSrc"];
+                masterUpgrade.plugin = plugin;
             } else {
-                this.sheet = board.upgradeSheet;
+                masterUpgrade.sheet = board.upgradeSheet;
             }
 
-            this.pp = Number($upgradeXML.attr("pp")) || 0;
-            this.active = isActive;
-            this.srcX = Number($upgradeXML.attr("srcx"));
-            this.srcY = Number($upgradeXML.attr("srcy"));
-            this.extraCard = ($upgradeXML.attr("extracard") === "true");
-            this.coverCard = ($upgradeXML.attr("covercard") === "true");
-
-            this.width = 23;
-            this.height = 19;
-        }
-
-        Upgrade.prototype.draw = drawIcon;
-        Upgrade.prototype.setLocation = function () { };
-
-        player.upgrades.push(new Upgrade(isActive));
+        player.upgrades.push(Object.create(masterUpgrade));
     });
 
     // PP and VP
@@ -1739,24 +1742,73 @@ Player.prototype.drag = dragObject;
 Player.prototype.drop = dropObject;
 
 /**
+ * Constructor for a "master" Old World Token.
+ */
+function Token ($tokenXML) {
+    var tokenName = $tokenXML[0].nodeName;
+
+    this.name = tokenName;
+    this.type = "token";
+
+    this.srcX = Number($tokenXML.attr("srcx"));
+    this.srcY = Number($tokenXML.attr("srcy"));
+    this.width = 19;
+    this.height = 19;
+}
+
+Token.prototype.draw = drawIcon;
+Token.prototype.setLocation = storeIconLocation;
+
+/**
  * Constructor for an individual Old World Token pool.
  */
 function TokenPool (name) {
-    var board = document.getElementById("board");
+    var board = $("#board")[0];
 
     this.name = name;
     this.type = "pool";
     this.tokens = [];
     this.maxLength = 0;
+    this._count = 0;
 
     board.map.tokenPool[name] = this;
 }
 
-TokenPool.prototype.addToken = function(token) {
+TokenPool.prototype.setMaster = function (token) {
+    this.master = token;
+}
+
+TokenPool.prototype.newTokenID = function () {
+    var idString, objectID;
+
+    this._count += 1;
+    idString = String(this._count);
+    idString = (idString.length == 1) ? "0" + idString : idString;
+    objectID = this.name.substr(0,3) + idString;
+
+    return objectID.toUpperCase();
+}
+
+TokenPool.prototype.createToken = function () {
+    if (!this.master) {
+        throw new Error("No master token to create from.");
+    }
+
+    var token = Object.create(this.master);
+
+    token.objectID = this.newTokenID();
+    token.home = this;
     this.tokens.push(token);
+
     this.maxLength = Math.max(this.maxLength, this.tokens.length);
 
-    return this;
+    return token;
+}
+
+TokenPool.prototype.makeTokens = function (tokenCount) {
+    for (var i = 0; i < tokenCount; i++) {
+        this.createToken();
+    }
 }
 
 TokenPool.prototype.rows = function() {
@@ -1970,52 +2022,29 @@ function drawBoard(blank, local){
 
     board.$afterPlugins.queue("toDo", function (next) {
         $(board.allTokens).each(function () {
-            var supply, count, pool
-                $tokenXML = this,
-                tokenName = $tokenXML[0].nodeName,
-                plugin = board.plugins[$tokenXML.attr("plugin")];
+            var masterToken;
+            var $tokenXML = this;
+            var tokenName = $tokenXML[0].nodeName;
+            var plugin = board.plugins[$tokenXML.attr("plugin")];
+            var supply = Number($tokenXML.text());
+            var pool = new TokenPool(tokenName);
 
-            supply = Number($tokenXML.text());
-            pool = new TokenPool(tokenName);
             map.tokenPool[tokenName] = pool;
             map.tokenPool._list.push(pool);
 
-            count = 0;
-
-            function Token () {
-                var idString;
-
-                this.name = tokenName;
-                this.type = "token";
-                this.home = pool;
-
-                this.srcX = Number($tokenXML.attr("srcx"));
-                this.srcY = Number($tokenXML.attr("srcy"));
-                this.width = 19;
-                this.height = 19;
-
-                count += 1;
-                idString = String(count);
-                idString = (idString.length === 1) ? "0" + idString : idString;
-
-                this.objectID = this.name.substr(0,3) + idString;
-                this.objectID.toUpperCase();
-            }
+            // This is the prototype token; copies are minted from it.
+            masterToken = new Token($tokenXML);
 
             if (plugin) {
-                Token.prototype.plugin = plugin;
-                Token.prototype.sheet = "custom/" + plugin.name + "/icons/" +
+                masterToken.plugin = plugin;
+                masterToken.sheet = "custom/" + plugin.name + "/icons/" +
                     "token_sprites.png";
             } else {
-                Token.prototype.sheet = board.tokenSheet;
+                masterToken.sheet = board.tokenSheet;
             }
 
-            Token.prototype.draw = drawIcon;
-            Token.prototype.setLocation = storeIconLocation;
-
-            for (j = 0; j < supply; j++){
-                pool.addToken(new Token());
-            }
+            pool.setMaster(masterToken);
+            pool.makeTokens(supply);
         });
 
         console.log("Token Pools are set up");

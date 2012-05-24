@@ -2,6 +2,17 @@
  * Created 13 Dec 2010
  */
 
+/* Implement Doulgas Crockford's pattern for true prototypal inheritance.
+ * http://javascript.crockford.com/prototypal.html
+ */
+if (typeof Object.create !== 'function') {
+    Object.create = function (o) {
+        function F() {}
+        F.prototype = o;
+        return new F();
+    };
+}
+
 /* Implement the .indexOf array method using
  * the Mozilla implementation, if needed.
  * https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/indexOf
@@ -54,6 +65,22 @@ Array.prototype.remove = function(from, to) {
     this.length = from < 0 ? this.length + from : from;
     return this.push.apply(this, rest);
 };
+
+/* Shim for Object.getPrototypeOf, by John Resig
+ * http://ejohn.org/blog/objectgetprototypeof/
+ */
+if ( typeof Object.getPrototypeOf !== "function" ) {
+  if ( typeof "test".__proto__ === "object" ) {
+    Object.getPrototypeOf = function(object){
+      return object.__proto__;
+    };
+  } else {
+    Object.getPrototypeOf = function(object){
+      // May break if the constructor has been tampered with
+      return object.constructor.prototype;
+    };
+  }
+}
 
 /* Create an XML HTTP request.
  */
