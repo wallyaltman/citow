@@ -344,22 +344,6 @@ var drawIcon = function (x, y, ctx) {
         board = $("#board")[0];
         object = this;
 
-    var finish = function (obj) {
-        var master;
-
-        master = Object.getPrototypeOf(object);
-        master.draw = function (x1, y1, ctx1) {
-            this.icon.draw(x1, y1, ctx1);
-            this.setLocation(x1, y1);
-            CHAOS.logger.groupCollapsed("Drawing", this.name, this.type, "at x=" + x1 + ", y=" + y1);
-            CHAOS.logger.info(this);
-            //CHAOS.logger.trace();
-            CHAOS.logger.groupEnd();
-        };
-
-        obj.draw(x, y, ctx);
-    };
-
     if (!this.icon) {
         (function (iconType) {
             var spriteSheet,
@@ -379,6 +363,7 @@ var drawIcon = function (x, y, ctx) {
             }
 
             master = Object.getPrototypeOf(object);
+
             master.icon = {
                 "img"  : spriteSheet,
                 "srcX" : sourceX,
@@ -388,16 +373,43 @@ var drawIcon = function (x, y, ctx) {
                 "draw" : drawFromSheet,
                 "alpha" : object.alpha
             };
+
+            master.$toDraw = $({});
+
+            master.drawObject = function (x1, y1, ctx1) {
+                this.icon.draw(x1, y1, ctx1);
+                this.setLocation(x1, y1);
+                CHAOS.logger.log("Drawing", this.name, this.type, "at x=" + x1 + ", y=" + y1);
+            };
+
+            master.remapDrawingFunction = function () {
+                if (this.$toDraw.queue("drawing").length === 0) {
+                    this.draw = master.drawObject;
+                }
+            };
+
+            master.draw = function (x2, y2, ctx2) {
+                var object = this;
+
+                this.$toDraw.queue("drawing", function (next) {
+                    object.drawObject(x2, y2, ctx2);
+                    master.remapDrawingFunction();
+
+                    next();
+                });
+            };
+
+            object.draw(x, y, ctx);
         })(this.type);
     }
 
     if (this.icon.img.complete) {
-        finish(this);
+        this.$toDraw.dequeue("drawing");
     } else {
         loadTimer = setInterval(function () {
             if (object.icon.img.complete) {
                 clearInterval(loadTimer);
-                finish(object);
+                object.$toDraw.dequeue("drawing");
             }
         }, 100);
     }

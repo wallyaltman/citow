@@ -356,7 +356,7 @@ function Logger (turnedOn) {
 
             console.info("Turning off logging");
             for (command in console) {
-                if (console.__proto__.hasOwnProperty(command)) {
+                if (console.hasOwnProperty(command) || console.__proto__.hasOwnProperty(command)) {
                     this[command] = function () { };
                 }
             }
@@ -364,6 +364,8 @@ function Logger (turnedOn) {
 
         if (turnedOn) {
             this.turnOn();
+        } else {
+            this.turnOff();
         }
     }
 }
@@ -373,5 +375,5 @@ if (!window.CHAOS) {
 }
 
 $().ready(function () {
-    CHAOS.logger = new Logger(true);
+    CHAOS.logger = new Logger(false);
 });
