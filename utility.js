@@ -306,3 +306,45 @@ function addMouseWheelListener(element, method){
         }, false);
     }
 }
+
+/* Create a logging system that can be turned on or off easily
+ */
+function Logger (turnedOn) {
+    if (console) {
+        this.turnOn = function () {
+            var command;
+
+            console.info("Turning on logging");
+            for (command in console) {
+                if (console.hasOwnProperty(command) || console.__proto__.hasOwnProperty(command)) {
+                    if (console[command].bind) {
+                        this[command] = console[command].bind(console, "CitOW:");
+                    }
+                }
+            }
+        };
+
+        this.turnOff = function () {
+            var command;
+
+            console.info("Turning off logging");
+            for (command in console) {
+                if (console.__proto__.hasOwnProperty(command)) {
+                    this[command] = function () { };
+                }
+            }
+        };
+
+        if (turnedOn) {
+            this.turnOn();
+        }
+    }
+}
+
+if (!window.CHAOS) {
+    window.CHAOS = {};
+}
+
+$().ready(function () {
+    CHAOS.logger = new Logger(true);
+});

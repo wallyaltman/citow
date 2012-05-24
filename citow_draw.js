@@ -348,11 +348,11 @@ var drawIcon = function (x, y, ctx) {
         obj.constructor.prototype.draw = function (x1, y1, ctx1) {
             this.icon.draw(x1, y1, ctx1);
             this.setLocation(x1, y1);
-            console.info("Drawing", this.name, this.type, "at x=" + x1 + ", y=" + y1);
-            //console.groupCollapsed("Drawing", this.name, this.type, "at x=" + x1 + ", y=" + y1);
-            //console.info(this);
-            //console.trace();
-            //console.groupEnd();
+            CHAOS.logger.log("Drawing", this.name, this.type, "at x=" + x1 + ", y=" + y1);
+            //CHAOS.logger.groupCollapsed("Drawing", this.name, this.type, "at x=" + x1 + ", y=" + y1);
+            //CHAOS.logger.info(this);
+            //CHAOS.logger.trace();
+            //CHAOS.logger.groupEnd();
         };
         obj.draw(x, y, ctx);
     };
