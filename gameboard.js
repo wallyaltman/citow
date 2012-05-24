@@ -1679,7 +1679,8 @@ Player.prototype.loadScoreboardData = function () {
     $allUpgrades.each(function(){
         var isActive = $heldUpgrades.is(this.nodeName),
             $upgradeXML = $(this),
-            plugin = player.plugin;
+            plugin = player.plugin,
+            board = $("#board")[0];
 
         function Upgrade (isActive) {
             this.name = $upgradeXML[0].nodeName;
