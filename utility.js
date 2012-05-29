@@ -341,7 +341,7 @@ function Logger (turnedOn) {
         this.turnOn = function () {
             var command;
 
-            console.info("Turning on logging");
+            console.info("CitOW: Turning on logging");
             for (command in console) {
                 if (console.hasOwnProperty(command) || console.__proto__.hasOwnProperty(command)) {
                     if (console[command].bind) {
@@ -354,7 +354,7 @@ function Logger (turnedOn) {
         this.turnOff = function () {
             var command;
 
-            console.info("Turning off logging");
+            console.info("CitOW: Turning off logging");
             for (command in console) {
                 if (console.hasOwnProperty(command) || console.__proto__.hasOwnProperty(command)) {
                     this[command] = function () { };
