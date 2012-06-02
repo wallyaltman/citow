@@ -33,7 +33,7 @@ function PluginLoader(board) {
             plugin,
             objectKey;
 
-        //console.log("Manifest downloaded for plugin " + pluginName);
+        //CHAOS.logger.log("Manifest downloaded for plugin " + pluginName);
 
         plugin = {
             "name" : pluginName,
@@ -46,12 +46,12 @@ function PluginLoader(board) {
                 return toLoadCount === loadedCount;
             },
             "checkLoadStatus" : function () {
-                //console.log("Checking plugin load status...");
+                //CHAOS.logger.log("Checking plugin load status...");
                 if (this.isLoaded()) {
-                    console.log("Firing pluginLoaded event...");
+                    CHAOS.logger.log("Firing pluginLoaded event...");
                     $board.trigger('pluginLoaded');
                 } else {
-                    //console.warn("Plugin " + pluginName + " not yet loaded.");
+                    //CHAOS.logger.warn("Plugin " + pluginName + " not yet loaded.");
                 }
             }
         };
@@ -64,14 +64,14 @@ function PluginLoader(board) {
             for (objectKey in manifest.gamedata) {
                 if (manifest.gamedata.hasOwnProperty(objectKey)) {
                     plugin.toLoad.push(objectKey);
-                    //console.log("Downloading " + objectKey + " component of plugin " + pluginName);
+                    //CHAOS.logger.log("Downloading " + objectKey + " component of plugin " + pluginName);
                     $.get("custom/" + pluginName + "/gamedata/" + manifest.gamedata[objectKey] + ".xml",
                            function (responseData) {
                         var nodeName = responseData.documentElement.nodeName,
                             fileref = nodeName + "XML";
                         board.plugins[pluginName][fileref] = responseData.documentElement;
                         // Handle the just-downloaded data, if needed
-                        //console.log("Processing " + nodeName + " component of plugin " + pluginName);
+                        //CHAOS.logger.log("Processing " + nodeName + " component of plugin " + pluginName);
                         if (dataLoaders[fileref]) {
                             dataLoaders[fileref](plugin, responseData.documentElement);
                         }
@@ -96,7 +96,7 @@ function PluginLoader(board) {
     };
 
     this.addPlugin = function (pluginName) {
-        console.log("Downloading manifest for plugin " + pluginName);
+        CHAOS.logger.log("Downloading manifest for plugin " + pluginName);
         $.getJSON("custom/" + pluginName.toLowerCase() + "/manifest.json",
                   readManifest);
     };

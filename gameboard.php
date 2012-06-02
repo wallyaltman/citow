@@ -28,8 +28,8 @@ echo '  <link rel="shortcut icon" href="favicon.ico" />'."\n";
 echo '  <link rel="stylesheet" href="'.$rooturl.'/style.css" />'."\n";
 echo '  <link rel="stylesheet" href="chaos.css?v='.$v.'" />'."\n";
 echo '  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>'."\n";
-echo '  <script src="'.$rooturl.'/library/myjquery.js" type="text/javascript"></script>'."\n";
 echo '  <script src="utility.js" type="text/javascript"></script>'."\n";
+//echo '  <script src="'.$rooturl.'/library/myjquery.js" type="text/javascript"></script>'."\n";
 echo '  <script src="citow_custom.js?v='.$v.'" type="text/javascript"></script>'."\n";
 echo '  <script src="citow_draw.js?v='.$v.'" type="text/javascript"></script>'."\n";
 echo '  <script src="gameboard.js?v='.$v.'" type="text/javascript"></script>'."\n";
@@ -270,6 +270,5 @@ $localreferer = preg_match('/gameboard\.php/', $_SERVER['HTTP_REFERER']) ? 'true
 echo '    <input type="hidden" id="localreferer" value="', $localreferer, '" />', "\n"; 
 ?>
   </div>
-  <script>initialize();</script>
 </body>
 </html>

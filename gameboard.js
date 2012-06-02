@@ -507,7 +507,7 @@ function getOldWorldCards(cardSet){
         var $board = $("#board");
         var board = $board[0];
 
-        console.log("Setting OWC listener for 'scoreboardLoaded'");
+        CHAOS.logger.log("Setting OWC listener for 'scoreboardLoaded'");
         $board.on("scoreboardLoaded", function () {
             var players = board.map.players;
             var $oldWorldCardXMLArray = $xmlDoc.find("card");
@@ -546,7 +546,7 @@ function getChaosCards(expansion){
         var i, j, $cc0, $cc1;
         var chaosCards = xmlDoc.getElementsByTagName("card");
         var $chaosCardXMLArray = $xmlDoc.find("card");
-        console.log("Setting CC listener for 'scoreboardLoaded'");
+        CHAOS.logger.log("Setting CC listener for 'scoreboardLoaded'");
         $board.on("scoreboardLoaded", function () {
             var players = board.map.players;
             var cardSets = [];
@@ -593,7 +593,7 @@ function getChaosCards(expansion){
             });
             $cardSets = $(cardSets);
 
-            console.log("Loading card drawer");
+            CHAOS.logger.log("Loading card drawer");
             // Determine a suitable distribution of card sets between the
             // columns, so that column 1 will have the most cards.
             setLengths = [];
@@ -714,7 +714,7 @@ function buildTokenPool(){
         pool.draw = drawOldWorldTokens;
         pool.drag = dragObject;
         pool.drop = dropObject;
-        //console.log("Drawing " + pool.name + " pool");
+        //CHAOS.logger.log("Drawing " + pool.name + " pool");
     });
     // Resize the canvas, then draw the pools
     canvas.height = y1 + 22;
@@ -1954,14 +1954,14 @@ function drawBoard(blank, local){
     };
     var $pluginList = $(state).find("customization").children("plugin")
     if ($pluginList.length > 0) {
-        console.log($pluginList.length + " plugin(s) found.");
+        CHAOS.logger.log($pluginList.length + " plugin(s) found.");
 
         var pluginLoader = new PluginLoader(board);
         $pluginList.each(function (index, node) {
             pluginLoader.addPlugin($(node).text());
         });
     } else {
-        console.warn("No plugins found.");
+        CHAOS.logger.warn("No plugins found.");
     }
     var mapXML = state.getElementsByTagName("map")[0];
     board.map = {
@@ -2048,7 +2048,7 @@ function drawBoard(blank, local){
             pool.makeTokens(supply);
         });
 
-        console.log("Token Pools are set up");
+        CHAOS.logger.log("Token Pools are set up");
         next();
     });
 
@@ -2272,7 +2272,7 @@ function drawBoard(blank, local){
         var region = this;
 
         board.$afterPlugins.queue("toDo", function (next) {
-            //console.log("Setting up " + region.name);
+            //CHAOS.logger.log("Setting up " + region.name);
             region.setupBorders();
             region.setupCorruption();
             region.setupRuination();
@@ -2356,7 +2356,7 @@ function drawBoard(blank, local){
         });
 
         // Fire the "scoreboard loaded" notice
-        console.log("Firing 'scoreboardLoaded' event");
+        CHAOS.logger.log("Firing 'scoreboardLoaded' event");
         $("#board").trigger('scoreboardLoaded');
     }
 
@@ -2367,7 +2367,7 @@ function drawBoard(blank, local){
     });
     // Draw the regions
     board.$afterPlugins.queue("toDo", function (next) {
-        //console.log("Drawing regions");
+        //CHAOS.logger.log("Drawing regions");
         $(board.map.regions).each(function () {
             this.draw();
         });
@@ -2488,7 +2488,7 @@ function drawBoard(blank, local){
         $board.on("pluginLoaded", function () {
             var allPluginsLoaded = true;
 
-            console.log("Custom event pluginLoaded captured!");
+            CHAOS.logger.log("Custom event pluginLoaded captured!");
 
             $(board.plugins._list).each(function (index, plugin) {
                 if (!plugin.isLoaded()) {
@@ -2497,14 +2497,14 @@ function drawBoard(blank, local){
             });
 
             if (allPluginsLoaded) {
-                console.log("Deferred board setup (with plugins)");
+                CHAOS.logger.log("Deferred board setup (with plugins)");
                 board.$afterPlugins.dequeue("toDo");
             } else {
-                console.log("Not all plugins are loaded yet.");
+                CHAOS.logger.log("Not all plugins are loaded yet.");
             }
         });
     } else {
-        console.log("Deferred board setup (without plugins)");
+        CHAOS.logger.log("Deferred board setup (without plugins)");
         board.$afterPlugins.dequeue("toDo");
     }
     //Set event handlers on the canvas and
@@ -3597,3 +3597,7 @@ function initialize(){
         });
     }
 }
+
+$(document).ready(function () {
+    initialize();
+});
