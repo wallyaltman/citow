@@ -334,6 +334,14 @@ function addMouseWheelListener(element, method){
     }
 }
 
+/* Add the hasOwnProperty method to console if it doesn't have it (this is a
+ * problem with IE 9, at least)
+ */
+if (typeof console.hasOwnProperty !== 'function') {
+    console.hasOwnProperty = Object.prototype.hasOwnProperty.bind(console);
+}
+
+
 /* Create a logging system that can be turned on or off easily
  */
 function Logger (turnedOn) {

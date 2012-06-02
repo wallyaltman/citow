@@ -1958,7 +1958,7 @@ function drawBoard(blank, local){
 
         var pluginLoader = new PluginLoader(board);
         $pluginList.each(function (index, node) {
-            pluginLoader.addPlugin(node.textContent);
+            pluginLoader.addPlugin($(node).text);
         });
     } else {
         console.warn("No plugins found.");
