@@ -9,8 +9,6 @@ $slash = strpos(getcwd(), '/') === false ? '\\' : '/';
 
 $dir = realpath(getcwd() . '/saves/') . '/';
 
-$quiet = ($_GET['quiet'] == 'true');
-
 //Read the file list
 $files = array();
 if ($handle = opendir($dir)){
@@ -55,9 +53,9 @@ file_put_contents($dir.$file, $output, LOCK_EX);
 $gamestarts = array();
 $xmlgame = new XMLReader();
 //Identify first saves
-$gamestartfiles = preg_grep('/game[0-9]+state0*1\.xml/', $files);
+$gamestartfiles = preg_grep('/game\d+state0*1\.xml/', $files);
 foreach ($gamestartfiles as $filename){
-    if (preg_match('/game([0-9]+)/', $filename, $matches)){
+    if (preg_match('/game(\d+)state\d+\.xml$/', $filename, $matches)){
         $gnum = (int) $matches[1];
         $xmlgame->open($dir.$filename);
         if ($xmlgame->read() && $xmlgame->moveToAttribute('creator')){

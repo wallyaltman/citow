@@ -15,7 +15,7 @@ session_start();
 $user = $_SESSION['username'];
 $userlevel = $_SESSION['privileges'];
 //Set the save directory
-$dir = realpath(getcwd() . $slash . 'saves');
+$dir = realpath(getcwd() . $slash . 'saves') . $slash;
 //Retrieve the POST variables
 $game = $_POST['game'];
 $state = $_POST['state'];
@@ -30,6 +30,8 @@ while (strlen($state) < 2){
     $state = '0'.$state;
 }
 $file = 'game' . $game . 'state' . $state . '.xml';
+
+$fail = false;
 //User verification, etc.
 if (!isset($_SESSION['username'])){
     $fail = true;
