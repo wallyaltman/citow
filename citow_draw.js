@@ -306,14 +306,6 @@ var loadSpriteSheet = function (base, sheetRef, sheetSrc) {
     return base[sheetRef];
 };
 
-var loadSingletonImage = function (plugin, iconName) {
-    plugin[iconName] = document.createElement('img');
-    plugin[iconName].src = "custom/" + plugin.name + "/icons/" +
-        iconName + ".png";
-
-    return plugin[iconName];
-}
-
 var storeIconLocation = function (x, y) {
     this.x0 = x;
     this.y0 = y;
@@ -330,10 +322,6 @@ var drawFromSheet = function (x, y, ctx) {
                   x, y, this.dimX, this.dimY);
 
     ctx.globalAlpha = 1;
-};
-
-var drawSingleton = function (x, y, ctx) {
-    ctx.drawImage(this.img, x, y);
 };
 
 /* The new and improved lazy drawing function! This really ought to be
