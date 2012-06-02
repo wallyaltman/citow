@@ -108,7 +108,7 @@ function PluginLoader(board) {
                     var $powerSetupXML = $(this),
                         name = $powerSetupXML.find("name").text();
                     $powerSetupXML.attr("plugin", plugin.name);
-                    board.allPowers[name] = $powerSetupXML;
+                    board.$allPowers[name] = $powerSetupXML;
                 });
             }
 

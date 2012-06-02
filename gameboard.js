@@ -1672,6 +1672,7 @@ function Player ($powerSetupXML, $playerXML, index) {
 
 Player.prototype.loadScoreboardData = function () {
     var player = this,
+        map = $("#board")[0].map,
         $powerSetupXML = player.$powerSetupXML,
         $playerXML = player.$playerXML,
         $peasantsXMLArray,
@@ -2053,13 +2054,13 @@ function drawBoard(blank, local){
 
     var players = [];
     map.players = players;
-    board.allPowers = {};
+    board.$allPowers = {};
     var numPowers = 0;
     //Dump the XML data for the individual powers into
     //an object, as jQuery objects keyed by name
     $powerSetupXMLArray.each(function () {
         var name = $(this).find("name").text();
-        board.allPowers[name] = $(this);
+        board.$allPowers[name] = $(this);
         numPowers += 1;
     });
     board.maxPowers = numPowers;
@@ -2070,7 +2071,7 @@ function drawBoard(blank, local){
         $playerXMLArray.each(function (i) {
             var $currentPlayer = $(this),
                 powerName = $currentPlayer.attr("name"),
-                $powerSetupXML = board.allPowers[powerName],
+                $powerSetupXML = board.$allPowers[powerName],
                 newPlayer = new Player($powerSetupXML, $currentPlayer, i);
             map.players.push(newPlayer);
             board.allPlayers[newPlayer.name] = newPlayer;
@@ -2205,7 +2206,7 @@ function drawBoard(blank, local){
             var $cardXML = $(this);
             var newCard = new ChaosCard($cardXML);
             var ownerName = $cardXML.attr("owner");
-            var owner = board.allPowers[ownerName];
+            var owner = board.allPlayers[ownerName];
             region.cards.push(newCard);
         });
     };
@@ -2232,7 +2233,7 @@ function drawBoard(blank, local){
         function addFigureToHolder ($figureXML, holder) {
             var playerName = $figureXML.attr("owner"),
                 figTypes = $figureXML[0].nodeName + "s",
-                figure = board.allPowers[playerName][figTypes].shift();
+                figure = board.allPlayers[playerName][figTypes].shift();
             if (figure){
                 figure.shield = ($figureXML.attr("shield") === "true");
                 figure.musk = ($figureXML.attr("musk") === "true");
