@@ -324,23 +324,48 @@ var drawFromSheet = function (x, y, ctx) {
     ctx.globalAlpha = 1;
 };
 
+/* The final, post-load version of the drawing function.
+ */
+var drawObject = function (x, y, ctx) {
+    var identifier = this.objectID || this.name;
+    this.icon.draw(x, y, ctx);
+    this.setLocation(x, y);
+    CHAOS.logger.log("Drawing", identifier);
+};
+
 /* The new and improved lazy drawing function! This really ought to be
  * backported to the main application.
  */
 var drawIcon = function (x, y, ctx) {
-    var loadTimer,
-        board = $("#board")[0];
+    function setQueueTimer (object) {
+        var $img = $(object.icon.img);
+        if ($img[0].complete) {
+            $img.dequeue("drawing");
+        } else {
+            if (!$img.data('loadTimer')) {
+                $img.data('loadTimer', setInterval(function () {
+                    if ($img[0].complete) {
+                        clearInterval($img.data('loadTimer'));
+                        $img.data('loadTimer', null);
+                        $img.dequeue("drawing");
+                    }
+                }, 100));
+            }
+        }
+    }
+
+    var board = $("#board")[0],
         object = this;
 
     if (!this.icon) {
         (function (iconType) {
-            var spriteSheet,
+            var master = Object.getPrototypeOf(object),
+                spriteSheet,
                 pluginName,
                 sheetRef = iconType + "Sprites",
                 sheetSrc = object.sheet,
                 sourceX = object.srcX,
-                sourceY = object.srcY,
-                master;
+                sourceY = object.srcY;
 
             if (object.plugin) {
                 spriteSheet = object.plugin[sheetRef] ||
@@ -349,8 +374,6 @@ var drawIcon = function (x, y, ctx) {
                 spriteSheet = board[sheetRef] ||
                     loadSpriteSheet(board, sheetRef, sheetSrc);
             }
-
-            master = Object.getPrototypeOf(object);
 
             master.icon = {
                 "img"  : spriteSheet,
@@ -362,45 +385,34 @@ var drawIcon = function (x, y, ctx) {
                 "alpha" : object.alpha
             };
 
-            master.$toDraw = $({});
-
-            master.drawObject = function (x1, y1, ctx1) {
-                this.icon.draw(x1, y1, ctx1);
-                this.setLocation(x1, y1);
-                CHAOS.logger.log("Drawing", this.name, this.type, "at x=" + x1 + ", y=" + y1);
-            };
-
             master.remapDrawingFunction = function () {
-                if (this.$toDraw.queue("drawing").length === 0) {
-                    this.draw = master.drawObject;
+                if ($(this.icon.img).queue("drawing").length === 0) {
+                    this.draw = this.drawObject;
+                    CHAOS.logger.info("Remapping the", this.name, "drawing function");
+                    this.remapDrawingFunction = function () {};
                 }
             };
 
             master.draw = function (x2, y2, ctx2) {
                 var object = this;
+                var identifier = object.objectID || object.name;
 
-                this.$toDraw.queue("drawing", function (next) {
+                CHAOS.logger.log("Queueing a draw instruction for", identifier);
+
+                $(object.icon.img).queue("drawing", function (next) {
+                    CHAOS.logger.log("Firing the queued draw for", identifier);
                     object.drawObject(x2, y2, ctx2);
                     master.remapDrawingFunction();
 
                     next();
                 });
-            };
 
-            object.draw(x, y, ctx);
+                setQueueTimer(object);
+            };
         })(this.type);
     }
 
-    if (this.icon.img.complete) {
-        this.$toDraw.dequeue("drawing");
-    } else {
-        loadTimer = setInterval(function () {
-            if (object.icon.img.complete) {
-                clearInterval(loadTimer);
-                object.$toDraw.dequeue("drawing");
-            }
-        }, 100);
-    }
+    this.draw(x, y, ctx);
 };
 
  /* Draw a subset of the reserve pool

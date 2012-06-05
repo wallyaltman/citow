@@ -392,5 +392,5 @@ if (!window.CHAOS) {
 }
 
 $().ready(function () {
-    CHAOS.logger = new Logger(true);
+    CHAOS.logger = new Logger(false);
 });

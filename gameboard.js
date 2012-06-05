@@ -1525,6 +1525,7 @@ function Icon (setup) {
 }
 
 Icon.prototype.draw = drawIcon;
+Icon.prototype.drawObject = drawObject;
 Icon.prototype.setLocation = function () { };
 
 var Icons = (function () {
@@ -1620,6 +1621,7 @@ function Upgrade ($upgradeXML, isActive) {
 }
 
 Upgrade.prototype.draw = drawIcon;
+Upgrade.prototype.drawObject = drawObject;
 Upgrade.prototype.setLocation = function () { };
 
 function Player ($powerSetupXML, $playerXML, index) {
@@ -1758,6 +1760,7 @@ function Token ($tokenXML) {
 }
 
 Token.prototype.draw = drawIcon;
+Token.prototype.drawObject = drawObject;
 Token.prototype.setLocation = storeIconLocation;
 
 /**
@@ -1828,7 +1831,7 @@ function grabCardCanvas (evt) {
         coord = this.cursorPos(evt);
         xOffset = coord.x;
         yOffset = coord.y;
-        this.objectId = board.newOldWorldID();
+        this.objectID = board.newOldWorldID();
         //Begin moving the card
         pen.move(evt, xOffset, yOffset);
     }
@@ -1863,7 +1866,7 @@ ChaosCard.prototype = new Card();
 ChaosCard.prototype.constructor = ChaosCard;
 function ChaosCard ($cardXML) {
     var board = $("#board")[0];
-    this.objectId = board.newChaosID();
+    this.objectID = board.newChaosID();
 
     this.owner = board.allPlayers[$cardXML.attr("owner")];
     this.name = $cardXML.text();
@@ -1884,7 +1887,7 @@ OldWorldCard.prototype = new Card();
 OldWorldCard.prototype.constructor = OldWorldCard;
 function OldWorldCard ($cardXML) {
     var board = $("#board")[0];
-    this.objectId = board.newOldWorldID();
+    this.objectID = board.newOldWorldID();
     this.dataid = $cardXML.attr("dataid");
 
     this.name = $cardXML.text();
