@@ -1702,7 +1702,14 @@ function drawBoard(blank, local){
     map.tokenPool.skaven = {
         name : "skaven",
         type : "pool",
-        tokens : []
+        tokens : [],
+        modifier : function () {
+            if ($(playersXML).find("player[name='Horned_Rat']")) {
+                return Number($tokenSetupXML.filter(this.name).attr("horned-rat"));
+            } else {
+                return 0;
+            }
+        }
     };
     map.tokenPool.warpstone = {
         name : "warpstone",
@@ -1715,7 +1722,10 @@ function drawBoard(blank, local){
         tokenName = tokenSet[i].name;
         $tokenSetupXML.each(function () {
             if (this.nodeName === tokenName){
-                supply = $(this).text();
+                supply = Number($(this).text());
+                if (tokenSet[i].modifier) {
+                    supply += tokenSet[i].modifier();
+                }
             }
         });
         for (j = 0; j < supply; j++){
