@@ -9,7 +9,6 @@
 
 $slash = strpos(getcwd(), '/') === false ? '\\' : '/';
 $docroot = realpath(getcwd() . $slash . '..');
-$rooturl = 'http://'.$_SERVER['HTTP_HOST'];
 
 $headerurl = realpath($docroot.'/header.php');
 include $headerurl;
@@ -25,10 +24,9 @@ $statenum = $_GET['state'];
 
 $v = 9812;
 echo '  <link rel="shortcut icon" href="favicon.ico" />'."\n";
-echo '  <link rel="stylesheet" href="'.$rooturl.'/style.css" />'."\n";
+echo '  <link rel="stylesheet" href="style.css" />'."\n";
 echo '  <link rel="stylesheet" href="chaos.css?v='.$v.'" />'."\n";
-echo '  <script src="'.$rooturl.'/library/jquery-1.6.1.min.js" type="text/javascript"></script>'."\n";
-echo '  <script src="'.$rooturl.'/library/myjquery.js" type="text/javascript"></script>'."\n";
+echo '  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>'."\n";
 echo '  <script src="utility.js" type="text/javascript"></script>'."\n";
 echo '  <script src="citow_draw.js?v='.$v.'" type="text/javascript"></script>'."\n";
 echo '  <script src="gameboard.js?v='.$v.'" type="text/javascript"></script>'."\n";
@@ -117,21 +115,21 @@ echo '  </hgroup>', "\n";
     <div id="corrupthandle" class="lefthandle">
       <div id="corruptswitch" class="handlecontents">
 <?php
-echo '          <img src="'.$rooturl.'/chaos/icons/corruption_txt2.png" id="corrupttext" height="81" width="19" title="Corruption" />'."\n";
+echo '          <img src="icons/corruption_txt2.png" id="corrupttext" height="81" width="19" title="Corruption" />'."\n";
 ?>
       </div>
     </div>
     <div id="scorehandle" class="lefthandle">
       <div id="scoreswitch" class="handlecontents">
 <?php      
-echo '          <img src="'.$rooturl.'/chaos/icons/scoreboard_txt2.png" id="scoretext" height="86" width="19" title="Scoreboard" />'."\n";
+echo '          <img src="icons/scoreboard_txt2.png" id="scoretext" height="86" width="19" title="Scoreboard" />'."\n";
 ?>
       </div>
     </div>
     <div id="workhandle" class="lefthandle">
       <div id="workswitch" class="handlecontents">
 <?php       
-echo '        <img src="'.$rooturl.'/chaos/icons/figure_effects_txt2.png" id="worktext" height="102" width="19" title="Figure Effects" />'."\n";
+echo '        <img src="icons/figure_effects_txt2.png" id="worktext" height="102" width="19" title="Figure Effects" />'."\n";
 ?>
       </div>
     </div>  

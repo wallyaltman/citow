@@ -9,7 +9,6 @@
 
 $slash = strpos(getcwd(), '/') === false ? '\\' : '/';
 $docroot = realpath(getcwd() . $slash . '..');
-$rooturl = 'http://'.$_SERVER['HTTP_HOST'];
 
 $headerurl = realpath($docroot.'/header.php');
 include $headerurl;
@@ -24,9 +23,9 @@ $dir = realpath($docroot.'/chaos/saves/').'/';
   <title>Chaos in the Old World - AppliedNerditry.com</title>
 <?php
 echo '  <link rel="shortcut icon" href="favicon.ico" />', "\n";
-echo '  <link rel="stylesheet" href="', $rooturl, '/style.css" />', "\n";
+echo '  <link rel="stylesheet" href="style.css" />', "\n";
 echo '  <link rel="stylesheet" href="chaos.css" />', "\n";
-echo '  <script src="', $rooturl, '/library/jquery-1.6.1.min.js" type="text/javascript"></script>', "\n";
+echo '  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>'."\n";
 echo '  <script src="index.js" type="text/javascript"></script>', "\n";
 echo '</head>'."\n";
 echo '<body id="body">'."\n";
@@ -118,9 +117,9 @@ echo '          <input type="radio" id="officialgame" name="gamerank" ', $disabl
           <input type="radio" id="othergame" name="gamerank" checked="checked" />
           <label for="othergame">Unofficial Game</label>
 <?php
-echo '          <img src="', $rooturl, '/graphics/check23.png" id="checkgame"',
+echo '          <img src="graphics/check23.png" id="checkgame"',
      ' height="23" width="23" alt="Game number is OK" class="hideme" />', "\n";
-echo '          <img src="', $rooturl, '/graphics/error23.png" id="errorgame" height="23"',
+echo '          <img src="graphics/error23.png" id="errorgame" height="23"',
      ' width="23" alt="Game number is too low or already taken" class="hideme" />', "\n";
 ?>
         </fieldset>
@@ -135,9 +134,9 @@ echo '          <img src="', $rooturl, '/graphics/error23.png" id="errorgame" he
           <legend>PA Forums Game Thread</legend>
           <input type="url" id="pathread" name="pathread" size="80" />
 <?php
-echo '          <img src="', $rooturl, '/graphics/check23.png" id="checkthread"',
+echo '          <img src="graphics/check23.png" id="checkthread"',
      ' height="23" width="23" alt="Game number is OK" class="hideme" />', "\n";
-echo '          <img src="', $rooturl, '/graphics/error23.png" id="errorthread" height="23"',
+echo '          <img src="graphics/error23.png" id="errorthread" height="23"',
      ' width="23" alt="Game number is too low or already taken" class="hideme" />', "\n";
 ?>
         <input type="hidden" id="threadnum" name="threadnum" />
