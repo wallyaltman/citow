@@ -1705,7 +1705,7 @@ function drawBoard(blank, local){
         tokens : [],
         modifier : function () {
             if ($(playersXML).find("player[name='Horned_Rat']")) {
-                return Number($tokenSetupXML.find(this.name).attr("horned-rat"));
+                return Number($tokenSetupXML.filter(this.name).attr("horned-rat"));
             } else {
                 return 0;
             }
@@ -1722,7 +1722,7 @@ function drawBoard(blank, local){
         tokenName = tokenSet[i].name;
         $tokenSetupXML.each(function () {
             if (this.nodeName === tokenName){
-                supply = $(this).text();
+                supply = Number($(this).text());
                 if (tokenSet[i].modifier) {
                     supply += tokenSet[i].modifier();
                 }
