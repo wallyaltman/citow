@@ -6,7 +6,7 @@
     <hero>4</hero>
     <noble>6</noble>
     <peasant>20</peasant>
-    <skaven>16</skaven>
+    <skaven horned-rat="+10">6</skaven>
     <warpstone>14</warpstone>
   </tokens>
   <ruinouspowers>
