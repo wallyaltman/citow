@@ -1704,7 +1704,7 @@ function drawBoard(blank, local){
         type : "pool",
         tokens : [],
         modifier : function () {
-            if ($(playersXML).find("player[name='Horned_Rat']")) {
+            if ($(playersXML).filter("player[name='Horned_Rat']").length > 0) {
                 return Number($tokenSetupXML.filter(this.name).attr("horned-rat"));
             } else {
                 return 0;
