@@ -60,7 +60,7 @@ if (isset($_GET['error'])){
 ?>
       <form action="newgame.php" method="post">
         <div>
-          <fieldset>
+          <fieldset id="powers">
             <legend>Powers</legend>
             <ol>
               <li>
@@ -88,25 +88,41 @@ if (isset($_GET['error'])){
                 <label for="horned_rat">The Horned Rat</label>
                 <input type="text" id="player_horned_rat" name="player_horned_rat" placeholder="Name of the Horned Rat player" size="30" />
               </li>
+              <li>
+                <input type="checkbox" id="cthulhu" name="cthulhu" value="1" />
+                <label for="cthulhu">Cthulhu</label>
+                <input type="text" id="player_cthulhu" name="player_cthulhu" placeholder="Name of the Cthulhu player" size="30" />
+              </li>
             </ol>
+            <p id="toomanyplayers" class="player-count hide-contents">
+              <img src="<?php echo $rooturl ?>/graphics/error23.png" id="errorgame" height="23" width="23" alt="Too many players" />
+              <span>Too many players—remove Cthulhu or a Ruinous Power!</span>
+            </p>
           </fieldset>
           <fieldset>
-            <legend>Chaos Cards &amp; Upgrades</legend>
-            <input type="radio" id="ccardsetbase" name="ccardset" />
-            <label for="ccardsetbase">CitOW</label>
-            <input type="radio" id="ccardsetmorrslieb" name="ccardset" checked="checked" value="morrslieb"/>
-            <label for="ccardsetmorrslieb">The Horned Rat</label>
-          </fieldset>
-          <fieldset>
-            <legend>Old World Card Set</legend>
-            <input type="radio" id="owcardsetbase" name="owcardset" value='citow' />
-            <label for="owcardsetbase">CitOW Only</label>
-            <input type="radio" id="owcardsetall" name="owcardset" checked="checked" value="all" />
-            <label for="owcardsetall">CitOW + The Horned Rat</label>
-            <input type="radio" id="owcardsetmorrslieb" name="owcardset" value="morrslieb" />
-            <label for="owcardsetmorrslieb">The Horned Rat Only</label>
+            <legend>Initial Old World Token Placement</legend>
+            <input type="radio" id="owtokensyes" name="owtokens" checked="checked" value="auto" />
+            <label for="owtokensyes">Automatic</label>
+            <input type="radio" id="owtokensno" name="owtokens" value="manual" />
+            <label for="owtokensno">Manual</label>
           </fieldset>
         </div>
+        <fieldset>
+          <legend>Chaos Cards &amp; Upgrades</legend>
+          <input type="radio" id="ccardsetbase" name="ccardset" />
+          <label for="ccardsetbase">CitOW</label>
+          <input type="radio" id="ccardsetmorrslieb" name="ccardset" checked="checked" value="morrslieb"/>
+          <label for="ccardsetmorrslieb">The Horned Rat</label>
+        </fieldset>
+        <fieldset>
+          <legend>Old World Card Set</legend>
+          <input type="radio" id="owcardsetbase" name="owcardset" value='citow' />
+          <label for="owcardsetbase">CitOW Only</label>
+          <input type="radio" id="owcardsetall" name="owcardset" checked="checked" value="all" />
+          <label for="owcardsetall">CitOW + The Horned Rat</label>
+          <input type="radio" id="owcardsetmorrslieb" name="owcardset" value="morrslieb" />
+          <label for="owcardsetmorrslieb">The Horned Rat Only</label>
+        </fieldset>
         <fieldset>
           <legend>Game Number</legend>
           <input type="number" id="gamenumber" name="gamenumber" required="required" />
@@ -117,13 +133,6 @@ echo '          <img src="', $rooturl, '/graphics/error23.png" id="errorgame" he
      ' width="23" alt="Game number is too low or already taken" class="hideme" />', "\n";
 ?>
         </fieldset>
-        <fieldset>
-          <legend>Initial Old World Token Placement</legend>
-          <input type="radio" id="owtokensyes" name="owtokens" checked="checked" value="auto" />
-          <label for="owtokensyes">Automatic</label>
-          <input type="radio" id="owtokensno" name="owtokens" value="manual" />
-          <label for="owtokensno">Manual</label>
-        </fieldset>
         <fieldset novalidate="novalidate">
           <legend>PA Forums Game Thread</legend>
           <input type="url" id="pathread" name="pathread" size="80" />
@@ -133,7 +142,7 @@ echo '          <img src="', $rooturl, '/graphics/check23.png" id="checkthread"'
 echo '          <img src="', $rooturl, '/graphics/error23.png" id="errorthread" height="23"',
      ' width="23" alt="Game number is too low or already taken" class="hideme" />', "\n";
 ?>
-        <input type="hidden" id="threadnum" name="threadnum" />
+          <input type="hidden" id="threadnum" name="threadnum" />
         </fieldset>
         <fieldset>
           <input type="submit" id="submit" />

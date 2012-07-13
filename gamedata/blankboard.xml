@@ -5,6 +5,9 @@
     <peasant>4</peasant>
     <warpstone>3</warpstone>
   </setup>
+  <customization>
+    <plugin>cthulhu</plugin>
+  </customization>
   <oldworld>
   </oldworld>
   <scoreboard>
@@ -71,6 +74,24 @@
         <setup>
           <peasant>-2</peasant>
           <skaven>2</skaven>
+        </setup>
+      </special>
+    </player>
+    <player name="Cthulhu">
+      <tokens>
+      </tokens>
+      <upgrades>
+      </upgrades>
+      <pp>6</pp>
+      <vp>0</vp>
+      <dial cap="8">
+        <value>0</value>
+        <dac>0</dac>
+      </dial>
+      <special>
+        <setup>
+          <peasant>-2</peasant>
+          <flood>2</flood>
         </setup>
       </special>
     </player>

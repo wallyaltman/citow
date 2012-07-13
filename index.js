@@ -24,30 +24,55 @@ function Index(){
     var $checkIconThread = $("#checkthread");
     var $errorIconThread = $("#errorthread");
 
+    var $playerCheckboxes = $('fieldset#powers input[type="checkbox"]');
+    var $tooManyPlayersMessage = $("p#toomanyplayers");
+
     /**
      * Disable the "player name" text input field for
-     * a ruinous power.
+     * a ruinous power, and check the player counts.
      */
     var disableTextInput = function(){
         var $nameField = $("#player_" + this.id);
         $nameField.prop("disabled", true);
         $nameField.attr("placeholder", "");
+        showOrHidePlayerCountError();
         $(this).unbind("change");
         $(this).change(enableTextInput);
     };
 
     /**
      * Enable the "player name" text input field for
-     * a ruinous power.
+     * a ruinous power, and check the player counts.
      */
     var enableTextInput = function(){
         var $nameField = $("#player_" + this.id);
         var labelName = $('[for="' + this.id + '"]').text().replace(/^the\s*/i, "");
         $nameField.prop("disabled", false);
         $nameField.attr("placeholder", "Name of the " + labelName + " player");
+        showOrHidePlayerCountError();
         $(this).unbind("change");
         $(this).change(disableTextInput);
     };
+
+    /**
+     * Determine whether too many players are selected.
+     */
+    var tooManyPlayers = function(){
+        var playerCount = $playerCheckboxes.filter(':checked').length;
+        return playerCount > 5;
+    }
+
+    /**
+     * Show or hide an error message, based on whether too
+     * many players are selected.
+     */
+    var showOrHidePlayerCountError = function(){
+        if (tooManyPlayers()){
+            $tooManyPlayersMessage.removeClass('hide-contents');
+        } else {
+            $tooManyPlayersMessage.addClass('hide-contents');
+        }
+    }
 
     /**
      * Determine whether the game number falls within
@@ -154,10 +179,11 @@ function Index(){
     }
     /**
      * Set handlers on checkboxes to enable/disable name
-     * entry fields and set/clear placeholder text.
+     * entry fields, set/clear placeholder text, and show or
+     * hide an error message for too many players.
      */
 
-    $('input[type="checkbox"]').each(function(){
+    $playerCheckboxes.each(function(){
         var checked = $(this).prop("checked");
         if (checked){
             $(this).change(disableTextInput);

@@ -7,7 +7,7 @@
 
 $slash = strpos(getcwd(), '/') === false ? '\\' : '/';
 
-$dir = realpath(getcwd() . '/saves/') . '/';
+$dir = realpath(getcwd() . $slash . 'saves') . $slash;
 
 //Read the file list
 $files = array();

@@ -111,6 +111,9 @@ label[for="slaanesh"]{
 label[for="hornedrat"]{
   color:#616161;
 }
+label[for="cthulhu"]{
+  color:#175A61;
+}
 /* Selected power styling */
 input:checked + label[for="khorne"]{
   color:#DD1111;
@@ -131,6 +134,25 @@ input:checked + label[for="slaanesh"]{
 input:checked + label[for="hornedrat"]{
   color:#E9E9E9;
   text-shadow: #282828 1px 1px 0;
+}
+input:checked + label[for="cthulhu"]{
+  color:#17BFB7;
+  text-shadow: #0F3331 1px 1px 0;
+}
+/* "Too many players" message */
+p.player-count {
+  padding-left: 35px;
+}
+p.player-count > img {
+  margin-bottom: -7px;
+}
+p.player-count > span {
+  color:#E9E9E9;
+  font-weight:bold;
+  text-shadow: #110000 1px 1px 0;
+}
+p.hide-contents {
+  visibility: hidden;
 }
 /** Game number, official vs. other game **/
 form > fieldset:nth-of-type(1){

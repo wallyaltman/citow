@@ -12,7 +12,7 @@ $docroot = realpath(getcwd() . $slash . '..');
 $rooturl = 'http://'.$_SERVER['HTTP_HOST'];
 
 //Set the save directory
-$dir = realpath(getcwd() . $slash . 'saves');
+$dir = realpath(getcwd() . $slash . 'saves') . $slash;
 
 //Set the session path
 session_save_path(realpath(dirname($_SERVER['DOCUMENT_ROOT']) . '/../var/php_sessions'));
@@ -27,7 +27,7 @@ if (isset($_SESSION['username'])){
 //Retrieve the POST variables
 $game = $_POST['gamenumber'];
 $players = array();
-$powerlist = array('khorne', 'nurgle', 'tzeentch', 'slaanesh', 'horned_rat');
+$powerlist = array('khorne', 'nurgle', 'tzeentch', 'slaanesh', 'horned_rat', 'cthulhu');
 foreach ($powerlist as $power){
     $checked = (isset($_POST[$power]))
                      ? ($_POST[$power] == '1')
@@ -58,10 +58,6 @@ else if (!isset($game)){
     $fail = true;
     $error = '12'; //No game number given
 }
-else if ($game < 1000 && $userlevel < 2){
-    $fail = true;
-    $error = '02'; //Insufficient user permissions
-}
 //Check for an existing file with the
 //same game & state numbers
 else if (file_exists($dir.$file)){
@@ -73,7 +69,7 @@ if (isset($_SERVER['HTTP_REFERER'])){
     $domain = parse_url($_SERVER['HTTP_REFERER']);
     $hostlist = array('localhost', 'www.appliednerditry.com', 'appliednerditry.com', 'appliednerditry.wallyaltman.com');
     $matches = array();
-    preg_match('/^(\/chaos(dev)?)/', $domain['path'], $matches);
+    preg_match('/^(\/(custom)?chaos(dev)?)/', $domain['path'], $matches);
     $path = (isset($matches[1]) && $matches[1] !== '')
                   ? $matches[1]
                   : '/chaos';
@@ -83,7 +79,7 @@ if (isset($_SERVER['HTTP_REFERER'])){
         $uri = 'http://appliednerditry.com/chaos';
     }
     else {
-        $uri = 'http://' . $domain['host'] . $path;
+        $uri = 'http://' . $_SERVER['HTTP_HOST'] . $path;
     }
 }
 
@@ -123,7 +119,7 @@ if (!$fail){
     //read token counts and any player-based modifiers
     if (strtolower($owtokens) == 'auto'){
         //Make a list of token names
-        $setuptokencounts = array('event'=>0, 'hero'=>0, 'noble'=>0, 'peasant'=>0, 'skaven'=>0, 'warpstone'=>0);
+        $setuptokencounts = array('event'=>0, 'hero'=>0, 'noble'=>0, 'peasant'=>0, 'skaven'=>0, 'warpstone'=>0, 'flood'=>0);
         foreach($setuptokencounts as $tokenname => $tokencount){
             //Run through each setup element and pull tokens
             for ($i = 0; $i < $setuplength; $i++){
