@@ -111,13 +111,6 @@ if (isset($_GET['error'])){
           <legend>Game Number</legend>
           <input type="number" id="gamenumber" name="gamenumber" required="required" />
 <?php
-$disabled = $userlevel > 1 ? '' : 'disabled="disabled" ';
-echo '          <input type="radio" id="officialgame" name="gamerank" ', $disabled, '/>', "\n";
-?>
-          <label for="officialgame">Official CF Game</label>
-          <input type="radio" id="othergame" name="gamerank" checked="checked" />
-          <label for="othergame">Unofficial Game</label>
-<?php
 echo '          <img src="', $rooturl, '/graphics/check23.png" id="checkgame"',
      ' height="23" width="23" alt="Game number is OK" class="hideme" />', "\n";
 echo '          <img src="', $rooturl, '/graphics/error23.png" id="errorgame" height="23"',

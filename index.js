@@ -56,9 +56,8 @@ function Index(){
 
     var checkGameNumber = function(){
         var dfd = new $.Deferred();
-        var official = $radioOfficialGame.prop("checked");
         var gameNum = $textGameNumber.attr("value");
-        var min = official ? 28 : 1001; //Development began around Game 28 or so
+        var min = 1
         if (gameNum < min){
             return false;
         }
