@@ -2000,9 +2000,9 @@ function drawBoard(blank, local){
                 figure.musk = ($(this).attr("musk") === "true");
                 figure.marker = ($(this).attr("marker") === "true");
                 figure.skull = ($(this).attr("skull") === "true");
+                newRegion.figures.push(figure);
+                figure.heldBy = newRegion;
             }
-            newRegion.figures.push(figure);
-            figure.heldBy = newRegion;
         });
         //Handle figures in the slots
         $figureSlots.each(function () {
@@ -2017,9 +2017,9 @@ function drawBoard(blank, local){
                     figure.musk = ($(this).attr("musk") === "true");
                     figure.marker = ($(this).attr("marker") === "true");
                     figure.skull = ($(this).attr("skull") === "true");
+                    newRegion.slots[slotID].figures.push(figure);
+                    figure.heldBy = newRegion.slots[slotID];
                 }
-                newRegion.slots[slotID].figures.push(figure);
-                figure.heldBy = newRegion.slots[slotID];
             });
         });
     });
@@ -2244,9 +2244,9 @@ function drawBoard(blank, local){
                     figure.musk = (figureXML.getAttribute("musk") == "true");
                     figure.marker = (figureXML.getAttribute("marker") == "true");
                     figure.skull = (figureXML.getAttribute("skull") == "true");
+                    oldWorld.slots[slotID].figures.push(figure);
+                    figure.heldBy = oldWorld.slots[slotID];
                 }
-                oldWorld.slots[slotID].figures.push(figure);
-                figure.heldBy = oldWorld.slots[slotID];
             }
         }
     }
