@@ -23,7 +23,7 @@ include $headerurl;
 $gamenum = $_GET['game'];
 $statenum = $_GET['state'];
 
-$v = 9813;
+$v = 9814;
 echo '  <link rel="shortcut icon" href="favicon.ico" />'."\n";
 echo '  <link rel="stylesheet" href="'.$rooturl.'/style.css" />'."\n";
 echo '  <link rel="stylesheet" href="chaos.css?v='.$v.'" />'."\n";

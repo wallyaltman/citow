@@ -13,6 +13,7 @@
   <ruinouspowers>
     <power id="0" highlight="#DD1111" shadow="#3A0A0A">
       <name>Khorne</name>
+      <sort-order>10</sort-order>
       <dial cap="9">3,6,12,14,17,23,28,31,32</dial>
       <figures>
         <cultists>4</cultists>
@@ -30,6 +31,7 @@
     </power>
     <power id="1" highlight="#339911" shadow="#112C08">
       <name>Nurgle</name>
+      <sort-order>20</sort-order>
       <dial cap="10">1,5,10,13,18,22,26,30,33,34</dial>
       <figures>
         <cultists>6</cultists>
@@ -47,6 +49,7 @@
     </power>
     <power id="2" highlight="#2255DD" shadow="#0D1A3D">
       <name>Tzeentch</name>
+      <sort-order>30</sort-order>
       <dial cap="8">2,7,9,15,20,21,25,29</dial>
       <figures>
         <cultists>8</cultists>
@@ -64,6 +67,7 @@
     </power>
     <power id="3" highlight="#9922CC" shadow="#2D0D3B">
       <name>Slaanesh</name>
+      <sort-order>40</sort-order>
       <dial cap="7">4,8,11,16,19,24,27</dial>
       <figures>
         <cultists>6</cultists>
@@ -81,6 +85,7 @@
     </power>
     <power id="4" highlight="#999999" shadow="#282828" nocorruption="true" cache="true">
       <name>Horned_Rat</name>
+      <sort-order>50</sort-order>
       <dial cap="8">0,5,9,12,16,20,24,28</dial>
       <figures>
         <cultists>11</cultists>

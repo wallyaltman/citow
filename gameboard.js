@@ -1636,6 +1636,7 @@ function Player ($powerSetupXML, $playerXML, index) {
 
     this.type = "player";
     this.idNum = index;
+    this.sortOrder = parseInt($powerSetupXML.find("sort-order").text(), 10);
     this.$powerSetupXML = $powerSetupXML;
     this.$playerXML = $playerXML;
 
@@ -2082,6 +2083,16 @@ function drawBoard(blank, local){
 
         next();
     });
+
+    //Sort the players by sortOrder
+    board.$afterPlugins.queue("toDo", function (next) {
+        map.players.sort(function (a, b) {
+            return a.sortOrder - b.sortOrder;
+        });
+
+        next();
+    });
+
 
     //Load the Chaos Cards
     getChaosCards(board.expansion);

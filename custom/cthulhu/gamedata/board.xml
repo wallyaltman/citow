@@ -6,6 +6,7 @@
   <ruinouspowers>
     <power id="" highlight="#17BFB7" shadow="#0F3331">
       <name>Cthulhu</name>
+      <sort-order>47</sort-order>
       <dial cap="8">0,5,9,12,16,20,24,28</dial>
       <figures>
         <cultists>7</cultists>
