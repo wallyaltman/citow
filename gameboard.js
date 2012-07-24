@@ -117,11 +117,11 @@ function GameSelector () {
     };
 
     var selectedGameNumber = function () {
-        return parseInt($gameSelectElement[0].selectedOptions[0].value, 10);
+        return parseInt($gameSelectElement.children(":selected")[0].value, 10);
     };
 
     var selectedStateNumber = function () {
-        return parseInt($stateSelectElement[0].selectedOptions[0].value, 10);
+        return parseInt($stateSelectElement.children(":selected")[0].value, 10);
     };
 
     /* Set the state selector to the provided state, if it is a valid and
