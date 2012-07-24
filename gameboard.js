@@ -69,6 +69,8 @@ function nextState(game, callBackFunc, passAlong){
 function GameSelector () {
     var board = $("#board")[0];
 
+    var $initialSaveManifest = $("#initial-save-manifest");
+
     var $gameSelectElement = $("#gamepick");
     var $stateSelectElement = $("#statepick");
 
@@ -103,6 +105,10 @@ function GameSelector () {
 
     var getStatesByGameNumber = function (gameNumber) {
         return board.gameStateMap[gameNumber];
+    };
+
+    var initializeGameStateMap = function () {
+        board.gameStateMap = JSON.parse($initialSaveManifest.val());
     };
 
     var selectGameAndState = function (gameNumber, stateNumber) {
@@ -205,6 +211,9 @@ function GameSelector () {
     // Make sure the local values of game and state stay up-to-date
     $gameSelectElement.on('change', setThisGame);
     $stateSelectElement.on('change', setThisState);
+
+    // Initialize the gamestate map
+    initializeGameStateMap();
 
     // Set the current values of the game and state properties
     setThisGame();
@@ -3592,10 +3601,8 @@ function initialize(){
         // Set up the game selector
         board.gameSelector = new GameSelector();
 
-        // Draw the board, once the game selector has loaded
-        board.gameSelector.update().done(function () {
-            drawBoard(false, localBoard);
-        });
+        // Draw the board
+        drawBoard(false, localBoard);
 
         //Set up the list of Chaos cards
         var $cchead = $("#cchead");

@@ -23,7 +23,7 @@ include $headerurl;
 $gamenum = isset($_GET['game']) ? $_GET['game'] : null;
 $statenum = isset($_GET['state']) ? $_GET['state'] : null;
 
-$v = 9815;
+$v = 9816;
 echo '  <link rel="shortcut icon" href="favicon.ico" />'."\n";
 echo '  <link rel="stylesheet" href="'.$rooturl.'/style.css" />'."\n";
 echo '  <link rel="stylesheet" href="chaos.css?v='.$v.'" />'."\n";
@@ -53,6 +53,9 @@ if (!file_exists($dir.'owned_games.json')){
 $rawdata = file_get_contents($dir.'owned_games.json');
 $jsondata = json_decode($rawdata);
 
+$rawmanifest = file_get_contents($dir . 'save_manifest.json');
+
+echo '  <input id="initial-save-manifest" type="hidden" value=\'', $rawmanifest, '\' />', "\n";
 $matches = array();
 $states = array();
 
