@@ -6,60 +6,6 @@
 /*** need to rewrite getGames, getStates, nextState ***/
 var saveDirectory = "saves/";
 
-/* Read in the list of gamestates for
- * the currently selected game.
- */
-function getStates(evt, game, state){
-    //File location
-    var file = "save_manifest.json";
-    var board = $("#board")[0];
-    var localObj = board.json;
-    //Set the function to do the dirty work
-    //once the data (local or served) is in
-    var responseFunction = function(jsonResponse, obj){
-        var gamesObject;
-        //Read the game list
-        gamesObject = jsonResponse || obj;
-        board.json = gamesObject;
-        var $statePick = $("#statepick");
-        //Identify the desired game
-        var selectedStates = gamesObject[+game];
-        //Reset the select options
-        $statePick.children().remove();
-        var opt, currState;
-        //If no state was specified, then set
-        //the last state to be selected
-        optState = state ? state : selectedStates[selectedStates.length - 1];
-        //Create a select option for each state
-        for (var i = 0; i < selectedStates.length; i++){
-            opt = document.createElement('option');
-            currState = String(selectedStates[i]);
-            while (currState.length < 2){
-                currState = "0" + currState;
-            }
-            opt.text = "State " + +currState;
-            opt.id = "state" + currState;
-            opt.value = currState;
-            if (+currState == optState){
-                opt.selected = true;
-            }
-            $statePick.append(opt);
-        }
-    };
-    //If no game was specified, read the gamePick
-    //select element to get one
-    if (!game){
-        var gamePick = $("#gamepick")[0];
-        game = gamePick[gamePick.selectedIndex].value;
-    }
-    if (localObj){
-        responseFunction(null, localObj);
-    }
-    else {
-        $.getJSON(saveDirectory + file, responseFunction);
-    }
-}
-
 /* Get the next available state number
  * for saving the current game.
  */
@@ -120,68 +66,149 @@ function nextState(game, callBackFunc, passAlong){
     }
 }
 
-/* Update the list of gamestates.
- */
-function updateGameStateList(game, state){
-    var xmlhttp = xmlRequest();
+function GameSelector () {
     var board = $("#board")[0];
-    //Set the function to do the dirty work,
-    //including replacing the saves list
-    var responseFunction = function(jsonResponse){
-        var gamesObject;
-        //Read the game list
-        gamesObject = JSON.parse(jsonResponse);
-        board.json = gamesObject;
-        var $statePick = $("#statepick");
-        //Identify the desired game
-        var selectedStates = gamesObject[game];
-        //Reset the select options
-        $statePick.children().remove();
-        var opt;
-        //If no state was specified, then set
-        //the last state to be selected
-        optState = state ? state : selectedStates[selectedStates.length - 1];
-        //Create a select option for each state
-        for (var i = 0; i < selectedStates.length; i++){
-            opt = document.createElement('option');
-            currState = String(selectedStates[i]);
-            while (currState.length < 2){
-                currState = "0" + currState;
-            }
-            opt.text = "State " + +currState;
-            opt.id = "state" + currState;
-            opt.value = currState;
-            if (+currState == optState){
-                opt.selected = true;
-            }
-            $statePick.append(opt);
-        }
-        //Update the save buttons
-        updateSaveButtons();
-        return true;
+
+    var $gameSelectElement = $("#gamepick");
+    var $stateSelectElement = $("#statepick");
+
+    var thisSelector = this;
+
+    this.game = null;
+    this.state = null;
+
+    var createStateOption = function (stateNumber) {
+        var optionValue = stringifyNumber(stateNumber, 2);
+        var optionElement = document.createElement("option");
+
+        optionElement.text = "State " + stateNumber;
+        optionElement.id = "state" + optionValue;
+        optionElement.value = optionValue;
+
+        return optionElement;
     };
-    //If no game was specified, read the gamePick
-    //select element to get one
-    if (!game){
-        var gamePick = $("#gamepick")[0];
-        game = gamePick[gamePick.selectedIndex].value;
-    }
-    if (xmlhttp) {
-        xmlhttp.onreadystatechange = function(){
-            if (this.readyState == 4 && this.status == 200){
-                responseFunction(this.responseText);
-            }
-            else {
-                return false;
-            }
-        };
-        xmlhttp.open("GET", "gamelist.php", true);
-        xmlhttp.setRequestHeader("Content-Type", "application/json");
-        xmlhttp.send();
-    }
-    else {
-        return false;
-    }
+
+    var doesGameExist = function (gameNumber) {
+        var result = board.gameStateMap[gameNumber];
+        return (typeof result === "object" && result !== null);
+    };
+
+    var doesStateExist = function (stateNumber) {
+        return (getStates().indexOf(stateNumber) >= 0);
+    };
+
+    var getStates = function () {
+        return getStatesByGameNumber(selectedGameNumber());
+    };
+
+    var getStatesByGameNumber = function (gameNumber) {
+        return board.gameStateMap[gameNumber];
+    };
+
+    var selectGameAndState = function (gameNumber, stateNumber) {
+        setSelectedGame(gameNumber);
+        setSelectedState(stateNumber);
+    };
+
+    var selectedGameNumber = function () {
+        return parseInt($gameSelectElement[0].selectedOptions[0].value, 10);
+    };
+
+    var selectedStateNumber = function () {
+        return parseInt($stateSelectElement[0].selectedOptions[0].value, 10);
+    };
+
+    /* Set the state selector to the provided state, if it is a valid and
+     * present state number, or to the last state if it is not.
+     */
+    var setSelectedState = function (stateNumber) {
+        var states = getStates();
+        var stateID;
+
+        if (states.indexOf(stateNumber) < 0) {
+            stateNumber = states.last();
+        }
+
+        stateID = "state" + stringifyNumber(stateNumber, 2);
+        // De-select whatever might be selected, before selecting a state
+        $stateSelectElement.prop("selectedIndex", null);
+        $stateSelectElement.find("option#" + stateID).prop("selected", true);
+
+        setThisState();
+    };
+
+    var setSelectedGame = function (gameNumber) {
+        var gameID = "game" + stringifyNumber(gameNumber, 4);
+        // De-select whatever might be selected, before selecting a game
+        $gameSelectElement.prop("selectedIndex", null);
+        $gameSelectElement.find("option#" + gameID).prop("selected", true);
+
+        setThisGame();
+    };
+
+    var stringifyNumber = function (number, minLength) {
+        var result = String(number);
+        if (minLength === null || typeof minLength === "undefined") {
+            minLength = 0;
+        }
+
+        while (result.length < minLength) {
+            result = "0" + result;
+        }
+
+        return result;
+    };
+
+    var updateGameStateMap = function () {
+        return $.getJSON("gamelist.php", function (jsonData) {
+            board.gameStateMap = jsonData;
+            updateStatePicker(selectedStateNumber());
+        });
+    };
+
+    var updateStatePicker = function (stateNumber) {
+        var gameNumber = selectedGameNumber();
+        var states = getStates();
+
+        $stateSelectElement.empty();
+        $(states.sort()).each(function () {
+            $stateSelectElement.append(createStateOption(this));
+        });
+
+        setSelectedState(stateNumber);
+    };
+
+    // Expose the current game and state as properties
+    var setThisGame = function () {
+        thisSelector.game = selectedGameNumber();
+        thisSelector.gameString = stringifyNumber(thisSelector.game, 4);
+    };
+
+    var setThisState = function () {
+        thisSelector.state = selectedStateNumber();
+        thisSelector.stateString = stringifyNumber(thisSelector.state, 2);
+    };
+
+    // Expose methods to query whether a given game or state exists
+    this.gameExists = doesGameExist;
+    this.stateExists = doesStateExist;
+
+    // Expose a method to set the game and state selectors
+    this.select = selectGameAndState;
+
+    // Expose a method to fetch the latest gamestate data from the server
+    this.update = updateGameStateMap;
+
+    // Set a handler to update the state picker when a game is selected
+    $gameSelectElement.on('change', updateStatePicker);
+
+    // Make sure the local values of game and state stay up-to-date
+    $gameSelectElement.on('change', setThisGame);
+    $stateSelectElement.on('change', setThisState);
+
+    // Set the current values of the game and state properties
+    setThisGame();
+    setThisState();
 }
 
 /* Update the "Save as Game" and "Overwrite Game" buttons.
@@ -237,11 +264,9 @@ function updateSaveButtons(game, state){
  */
 function getBoardState(blank, expansion){
     var xmlhttp = xmlRequest();
-    var gamePick = document.getElementById("gamepick");
-    var game = gamePick.options[gamePick.selectedIndex].value;
-    var statePick = document.getElementById("statepick");
-    var state = statePick.options[statePick.selectedIndex].value;
-    var board = document.getElementById("board");
+    var board = $("#board")[0];
+    var game = board.gameSelector.gameString;
+    var state = board.gameSelector.stateString;
     var loc, file, url;
     //Get the board state document
     //If getting a clean board, check whether an
@@ -1919,8 +1944,7 @@ function drawBoard(blank, local){
     if (local){
         //Check whether the game in local storage
         //has a matching game number
-        var gamePick = document.getElementById("gamepick");
-        var selectedGame = Number(gamePick.options[gamePick.selectedIndex].value);
+        var selectedGame = board.gameSelector.game
         //Read the local board's game number and
         //state number from the XML doc
         var root = local.getElementsByTagName("boardstate")[0];
@@ -1935,9 +1959,7 @@ function drawBoard(blank, local){
             board.game = localGame;
             board.state = localState;
             //Update the HTML controls
-            var gameOption = document.getElementById("game" + board.game);
-            gameOption.selected = true;
-            getStates(null, board.game, board.state);
+            board.gameSelector.select(board.game, board.state);
             //Update the save buttons
             updateSaveButtons();
         }
@@ -3246,7 +3268,7 @@ function saveBoardXML(saveType){
                             board.state = gameState;
                             //If the save represents a new game, update
                             //the game list
-                            updateGameStateList(gameNumber, gameState);
+                            board.gameSelector.update();
                             //Show the "Success!" message
                             showMessage(this.responseText, "okay");
                             //Turn off the "unsaved" flags
@@ -3298,13 +3320,9 @@ function saveBoardXML(saveType){
             //Check to be sure the game doesn't
             //exist already
             else {
-                var gamePick = document.getElementById("gamepick");
-                for (i = 0; i < gamePick.options.length; i++){
-                    if (gamePick.options[i].value == gameNumber){
-                        fail = true;
-                        showMessage("ERROR: Specified gamestate file already exists", "error");
-                        break;
-                    }
+                if (board.gameSelector.gameExists(gameNumber)){
+                    fail = true;
+                    showMessage("ERROR: Specified gamestate file already exists", "error");
                 }
             }
             //Call the function to make the XML data
@@ -3540,15 +3558,12 @@ function initialize(){
         //Assign the board parser (for
         //a board in local storage)
         board.parser = xmlParser();
-        //Set handlers for the dropdown lists
-        var $gamePick = $("#gamepick");
-        var $statePick = $("#statepick");
-        $gamePick.change(getStates);
+
         var prohibitLocal = $("#localreferer").val() == 'true';
         $("#drawnow").click(function(){
             //Reload the page with the requested data
-            var game = Number($gamePick[0].options[$gamePick[0].selectedIndex].value);
-            var state = Number($statePick[0].options[$statePick[0].selectedIndex].value);
+            var game = board.gameSelector.game;
+            var state = board.gameSelector.state;
             window.location = "gameboard.php?game=" + game + "&state=" + state;
         });
         //Set up the save game/state buttons
@@ -3573,9 +3588,15 @@ function initialize(){
         if (checkCompatibility().localStorage && !prohibitLocal){
             var localBoard = checkLocalStorage();
         }
-        //Draw the starting board (either the locally
-        //stored board, or the selected saved one)
-        drawBoard(false, localBoard);
+
+        // Set up the game selector
+        board.gameSelector = new GameSelector();
+
+        // Draw the board, once the game selector has loaded
+        board.gameSelector.update().done(function () {
+            drawBoard(false, localBoard);
+        });
+
         //Set up the list of Chaos cards
         var $cchead = $("#cchead");
         $cchead[0].items = $("#cc0")[0];
