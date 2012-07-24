@@ -5,11 +5,8 @@
  */
 
 $slash = strpos(getcwd(), '/') === false ? '\\' : '/';
-$docroot = realpath(getcwd() . $slash . '..');
 
-$dir = realpath($docroot . '/chaos/saves/') . '/';
-
-$quiet = ($_GET['quiet'] == 'true');
+$dir = realpath(getcwd() . $slash . 'saves') . $slash;
 
 //Read the file list
 $files = array();
@@ -30,12 +27,12 @@ foreach ($gamefiles as $filename){
     if (preg_match('/game([0-9]+)state([0-9]+)/', $filename, $matches)){
         $gnum = (int) $matches[1];
         $snum = (int) $matches[2];
-        if (!is_array($games[$gnum])){
+        if (!isset($games[$gnum]) || !is_array($games[$gnum])){
             $games[$gnum] = array();
         }
         $games[$gnum][] = $snum;
         $currentmodtime = filemtime($dir.$filename);
-        if ($currentmodtime > $modtimes[$gnum] || !isset($modtimes[$gnum])){
+        if (!isset($modtimes[$gnum]) || $currentmodtime > $modtimes[$gnum]){
             $modtimes[$gnum] = $currentmodtime;
         }
     }
@@ -88,8 +85,7 @@ else {
     $x = new stdClass();
     $returnmsg = json_encode($x);
 }
-if (!$quiet){
-    echo $returnmsg;
-}
+
+echo $returnmsg;
 ?>
 

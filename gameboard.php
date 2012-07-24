@@ -20,8 +20,8 @@ include $headerurl;
   <meta charset="utf-8" />
   <title>Chaos in the Old World - Game Board</title>
 <?php
-$gamenum = $_GET['game'];
-$statenum = $_GET['state'];
+$gamenum = isset($_GET['game']) ? $_GET['game'] : null;
+$statenum = isset($_GET['state']) ? $_GET['state'] : null;
 
 $v = 9814;
 echo '  <link rel="shortcut icon" href="favicon.ico" />'."\n";
@@ -266,7 +266,8 @@ echo '    <input type="button" id="savexmlstate" class="right warn" value="Save 
     <input type="button" id="savepng" class="right" value="Export as .PNG" />
 <?php
 echo '    <input type="button" id="overwritestate" class="right warn" value="Overwrite" '.$disabled.' />'."\n";
-$localreferer = preg_match('/gameboard\.php/', $_SERVER['HTTP_REFERER']) ? 'true' : '';
+$referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+$localreferer = preg_match('/gameboard\.php/', $referer) ? 'true' : '';
 echo '    <input type="hidden" id="localreferer" value="', $localreferer, '" />', "\n"; 
 ?>
   </div>
