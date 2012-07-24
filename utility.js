@@ -57,6 +57,15 @@ if (!Array.prototype.indexOf)
     };
 }
 
+/* Array.last - by Álvaro G. Vicario on StackOverflow
+ * http://stackoverflow.com/questions/3235043/last-element-of-array-in-javascript
+ */
+if (!Array.prototype.last) {
+    Array.prototype.last = function () {
+        return this.slice(-1)[0];
+    };
+}
+
 /* Array Remove - By John Resig (MIT Licensed)
  * http://ejohn.org/blog/javascript-array-remove/
  */
