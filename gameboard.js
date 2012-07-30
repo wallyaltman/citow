@@ -2131,7 +2131,7 @@ function drawBoard(blank, local){
     map.regions = [];
 
     function CorruptionPile (region, player, $corruptionXML) {
-        var amount = Number($corruptionXML.find("*[owner=" + player.name + "]").text());
+        var amount = Number($corruptionXML.filter("*[owner=" + player.name + "]").text());
 
         this.owner = player;
         this.value = amount || 0;
