@@ -100,6 +100,12 @@ if (!$fail){
         }
     }
     $data = implode("\n", $pretty);
+
+    //Remove the existing file (if any) before writing
+    if (file_exists($dir.$file)){
+        unlink($dir.$file);
+    }
+
     file_put_contents($dir.$file, '<?xml version="1.0" encoding="UTF-8" ?>'."\n".$data, LOCK_EX);
     if (file_exists($dir.$file) && simplexml_load_file($dir.$file)){
         $returnmsg = 'Success!';
