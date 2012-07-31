@@ -276,6 +276,7 @@ function getBoardState(blank, expansion){
     var board = $("#board")[0];
     var game = board.gameSelector.gameString;
     var state = board.gameSelector.stateString;
+    var stamp = new Date().getTime();
     var loc, file, url;
     //Get the board state document
     //If getting a clean board, check whether an
@@ -287,7 +288,7 @@ function getBoardState(blank, expansion){
     }
     else {
         loc = saveDirectory;
-        url = loc + "game" + game + "state" + state + ".xml";
+        url = loc + "game" + game + "state" + state + ".xml?t=" + stamp;
     }
     xmlhttp.open("GET", url, false);
     xmlhttp.send();
