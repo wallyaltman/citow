@@ -2239,7 +2239,7 @@ function drawBoard(blank, local){
 
         //Set the region's ruination rank, if ruined
         $ruinTemp = this.$regionXML.find("ruined");
-        region.ruined = this.$ruinTemp ? $ruinTemp.text() : 0;
+        region.ruined = Number($ruinTemp.text());
 
     };
 
