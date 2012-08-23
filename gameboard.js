@@ -585,10 +585,11 @@ function getChaosCards(expansion){
         $board.on("scoreboardLoaded", function () {
             var players = board.map.players;
             var cardSets = [];
-            var $cardSets;
+            var cardSetsHash = {};
             var setLengths;
             var columns;
             var currentCol;
+            var key;
             $cc0 = $("#cc0");
             $cc0.children().remove();
             $cc1 = $("#cc1");
@@ -602,66 +603,43 @@ function getChaosCards(expansion){
 
             $chaosCardXMLArray.each(function () {
                 var card = new ChaosCard($(this)),
-                    currentId;
+                    ownerName;
 
-                //Check the player list for the card's owner, and
-                //link them.  Skip the rest if the card's owner
+                //Skip the rest if the card's owner
                 //isn't a player in the game (or the Old World).
-                if (!card.owner) {
-                    card.owner = {
-                        name      : "Old_World",
-                        idNum     : board.maxPowers,
-                        highlight : "#CCA477",
-                        shadow    : "#3D3322"
-                    }
-                } else {
+                if (card.owner) {
+                    ownerName = card.owner.name;
+
                     card.createCanvas();
 
-                    currentId = card.owner.idNum;
                     // Add the card's canvas to the appropriate
                     // card set, creating it if needed
-                    if (!cardSets[currentId]) {
-                        cardSets[currentId] = [];
+                    if (!cardSetsHash[ownerName]) {
+                        cardSetsHash[ownerName] = [];
                     }
-                    cardSets[currentId].push(card);
+                    cardSetsHash[ownerName].push(card);
                 }
             });
-            $cardSets = $(cardSets);
 
             CHAOS.logger.log("Loading card drawer");
+
+            for (key in cardSetsHash) {
+                if (cardSetsHash.hasOwnProperty(key)) {
+                    cardSets.push(cardSetsHash[key]);
+                }
+            }
+
             // Determine a suitable distribution of card sets between the
             // columns, so that column 1 will have the most cards.
-            setLengths = [];
-            $cardSets.each(function () {
-                setLengths.push(this.length);
-            });
+            cardSets.sort(function (a, b) { return b.length - a.length });
 
-            // Sort in descending order, and assign columns
-            setLengths.sort(function (a, b) { return b - a });
             columns = [ [], [] ];
             currentCol = 0;
-            $(setLengths).each(function () {
-                var match,
-                    currentLength = this.valueOf();
-
-                for (var i = 0; i < cardSets.length; i++) {
-                    if (cardSets[i].length === currentLength) {
-                        match = cardSets.splice(i, 1)[0];
-                        break;
-                    }
-
-                }
-
-                // If we somehow failed to find a match, take the first cardset
-                if (!match) {
-                    match = cardSets.splice(0, 1)[0];
-                }
-
-                columns[currentCol] = columns[currentCol].concat(match);
-
-                // Alternate columns
+            $(cardSets).each(function (i) {
+                columns[currentCol] = columns[currentCol].concat(cardSets[i]);
                 currentCol = (currentCol + 1) % 2;
             });
+
             // Define a card comparison function for use in sorting the columns
             var compareCards = function(a, b) {
                 var id_a, id_b, name_a, name_b;
@@ -1902,9 +1880,20 @@ ChaosCard.prototype = new Card();
 ChaosCard.prototype.constructor = ChaosCard;
 function ChaosCard ($cardXML) {
     var board = $("#board")[0];
+    var ownerName = $cardXML.attr("owner");
+
     this.objectID = board.newChaosID();
 
-    this.owner = board.allPlayers[$cardXML.attr("owner")];
+    if (ownerName === "Old_World") {
+        this.owner = {
+            name      : "Old_World",
+            idNum     : board.maxPowers,
+            highlight : "#CCA477",
+            shadow    : "#3D3322"
+        }
+    } else {
+        this.owner = board.allPlayers[ownerName];
+    }
     this.name = $cardXML.text();
     this.normalizedName = this.name.toLowerCase().replace(/^\s*the\s*/, "");
     this.type = "chaos";
